@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/mood_entry.dart';
-import '../../core/utils/app_logger.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

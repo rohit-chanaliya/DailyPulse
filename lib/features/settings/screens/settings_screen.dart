@@ -1,5 +1,5 @@
-import 'package:dailypulse/core/providers/auth_provider.dart';
-import 'package:dailypulse/core/providers/theme_provider.dart';
+import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/features/settings/presentation/providers/theme_provider.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

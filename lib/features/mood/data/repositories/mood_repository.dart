@@ -3,7 +3,7 @@ import '../models/mood_entry.dart';
 import '../local/hive_service.dart';
 import '../services/sync_service.dart';
 import '../remote/firestore_service.dart';
-import '../../core/utils/app_logger.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 
 class MoodRepository {
   final Box<MoodEntry> _box = HiveService.getMoodBox();

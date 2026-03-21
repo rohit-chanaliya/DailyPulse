@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constant/constants.dart';
 import '../../../core/utils/date_utils.dart' as date_utils;
-import '../../../data/models/mood_entry.dart';
+import '../../../features/mood/data/models/mood_entry.dart';
 
 class MoodHistoryCard extends StatelessWidget {
   final MoodEntry entry;

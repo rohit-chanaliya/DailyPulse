@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../data/models/mood_entry.dart';
-import '../../data/repo/mood_repository.dart';
-import '../utils/app_logger.dart';
+import '../../data/repositories/mood_repository.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 
 class MoodProvider extends ChangeNotifier {
   final MoodRepository _repository = MoodRepository();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/providers/mood_provider.dart';
-import '../../../core/utils/snackbar_utils.dart';
+import '../../../mood/presentation/providers/mood_provider.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../models/mood_option.dart';
 
 class AddNoteScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
-import 'package:dailypulse/core/providers/auth_provider.dart';
-import 'package:dailypulse/core/routes/fade_page_route.dart';
+import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/shared/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';

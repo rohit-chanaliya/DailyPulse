@@ -4,7 +4,7 @@ import 'package:dailypulse/core/animations/common_animations.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/animations/splash_animations.dart';
-import '../../core/routes/fade_page_route.dart';
+import '../../shared/navigation/fade_page_route.dart';
 import '../auth/widgets/auth_wrapper.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -1,14 +1,13 @@
-import 'package:dailypulse/core/app_theme/theme.dart';
-import 'package:dailypulse/core/providers/auth_provider.dart';
-import 'package:dailypulse/core/providers/insights_provider.dart';
-import 'package:dailypulse/core/providers/mood_provider.dart';
-import 'package:dailypulse/core/providers/theme_provider.dart';
+import 'package:dailypulse/app/theme/app_theme.dart';
+import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/features/insights/presentation/providers/insights_provider.dart';
+import 'package:dailypulse/features/mood/data/local/hive_service.dart';
+import 'package:dailypulse/features/mood/presentation/providers/mood_provider.dart';
+import 'package:dailypulse/features/settings/presentation/providers/theme_provider.dart';
 import 'package:dailypulse/features/splash/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'data/local/hive_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -17,11 +16,11 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await HiveService.init();
 
-  runApp(const MyApp());
+  runApp(const DailyPulseApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DailyPulseApp extends StatelessWidget {
+  const DailyPulseApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,14 @@
-import 'package:dailypulse/core/providers/auth_provider.dart';
-import 'package:dailypulse/core/providers/mood_provider.dart';
+import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/features/history/screens/history_screen.dart';
+import 'package:dailypulse/features/insights/screens/insights_screen.dart';
+import 'package:dailypulse/features/mood/presentation/providers/mood_provider.dart';
+import 'package:dailypulse/features/mood/presentation/screens/home_mood_screen.dart';
+import 'package:dailypulse/features/settings/screens/settings_screen.dart';
+import 'package:dailypulse/shared/widgets/nav_bar_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'features/home/screen/home_mood_screen.dart';
-import 'features/history/screen/history_screen.dart';
-import 'features/insights/screen/insights_screen.dart';
-import 'features/settings/screen/settings_screen.dart';
-import 'core/widgets/nav_bar_item.dart';
-import 'core/utils/app_logger.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 
 class AppScaffold extends StatefulWidget {
   const AppScaffold({super.key});

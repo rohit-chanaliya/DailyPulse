@@ -100,7 +100,6 @@ flutter build appbundle              # Build Android App Bundle (for Play Store)
 # Build iOS
 flutter build ios                    # Build iOS app (requires macOS)
 
-
 # Code Generation
 flutter pub run build_runner build   # Generate Hive adapters
 ```
@@ -171,26 +170,23 @@ dev_dependencies:
 
 ```
 lib/
+├── app/
+│   ├── app_scaffold.dart   # Authenticated app shell
+│   └── theme/              # App theme configuration
 ├── core/
-│   ├── app_theme/         # Theme configuration
 │   ├── constant/          # App constants
-│   ├── providers/         # State management
-│   ├── routes/            # Navigation
-│   ├── utils/             # Utilities
-│   └── widgets/           # Reusable widgets
-├── data/
-│   ├── local/             # Hive storage
-│   ├── models/            # Data models
-│   ├── remote/            # Firestore
-│   ├── repo/              # Repositories
-│   └── services/          # Background sync
+│   ├── utils/             # Shared utilities
+│   └── widgets/           # Shared reusable widgets
 ├── features/
-│   ├── auth/              # Sign in/up
-│   ├── history/           # Mood history
-│   ├── home/              # Mood logging
-│   ├── insights/          # Analytics
-│   └── settings/          # App settings
-├── app_scaffold.dart
+│   ├── auth/              # Auth presentation + provider
+│   ├── history/           # History screens/widgets
+│   ├── insights/          # Insights screens + provider
+│   ├── mood/              # Mood data + presentation
+│   ├── settings/          # Settings screens + provider
+│   └── splash/            # Splash screen and animations
+├── shared/
+│   ├── navigation/        # Shared routes/transitions
+│   └── widgets/           # Shared navigation widgets
 └── main.dart
 ```
 

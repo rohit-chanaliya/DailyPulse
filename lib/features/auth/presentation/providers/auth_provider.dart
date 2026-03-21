@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import '../utils/app_logger.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 

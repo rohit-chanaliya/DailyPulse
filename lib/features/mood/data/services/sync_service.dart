@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dailypulse/data/models/mood_entry.dart';
+import 'package:dailypulse/features/mood/data/models/mood_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../core/utils/app_logger.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
 import '../local/hive_service.dart';
 import '../remote/firestore_service.dart';
 

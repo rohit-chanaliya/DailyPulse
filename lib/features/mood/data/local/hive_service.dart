@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/mood_entry.dart';
-import '../../core/constant/constants.dart';
+import 'package:dailypulse/core/constant/constants.dart';
 
 class HiveService {
   static Future<void> init() async {

@@ -1,4 +1,4 @@
-import '../../data/models/mood_entry.dart';
+import '../../features/mood/data/models/mood_entry.dart';
 
 class AnalyticsUtils {
   static Map<String, dynamic> calculateAnalytics(List<MoodEntry> entries) {

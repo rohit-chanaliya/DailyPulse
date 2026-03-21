@@ -1,5 +1,5 @@
 import '../../core/constant/constants.dart';
-import '../../features/home/models/mood_option.dart';
+import '../../features/mood/presentation/models/mood_option.dart';
 
 class MoodUtils {
   static List<MoodOption> getMoodOptions() {
