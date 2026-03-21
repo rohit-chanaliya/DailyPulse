@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../widgets/settings_card.dart';
 import '../widgets/theme_selector.dart';
 import '../widgets/user_profile_card.dart';
+import '../widgets/settings_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,17 +17,10 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _isAppearanceExpanded = true;
-  bool _isAccountExpanded = true;
 
   void _toggleAppearance() {
     setState(() {
       _isAppearanceExpanded = !_isAppearanceExpanded;
-    });
-  }
-
-  void _toggleAccount() {
-    setState(() {
-      _isAccountExpanded = !_isAccountExpanded;
     });
   }
 
@@ -49,211 +43,216 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = context.watch<ThemeProvider>();
     final authProvider = context.watch<AuthProvider>();
+    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8F9FA),
+            elevation: 0,
+            title: Text(
+              'Settings',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: -1,
+                color: isDark ? Colors.white : Colors.black87,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Manage your account and preferences',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.search),
+                color: isDark ? Colors.white70 : Colors.black54,
               ),
-              const SizedBox(height: 32),
-
-              UserProfileCard(
-                displayName: authProvider.user?.displayName,
-                email: authProvider.user?.email,
-              ),
-              const SizedBox(height: 32),
-
-              _buildExpandableSectionHeader(
-                'Appearance',
-                _isAppearanceExpanded,
-                _toggleAppearance,
-                isDark,
-              ),
-              const SizedBox(height: 16),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: _isAppearanceExpanded
-                    ? Column(
-                        children: [
-                          SettingsCard(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: ThemeSelector(
-                                isLightMode: themeProvider.isLightMode,
-                                isDarkMode: themeProvider.isDarkMode,
-                                isSystemMode: themeProvider.isSystemMode,
-                                onLightMode: themeProvider.setLightTheme,
-                                onDarkMode: themeProvider.setDarkTheme,
-                                onSystemMode: themeProvider.setSystemTheme,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                        ],
-                      )
-                    : const SizedBox(height: 32),
-              ),
-
-              _buildExpandableSectionHeader(
-                'Account',
-                _isAccountExpanded,
-                _toggleAccount,
-                isDark,
-              ),
-              const SizedBox(height: 16),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: _isAccountExpanded
-                    ? Column(
-                        children: [
-                          SettingsCard(
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => _handleSignOut(context),
-                                borderRadius: BorderRadius.circular(20),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.shade50,
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Icon(
-                                          Icons.logout,
-                                          color: Colors.red.shade600,
-                                          size: 24,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Sign Out',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.red.shade600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              'Sign out of your account',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: isDark
-                                                    ? Colors.grey.shade400
-                                                    : Colors.grey.shade600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                        color: Colors.grey.shade400,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
-              ),
-              const SizedBox(height: 32),
-
-              Center(
-                child: Column(
-                  children: [
-                    Text(
-                      'DailyPulse',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Version 1.0.0',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark
-                            ? Colors.grey.shade500
-                            : Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
-        ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  UserProfileCard(
+                    displayName: authProvider.user?.displayName,
+                    email: authProvider.user?.email,
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  _buildSectionHeader('Appearance', isDark),
+                  const SizedBox(height: 12),
+                  SettingsCard(
+                    child: Column(
+                      children: [
+                        SettingsTile(
+                          icon: Icons.palette_outlined,
+                          iconColor: Colors.purple,
+                          title: 'Theme Mode',
+                          subtitle: _getThemeName(themeProvider),
+                          onTap: _toggleAppearance,
+                          trailing: AnimatedRotation(
+                            turns: _isAppearanceExpanded ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 300),
+                            child: const Icon(Icons.keyboard_arrow_down, size: 20),
+                          ),
+                        ),
+                        AnimatedCrossFade(
+                          firstChild: const SizedBox.shrink(),
+                          secondChild: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: ThemeSelector(
+                              isLightMode: themeProvider.isLightMode,
+                              isDarkMode: themeProvider.isDarkMode,
+                              isSystemMode: themeProvider.isSystemMode,
+                              onLightMode: themeProvider.setLightTheme,
+                              onDarkMode: themeProvider.setDarkTheme,
+                              onSystemMode: themeProvider.setSystemTheme,
+                            ),
+                          ),
+                          crossFadeState: _isAppearanceExpanded
+                              ? CrossFadeState.showSecond
+                              : CrossFadeState.showFirst,
+                          duration: const Duration(milliseconds: 300),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  _buildSectionHeader('Preferences', isDark),
+                  const SizedBox(height: 12),
+                  SettingsCard(
+                    child: Column(
+                      children: [
+                        SettingsTile(
+                          icon: Icons.notifications_none_rounded,
+                          iconColor: Colors.blue,
+                          title: 'Notifications',
+                          subtitle: 'Manage app alerts',
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1, indent: 60),
+                        SettingsTile(
+                          icon: Icons.language_rounded,
+                          iconColor: Colors.orange,
+                          title: 'Language',
+                          subtitle: 'English (US)',
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1, indent: 60),
+                        SettingsTile(
+                          icon: Icons.lock_outline_rounded,
+                          iconColor: Colors.green,
+                          title: 'Privacy & Security',
+                          subtitle: 'Control your data',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  _buildSectionHeader('Support', isDark),
+                  const SizedBox(height: 12),
+                  SettingsCard(
+                    child: Column(
+                      children: [
+                        SettingsTile(
+                          icon: Icons.help_outline_rounded,
+                          iconColor: Colors.teal,
+                          title: 'Help Center',
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1, indent: 60),
+                        SettingsTile(
+                          icon: Icons.info_outline_rounded,
+                          iconColor: Colors.indigo,
+                          title: 'About DailyPulse',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  _buildSectionHeader('Account', isDark),
+                  const SizedBox(height: 12),
+                  SettingsCard(
+                    child: SettingsTile(
+                      icon: Icons.logout_rounded,
+                      iconColor: Colors.red,
+                      title: 'Sign Out',
+                      subtitle: 'Exit your current session',
+                      isDestructive: true,
+                      onTap: () => _handleSignOut(context),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 48),
+                  Center(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.bolt,
+                            color: primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'DailyPulse',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Version 1.0.0',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildExpandableSectionHeader(
-    String title,
-    bool isExpanded,
-    VoidCallback onToggle,
-    bool isDark,
-  ) {
-    return GestureDetector(
-      onTap: onToggle,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-          AnimatedRotation(
-            turns: isExpanded ? 0.5 : 0,
-            duration: const Duration(milliseconds: 300),
-            child: Icon(
-              Icons.keyboard_arrow_down,
-              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-            ),
-          ),
-        ],
+  String _getThemeName(ThemeProvider provider) {
+    if (provider.isSystemMode) return 'System';
+    if (provider.isDarkMode) return 'Dark';
+    return 'Light';
+  }
+
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+          color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+        ),
       ),
     );
   }

@@ -24,10 +24,11 @@ class _AppScaffoldState extends State<AppScaffold>
   late Animation<double> _fadeAnimation;
 
   final _screens = const [
-    HomeMoodScreen(),
-    HistoryScreen(),
-    InsightsScreen(),
-    SettingsScreen(),
+    HomeMoodScreen(), // Home
+    HistoryScreen(), // Journey
+    Center(child: Text('Ask Screen')), // Ask (Placeholder)
+    InsightsScreen(), // Library
+    SettingsScreen(), // Calendar
   ];
 
   @override
@@ -75,88 +76,80 @@ class _AppScaffoldState extends State<AppScaffold>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final authProvider = context.watch<AuthProvider>();
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? [const Color(0xFF1E1E1E), const Color(0xFF121212)]
-              : [
-                  Colors.blue.shade200,
-                  Colors.blue.shade100,
-                  Colors.blue.shade50,
-                ],
-        ),
-      ),
-
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: _currentIndex == 3
-              ? null
-              : AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: Text(
-                    authProvider.user?.displayName != null
-                        ? 'Hello, ${authProvider.user!.displayName}'
-                        : 'DailyPulse',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.blue.shade900,
-                    ),
-                  ),
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Scaffold(
+        body: _currentIndex == 0
+            ? FadeTransition(
+                opacity: _fadeAnimation,
+                child: _screens[_currentIndex],
+              )
+            : SafeArea(
+                bottom: false,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: _screens[_currentIndex],
                 ),
-          body: FadeTransition(
-            opacity: _fadeAnimation,
-            child: _screens[_currentIndex],
+              ),
+        bottomNavigationBar: Container(
+          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 24, top: 8),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          bottomNavigationBar: Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                NavBarItem(
-                  icon: CupertinoIcons.smiley,
-                  selectedIcon: CupertinoIcons.smiley_fill,
-                  label: 'Mood',
-                  isSelected: _currentIndex == 0,
-                  onTap: () => _onTabChanged(0),
-                  isDark: isDark,
-                ),
-                NavBarItem(
-                  icon: CupertinoIcons.clock,
-                  selectedIcon: CupertinoIcons.clock_fill,
-                  label: 'History',
-                  isSelected: _currentIndex == 1,
-                  onTap: () => _onTabChanged(1),
-                  isDark: isDark,
-                ),
-                NavBarItem(
-                  icon: CupertinoIcons.chart_bar,
-                  selectedIcon: CupertinoIcons.chart_bar_fill,
-                  label: 'Insights',
-                  isSelected: _currentIndex == 2,
-                  onTap: () => _onTabChanged(2),
-                  isDark: isDark,
-                ),
-                NavBarItem(
-                  icon: CupertinoIcons.settings,
-                  selectedIcon: CupertinoIcons.settings_solid,
-                  label: 'Settings',
-                  isSelected: _currentIndex == 3,
-                  onTap: () => _onTabChanged(3),
-                  isDark: isDark,
-                ),
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              NavBarItem(
+                icon: CupertinoIcons.home,
+                selectedIcon: CupertinoIcons.house_fill,
+                label: 'Home',
+                isSelected: _currentIndex == 0,
+                onTap: () => _onTabChanged(0),
+                isDark: isDark,
+              ),
+              NavBarItem(
+                icon: CupertinoIcons.chart_bar,
+                selectedIcon: CupertinoIcons.chart_bar_fill,
+                label: 'Journey',
+                isSelected: _currentIndex == 1,
+                onTap: () => _onTabChanged(1),
+                isDark: isDark,
+              ),
+              NavBarItem(
+                icon: CupertinoIcons.chat_bubble_text,
+                selectedIcon: CupertinoIcons.chat_bubble_text_fill,
+                label: 'Ask',
+                isSelected: _currentIndex == 2,
+                onTap: () => _onTabChanged(2),
+                isDark: isDark,
+              ),
+              NavBarItem(
+                icon: CupertinoIcons.play_rectangle,
+                selectedIcon: CupertinoIcons.play_rectangle_fill,
+                label: 'Library',
+                isSelected: _currentIndex == 3,
+                onTap: () => _onTabChanged(3),
+                isDark: isDark,
+              ),
+              NavBarItem(
+                icon: CupertinoIcons.calendar,
+                selectedIcon: CupertinoIcons.calendar,
+                label: 'Calendar',
+                isSelected: _currentIndex == 4,
+                onTap: () => _onTabChanged(4),
+                isDark: isDark,
+              ),
+            ],
           ),
         ),
       ),
