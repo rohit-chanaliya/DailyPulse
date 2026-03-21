@@ -45,10 +45,11 @@ class HomeMoodScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Top Purple Background
-          Container(
-            height: MediaQuery.of(context).size.height * 0.45,
-            color: AppTheme.primaryBlue,
+          // Top Purple Background covering the whole screen underneath
+          Positioned.fill(
+            child: Container(
+              color: AppTheme.primaryBlue,
+            ),
           ),
 
           SafeArea(
