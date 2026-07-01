@@ -21,16 +21,16 @@ class AppTheme {
       ),
       textTheme: AppTypography.textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: AppColors.textLightPrimary),
         iconTheme: const IconThemeData(color: AppColors.textLightPrimary),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
-        indicatorColor: Colors.transparent,
+        indicatorColor: AppColors.transparent,
         labelTextStyle: WidgetStateProperty.all(
           AppTypography.textXsMedium,
         ),
@@ -45,7 +45,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: accentPink,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -61,8 +61,8 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        hintStyle: AppTypography.textMdMedium.copyWith(color: Colors.grey.shade400),
+        fillColor: AppColors.white,
+        hintStyle: AppTypography.textMdMedium.copyWith(color: AppColors.grey400),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -80,11 +80,11 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: AppColors.red, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: AppColors.red, width: 2),
         ),
       ),
     );
@@ -104,16 +104,16 @@ class AppTheme {
       ),
       textTheme: AppTypography.textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: Colors.white),
-        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: AppColors.white),
+        iconTheme: const IconThemeData(color: AppColors.white),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surfaceDark,
         elevation: 0,
-        indicatorColor: Colors.transparent,
+        indicatorColor: AppColors.transparent,
         labelTextStyle: WidgetStateProperty.all(
           AppTypography.textXsMedium,
         ),
@@ -128,7 +128,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: accentPink,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
@@ -145,7 +145,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardDark,
-        hintStyle: AppTypography.textMdMedium.copyWith(color: Colors.grey.shade500),
+        hintStyle: AppTypography.textMdMedium.copyWith(color: AppColors.grey500),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -163,11 +163,11 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: AppColors.red, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: const BorderSide(color: AppColors.red, width: 2),
         ),
       ),
     );

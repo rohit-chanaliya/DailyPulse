@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import '../../app/theme/colors.dart';
+import '../../core/theme/colors.dart';
 import '../../shared/navigation/fade_page_route.dart';
 import '../auth/widgets/auth_wrapper.dart';
 

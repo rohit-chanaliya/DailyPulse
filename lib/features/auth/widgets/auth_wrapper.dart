@@ -1,4 +1,4 @@
-import 'package:dailypulse/app/app_scaffold.dart';
+import 'package:dailypulse/app_scaffold.dart';
 import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

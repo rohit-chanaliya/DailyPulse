@@ -1,4 +1,4 @@
-import 'package:dailypulse/app/theme/app_theme.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class NavBarItem extends StatelessWidget {

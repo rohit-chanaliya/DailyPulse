@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 /// The Color Palette for the DailyPulse application.
 /// Contains both core semantic mapping and the complete design token swatches.
 class AppColors {
+  // Base Colors
+  static const Color white = Colors.white;
+  static const Color transparent = Colors.transparent;
+  static const Color red = Colors.red;
+  static const Color grey400 = Color(0xFFBDBDBD); // Colors.grey.shade400
+  static const Color grey500 = Color(0xFF9E9E9E); // Colors.grey.shade500
+
   // --- CORE SEMANTIC THEME COLORS ---
   static const Color primaryBlue = Color(0xFF5C49E1); // Deep purple/blue primary
   static const Color accentPink = Color(0xFFFF4D8D);  // Pink accent color

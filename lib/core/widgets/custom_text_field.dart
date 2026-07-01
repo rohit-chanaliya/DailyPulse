@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../app/theme/colors.dart';
-import '../../app/theme/typography.dart';
+import '../theme/colors.dart';
+import '../theme/typography.dart';
 
 /// A shared, highly customizable Text Form Field that represents the
 /// Figma "Input Field Master" component. It supports optional labels,

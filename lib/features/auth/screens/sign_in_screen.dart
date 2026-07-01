@@ -1,5 +1,5 @@
-import 'package:dailypulse/app/theme/colors.dart';
-import 'package:dailypulse/app/theme/typography.dart';
+import 'package:dailypulse/core/theme/colors.dart';
+import 'package:dailypulse/core/theme/typography.dart';
 import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dailypulse/features/auth/widgets/auth_custom_widgets.dart';
 import 'package:dailypulse/shared/navigation/fade_page_route.dart';

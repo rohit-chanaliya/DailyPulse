@@ -1,5 +1,5 @@
-import 'package:dailypulse/app/theme/colors.dart';
-import 'package:dailypulse/app/theme/typography.dart';
+import 'package:dailypulse/core/theme/colors.dart';
+import 'package:dailypulse/core/theme/typography.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';

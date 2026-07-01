@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../app/theme/colors.dart';
-import '../../app/theme/typography.dart';
+import '../theme/colors.dart';
+import '../theme/typography.dart';
 
 enum AppButtonVariant {
   primary,

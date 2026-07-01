@@ -9,7 +9,7 @@ import '../../../../shared/navigation/fade_page_route.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../models/mood_option.dart';
 import 'add_note_screen.dart';
-import '../../../../app/theme/app_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class HomeMoodScreen extends StatelessWidget {
   const HomeMoodScreen({super.key});
