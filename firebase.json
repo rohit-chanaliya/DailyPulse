@@ -1,1 +1,22 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"dailyplus-mobile-app","appId":"1:560891206540:android:102cd7b837b842d66414a9","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"dailyplus-mobile-app","configurations":{"android":"1:560891206540:android:102cd7b837b842d66414a9","ios":"1:560891206540:ios:501c5ae94820e8466414a9"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "dailyplus-mobile-app",
+          "appId": "1:560891206540:android:102cd7b837b842d66414a9",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "dailyplus-mobile-app",
+          "configurations": {
+            "android": "1:560891206540:android:102cd7b837b842d66414a9",
+            "ios": "1:560891206540:ios:501c5ae94820e8466414a9"
+          }
+        }
+      }
+    }
+  }
+}

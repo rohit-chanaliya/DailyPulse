@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'colors.dart';
+import 'typography.dart';
 
 class AppTheme {
-  static const Color primaryBlue = Color(0xFF5C49E1); // Deep purple/blue
-  static const Color accentPink = Color(0xFFFF4D8D); // Pink accent
-  static const Color backgroundLight = Color(0xFFF7F8FA);
-  static const Color cardBackground = Colors.white;
+  static const Color primaryBlue = AppColors.primaryBlue;
+  static const Color accentPink = AppColors.accentPink;
+  static const Color backgroundLight = AppColors.backgroundLight;
+  static const Color cardBackground = AppColors.cardLight;
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -17,23 +19,20 @@ class AppTheme {
         brightness: Brightness.light,
         surface: backgroundLight,
       ),
-      appBarTheme: const AppBarTheme(
+      textTheme: AppTypography.textTheme,
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.black87,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-        iconTheme: IconThemeData(color: Colors.black87),
+        titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: AppColors.textLightPrimary),
+        iconTheme: const IconThemeData(color: AppColors.textLightPrimary),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
         elevation: 0,
         indicatorColor: Colors.transparent,
         labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          AppTypography.textXsMedium,
         ),
       ),
       cardTheme: const CardThemeData(
@@ -51,25 +50,19 @@ class AppTheme {
             borderRadius: BorderRadius.circular(30),
           ),
           padding: const EdgeInsets.symmetric(vertical: 18),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: AppTypography.textMdSemiBold,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: accentPink,
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: AppTypography.textMdSemiBold,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        hintStyle: TextStyle(color: Colors.grey.shade400),
+        hintStyle: AppTypography.textMdMedium.copyWith(color: Colors.grey.shade400),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -101,35 +94,32 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: AppColors.backgroundDark,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryBlue,
         primary: primaryBlue,
         secondary: accentPink,
         brightness: Brightness.dark,
-        surface: const Color(0xFF1E1E1E),
+        surface: AppColors.surfaceDark,
       ),
-      appBarTheme: const AppBarTheme(
+      textTheme: AppTypography.textTheme,
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surfaceDark,
         elevation: 0,
         indicatorColor: Colors.transparent,
         labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          AppTypography.textXsMedium,
         ),
       ),
       cardTheme: const CardThemeData(
-        color: Color(0xFF2C2C2C),
+        color: AppColors.cardDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(24)),
@@ -143,25 +133,19 @@ class AppTheme {
             borderRadius: BorderRadius.circular(30),
           ),
           padding: const EdgeInsets.symmetric(vertical: 18),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: AppTypography.textMdSemiBold,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: accentPink,
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: AppTypography.textMdSemiBold,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF2C2C2C),
-        hintStyle: TextStyle(color: Colors.grey.shade500),
+        fillColor: AppColors.cardDark,
+        hintStyle: AppTypography.textMdMedium.copyWith(color: Colors.grey.shade500),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,

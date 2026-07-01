@@ -22,6 +22,7 @@ dependencies:
   provider: ^6.1.2
   connectivity_plus: ^7.0.0
   logger: ^2.7.0
+  google_fonts: ^6.2.1
   
 
 dev_dependencies:
@@ -38,6 +39,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/general_ui/
+    - assets/mindfull/
+    - assets/navigation/
+    - assets/super_ego/
 
 flutter_native_splash:
   color: "#FFFFFF"
