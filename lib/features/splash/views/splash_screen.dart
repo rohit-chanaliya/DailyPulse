@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/theme_extension.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import '../../../../shared/navigation/fade_page_route.dart';
 import 'package:dailypulse/features/auth/widgets/auth_wrapper.dart';
 import '../viewmodels/splash_viewmodel.dart';
@@ -39,16 +39,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 
-  Color _getSkipButtonColor(SplashPhase phase, AppThemeExtension customTheme) {
+  Color _getSkipButtonColor(SplashPhase phase, SplashColors splashColors) {
     switch (phase) {
       case SplashPhase.brandLogo:
-        return customTheme.splashBrandLogoColor.withValues(alpha: 0.5);
+        return splashColors.brandLogoColor.withValues(alpha: 0.5);
       case SplashPhase.progressLoading:
-        return customTheme.splashProgressLoadingText.withValues(alpha: 0.5);
+        return splashColors.progressLoadingText.withValues(alpha: 0.5);
       case SplashPhase.fetchingData:
-        return customTheme.splashFetchingDataText.withValues(alpha: 0.5);
+        return splashColors.fetchingDataText.withValues(alpha: 0.5);
       case SplashPhase.quote:
-        return customTheme.splashQuoteText.withValues(alpha: 0.5);
+        return splashColors.quoteText.withValues(alpha: 0.5);
     }
   }
 
@@ -70,7 +70,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final splashState = ref.watch(splashViewModelProvider);
     final currentPhase = splashState.currentPhase;
     final progressValue = splashState.progressValue;
-    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
+    final splashColors = context.splash;
+    
 
     return Scaffold(
       body: Stack(
@@ -95,24 +96,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 child: TextButton(
                   key: ValueKey(currentPhase),
                   onPressed: () {
-                    ref.read(splashViewModelProvider.notifier).skipSplash(_navigateToAuth);
+                    ref
+                        .read(splashViewModelProvider.notifier)
+                        .skipSplash(_navigateToAuth);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: _getSkipButtonColor(currentPhase, customTheme),
+                    foregroundColor: _getSkipButtonColor(
+                      currentPhase,
+                      splashColors,
+                    ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'Skip',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
+                        style: context.textTheme.labelMedium,
                       ),
-                      SizedBox(width: 4),
-                      Icon(Icons.chevron_right_rounded, size: 18),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right_rounded, size: 18),
                     ],
                   ),
                 ),

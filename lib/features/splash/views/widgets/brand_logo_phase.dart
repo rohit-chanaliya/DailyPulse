@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/theme_extension.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import 'four_circle_logo.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -8,11 +8,11 @@ class BrandLogoPhase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
+    final splashColors = context.splash;
 
     return Container(
       key: const ValueKey(SplashPhase.brandLogo),
-      color: customTheme.splashBrandLogoBg,
+      color: splashColors.brandLogoBg,
       width: double.infinity,
       height: double.infinity,
       child: Center(
@@ -21,16 +21,14 @@ class BrandLogoPhase extends StatelessWidget {
           children: [
             FourCircleLogo(
               size: 80,
-              color: customTheme.splashBrandLogoColor,
+              color: splashColors.brandLogoColor,
             ),
             const SizedBox(height: 24),
             Text(
               'dailypulse.ai',
-              style: TextStyle(
-                fontFamily: 'Urbanist',
-                fontSize: 32,
+              style: context.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: customTheme.splashBrandLogoColor,
+                color: splashColors.brandLogoColor,
                 letterSpacing: -1.0,
               ),
             ),

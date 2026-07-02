@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/theme_extension.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import 'four_circle_logo.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -13,11 +13,11 @@ class QuotePhase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
+    final splashColors = context.splash;
 
     return Container(
       key: const ValueKey(SplashPhase.quote),
-      color: customTheme.splashQuoteBg, // Terracotta Orange
+      color: splashColors.quoteBg,
       width: double.infinity,
       height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -27,27 +27,26 @@ class QuotePhase extends StatelessWidget {
           const Spacer(flex: 3),
           FourCircleLogo(
             size: 60,
-            color: customTheme.splashQuoteText,
+            color: splashColors.quoteText,
           ),
           const Spacer(flex: 2),
           Text(
             '"In the midst of winter, I found there was within me an invincible summer."',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: context.textTheme.titleLarge?.copyWith(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               fontStyle: FontStyle.italic,
-              color: customTheme.splashQuoteText,
+              color: splashColors.quoteText,
               height: 1.45,
             ),
           ),
           const SizedBox(height: 20),
           Text(
             '— ALBERT CAMUS',
-            style: TextStyle(
-              fontSize: 12,
+            style: context.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w800,
-              color: customTheme.splashQuoteText.withValues(alpha: 0.8),
+              color: splashColors.quoteText.withValues(alpha: 0.8),
               letterSpacing: 2.0,
             ),
           ),
@@ -60,7 +59,7 @@ class QuotePhase extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: customTheme.splashQuoteText.withValues(alpha: 0.4),
+                    color: splashColors.quoteText.withValues(alpha: 0.4),
                     width: 1.5,
                   ),
                 ),
@@ -69,7 +68,7 @@ class QuotePhase extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   icon: Icon(
                     Icons.arrow_forward_rounded,
-                    color: customTheme.splashQuoteText,
+                    color: splashColors.quoteText,
                   ),
                   onPressed: onContinue,
                 ),

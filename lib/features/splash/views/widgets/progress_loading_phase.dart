@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/theme_extension.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import 'background_circle.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -16,12 +16,12 @@ class ProgressLoadingPhase extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
-    final circleColor = customTheme.splashProgressLoadingOverlay;
+    final splashColors = context.splash;
+    final circleColor = splashColors.progressLoadingOverlay;
 
     return Container(
       key: const ValueKey(SplashPhase.progressLoading),
-      color: customTheme.splashProgressLoadingBg,
+      color: splashColors.progressLoadingBg,
       width: double.infinity,
       height: double.infinity,
       child: Stack(
@@ -63,20 +63,20 @@ class ProgressLoadingPhase extends StatelessWidget {
               children: [
                 Text(
                   progressValue.toInt().toString(),
-                  style: TextStyle(
+                  style: context.textTheme.displayLarge?.copyWith(
                     fontSize: 84,
                     fontWeight: FontWeight.w800,
-                    color: customTheme.splashProgressLoadingText,
+                    color: splashColors.progressLoadingText,
                     letterSpacing: -2.0,
                   ),
                 ),
                 const SizedBox(width: 2),
                 Text(
                   '%',
-                  style: TextStyle(
+                  style: context.textTheme.displayMedium?.copyWith(
                     fontSize: 36,
                     fontWeight: FontWeight.w700,
-                    color: customTheme.splashProgressLoadingText.withValues(alpha: 0.7),
+                    color: splashColors.progressLoadingText.withValues(alpha: 0.7),
                   ),
                 ),
               ],

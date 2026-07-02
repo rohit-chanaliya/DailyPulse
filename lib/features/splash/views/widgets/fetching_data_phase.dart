@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/theme_extension.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
 import 'background_circle.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -113,15 +113,15 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
-    final circleColor = customTheme.splashFetchingDataText.withValues(alpha: 0.18);
+    final splashColors = context.splash;
+    final circleColor = splashColors.fetchingDataText.withValues(alpha: 0.18);
 
     return GestureDetector(
       key: const ValueKey(SplashPhase.fetchingData),
       onTapDown: _handleTapDown,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        color: customTheme.splashFetchingDataBg,
+        color: splashColors.fetchingDataBg,
         width: double.infinity,
         height: double.infinity,
         child: Stack(
@@ -158,7 +158,7 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
               child: CustomPaint(
                 painter: RipplePainter(
                   ripples: _ripples,
-                  color: customTheme.splashFetchingDataText,
+                  color: splashColors.fetchingDataText,
                 ),
               ),
             ),
@@ -178,20 +178,19 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                   children: [
                     Text(
                       'Fetching Data...',
-                      style: TextStyle(
+                      style: context.textTheme.headlineMedium?.copyWith(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: customTheme.splashFetchingDataText,
+                        color: splashColors.fetchingDataText,
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'Shake your screen to interact!',
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: customTheme.splashFetchingDataText.withValues(alpha: 0.75),
+                        color: splashColors.fetchingDataText.withValues(alpha: 0.75),
                       ),
                     ),
                   ],
