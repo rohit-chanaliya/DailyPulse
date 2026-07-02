@@ -1,8 +1,8 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
 import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
-import 'package:dailypulse/features/auth/widgets/auth_custom_widgets.dart';
-import 'package:dailypulse/shared/navigation/fade_page_route.dart';
+
+import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
@@ -57,8 +57,7 @@ class _SignInScreenState extends State<SignInScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Curved Sage Green Header
-            const CurvedHeader(),
+            
             
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -127,8 +126,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 36),
 
-                    // Social Logins
-                    const SocialRow(),
+                    
                     const SizedBox(height: 36),
 
                     // Navigation Links

@@ -1,9 +1,9 @@
+import 'package:dailypulse/features/mood/presentation/screens/home_mood_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:dailypulse/core/theme/app_theme.dart';
-import '../../../../shared/navigation/fade_page_route.dart';
-import 'package:dailypulse/features/auth/widgets/auth_wrapper.dart';
+import '../../../core/widgets/navigation/fade_page_route.dart';
 import '../viewmodels/splash_viewmodel.dart';
 import 'widgets/brand_logo_phase.dart';
 import 'widgets/fetching_data_phase.dart';
@@ -24,16 +24,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(splashViewModelProvider.notifier).startSplashSequence(() {
-          _navigateToAuth();
+          _navigateToHome();
         });
       }
     });
   }
 
-  void _navigateToAuth() {
+  void _navigateToHome() {
     Navigator.of(context).pushReplacement(
       FadePageRoute(
-        page: const AuthWrapper(),
+        page: const HomeMoodScreen(),
         duration: const Duration(milliseconds: 600),
       ),
     );
@@ -74,7 +74,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       case SplashPhase.fetchingData:
         return const FetchingDataPhase();
       case SplashPhase.quote:
-        return QuotePhase(onContinue: _navigateToAuth);
+        return QuotePhase(onContinue: _navigateToHome);
     }
   }
 
@@ -111,7 +111,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   onPressed: () {
                     ref
                         .read(splashViewModelProvider.notifier)
-                        .skipSplash(_navigateToAuth);
+                        .skipSplash(_navigateToHome);
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: _getSkipButtonColor(
@@ -122,10 +122,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Skip',
-                        style: context.textTheme.labelMedium,
-                      ),
+                      Text('Skip', style: context.textTheme.labelMedium),
                       const SizedBox(width: 4),
                       const Icon(Icons.chevron_right_rounded, size: 18),
                     ],

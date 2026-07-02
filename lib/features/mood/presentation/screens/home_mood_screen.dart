@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/utils/mood_utils.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../shared/navigation/fade_page_route.dart';
+import '../../../../core/widgets/navigation/fade_page_route.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../models/mood_option.dart';
 import 'add_note_screen.dart';

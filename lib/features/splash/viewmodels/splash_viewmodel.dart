@@ -43,7 +43,6 @@ class SplashViewModel extends _$SplashViewModel {
   }
 
   void _startPhase1(void Function() onComplete) {
-    // Commented out to stay on BrandLogoPhase for debugging
     _phaseTimer = Timer(const Duration(milliseconds: 2200), () {
       if (_isDisposed) return;
       state = state.copyWith(currentPhase: SplashPhase.progressLoading);
@@ -67,8 +66,6 @@ class SplashViewModel extends _$SplashViewModel {
       if (nextProgress >= 100) {
         state = state.copyWith(progressValue: 100);
         timer.cancel();
-
-        // Subtle pause at 100% before transition
         Future.delayed(const Duration(milliseconds: 300), () {
           if (_isDisposed) return;
           state = state.copyWith(currentPhase: SplashPhase.fetchingData);
