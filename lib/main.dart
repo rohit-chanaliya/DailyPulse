@@ -4,11 +4,11 @@ import 'package:dailypulse/features/insights/presentation/providers/insights_pro
 import 'package:dailypulse/features/mood/data/local/objectbox_service.dart';
 import 'package:dailypulse/features/mood/presentation/providers/mood_provider.dart';
 import 'package:dailypulse/features/settings/presentation/providers/theme_provider.dart';
-import 'package:dailypulse/features/splash/presentation/providers/splash_provider.dart';
-import 'package:dailypulse/features/splash/presentation/screens/splash_screen.dart';
+import 'package:dailypulse/features/splash/views/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as legacy_provider;
 import 'firebase_options.dart';
 
 void main() async {
@@ -17,7 +17,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await ObjectBoxService.init();
 
-  runApp(const DailyPulseApp());
+  runApp(const ProviderScope(child: DailyPulseApp()));
 }
 
 class DailyPulseApp extends StatelessWidget {
@@ -25,15 +25,16 @@ class DailyPulseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return legacy_provider.MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => MoodProvider()),
-        ChangeNotifierProvider(create: (_) => InsightsProvider()),
-        ChangeNotifierProvider(create: (_) => SplashProvider()),
+        legacy_provider.ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        legacy_provider.ChangeNotifierProvider(create: (_) => AuthProvider()),
+        legacy_provider.ChangeNotifierProvider(create: (_) => MoodProvider()),
+        legacy_provider.ChangeNotifierProvider(
+          create: (_) => InsightsProvider(),
+        ),
       ],
-      child: Consumer<ThemeProvider>(
+      child: legacy_provider.Consumer<ThemeProvider>(
         builder: (context, theme, _) {
           return MaterialApp(
             title: 'DailyPulse',

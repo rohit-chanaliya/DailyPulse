@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/colors.dart';
+import 'package:dailypulse/core/theme/theme_extension.dart';
 import 'background_circle.dart';
-import '../providers/splash_provider.dart';
+import '../../viewmodels/splash_viewmodel.dart';
 
 class TouchRipple {
   final Offset position;
@@ -15,8 +15,9 @@ class TouchRipple {
 
 class RipplePainter extends CustomPainter {
   final List<TouchRipple> ripples;
+  final Color color;
 
-  RipplePainter({required this.ripples})
+  RipplePainter({required this.ripples, required this.color})
       : super(repaint: Listenable.merge(ripples.map((r) => r.controller).toList()));
 
   @override
@@ -26,7 +27,7 @@ class RipplePainter extends CustomPainter {
       final progress = ripple.controller.value;
       final radius = 20.0 + (190.0 * progress);
       final opacity = (1.0 - progress) * 0.22;
-      paint.color = Colors.white.withValues(alpha: opacity);
+      paint.color = color.withValues(alpha: opacity);
       canvas.drawCircle(ripple.position, radius, paint);
     }
   }
@@ -59,12 +60,10 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
       TweenSequenceItem(tween: Tween(begin: 12.0, end: -12.0), weight: 2),
       TweenSequenceItem(tween: Tween(begin: -12.0, end: 10.0), weight: 2),
       TweenSequenceItem(tween: Tween(begin: 10.0, end: -8.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -8.0, end: 6.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 6.0, end: 0.0), weight: 1),
-    ]).animate(CurvedAnimation(
-      parent: _shakeController,
-      curve: Curves.easeInOut,
-    ));
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 5.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 5.0, end: -3.0), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
   }
 
   @override
@@ -76,13 +75,20 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
     super.dispose();
   }
 
+  void _triggerShake() {
+    if (!_shakeController.isAnimating) {
+      _shakeController.forward(from: 0.0);
+    }
+  }
+
   void _handleTapDown(TapDownDetails details) {
-    _shakeController.forward(from: 0.0);
+    _triggerShake();
 
     final controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1400),
     );
+
     final ripple = TouchRipple(
       position: details.localPosition,
       controller: controller,
@@ -107,14 +113,15 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final circleColor = Colors.white.withValues(alpha: 0.18);
+    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
+    final circleColor = customTheme.splashFetchingDataText.withValues(alpha: 0.18);
 
     return GestureDetector(
       key: const ValueKey(SplashPhase.fetchingData),
       onTapDown: _handleTapDown,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        color: AppColors.splashGreenBg, // Sage Green
+        color: customTheme.splashFetchingDataBg,
         width: double.infinity,
         height: double.infinity,
         child: Stack(
@@ -149,7 +156,10 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
             // Expanding ripple paint layer
             Positioned.fill(
               child: CustomPaint(
-                painter: RipplePainter(ripples: _ripples),
+                painter: RipplePainter(
+                  ripples: _ripples,
+                  color: customTheme.splashFetchingDataText,
+                ),
               ),
             ),
 
@@ -166,12 +176,12 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Fetching Data...',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: customTheme.splashFetchingDataText,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -181,7 +191,7 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.75),
+                        color: customTheme.splashFetchingDataText.withValues(alpha: 0.75),
                       ),
                     ),
                   ],

@@ -1,6 +1,6 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/splash/presentation/widgets/four_circle_logo.dart';
+import 'package:dailypulse/features/splash/views/widgets/four_circle_logo.dart';
 import 'package:flutter/material.dart';
 
 /// Reusable curved wave header for Sign In & Sign Up screens.

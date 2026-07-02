@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dailypulse/core/theme/colors.dart';
+import 'package:dailypulse/core/theme/theme_extension.dart';
 import 'background_circle.dart';
-import '../providers/splash_provider.dart';
+import '../../viewmodels/splash_viewmodel.dart';
 
 class ProgressLoadingPhase extends StatelessWidget {
   final double progressValue;
@@ -16,11 +16,12 @@ class ProgressLoadingPhase extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    const circleColor = AppColors.splashDarkOverlay;
+    final customTheme = Theme.of(context).extension<AppThemeExtension>()!;
+    final circleColor = customTheme.splashProgressLoadingOverlay;
 
     return Container(
       key: const ValueKey(SplashPhase.progressLoading),
-      color: AppColors.splashDarkBg, // Deep Dark Brown
+      color: customTheme.splashProgressLoadingBg,
       width: double.infinity,
       height: double.infinity,
       child: Stack(
@@ -62,10 +63,10 @@ class ProgressLoadingPhase extends StatelessWidget {
               children: [
                 Text(
                   progressValue.toInt().toString(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 84,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: customTheme.splashProgressLoadingText,
                     letterSpacing: -2.0,
                   ),
                 ),
@@ -75,7 +76,7 @@ class ProgressLoadingPhase extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: customTheme.splashProgressLoadingText.withValues(alpha: 0.7),
                   ),
                 ),
               ],

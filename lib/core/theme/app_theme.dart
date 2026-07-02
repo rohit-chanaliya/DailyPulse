@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
 import 'typography.dart';
+import 'theme_extension.dart';
 
 class AppTheme {
   static const Color primaryBlue = AppColors.primaryBlue;
@@ -19,6 +20,7 @@ class AppTheme {
         brightness: Brightness.light,
         surface: backgroundLight,
       ),
+      extensions: [lightThemeExtension],
       textTheme: AppTypography.textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.transparent,
@@ -102,6 +104,7 @@ class AppTheme {
         brightness: Brightness.dark,
         surface: AppColors.surfaceDark,
       ),
+      extensions: [darkThemeExtension],
       textTheme: AppTypography.textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.transparent,
