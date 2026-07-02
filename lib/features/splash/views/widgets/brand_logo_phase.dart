@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import '../../viewmodels/splash_viewmodel.dart';
 
+import 'package:dailypulse/core/widgets/app_logo_widget.dart';
+import '../../viewmodels/splash_viewmodel.dart';
 class BrandLogoPhase extends StatelessWidget {
   const BrandLogoPhase({super.key});
 
@@ -18,18 +19,13 @@ class BrandLogoPhase extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/mindful_yoga_logo.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.contain,
-            ),
+            const AppLogoWidget(size: 150),
 
             Text(
               'dailypulse.ai',
               style: context.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: splashColors.brandLogoColor,
+                color: AppColors.brownGray10,
                 letterSpacing: 0,
               ),
             ),

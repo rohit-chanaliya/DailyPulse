@@ -1,15 +1,12 @@
+import 'package:dailypulse/core/widgets/app_logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'four_circle_logo.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
 class QuotePhase extends StatelessWidget {
   final VoidCallback onContinue;
 
-  const QuotePhase({
-    super.key,
-    required this.onContinue,
-  });
+  const QuotePhase({super.key, required this.onContinue});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +22,13 @@ class QuotePhase extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(flex: 3),
-          FourCircleLogo(
-            size: 60,
-            isBadge: true,
-            color: splashColors.quoteBg,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const AppLogoWidget(size: 80),
           ),
           const Spacer(flex: 2),
           Text(

@@ -1,6 +1,6 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/splash/views/widgets/four_circle_logo.dart';
+
 import 'package:flutter/material.dart';
 
 /// Reusable curved wave header for Sign In & Sign Up screens.
@@ -17,13 +17,7 @@ class CurvedHeader extends StatelessWidget {
         height: height,
         color: AppColors.splashGreenBg, // Sage Green
         child: const Center(
-          child: SafeArea(
-            bottom: false,
-            child: FourCircleLogo(
-              size: 48,
-              color: Colors.white,
-            ),
-          ),
+          child: SafeArea(bottom: false, child: Placeholder()),
         ),
       ),
     );
@@ -36,7 +30,7 @@ class CurvedHeaderClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 35);
-    
+
     final firstControlPoint = Offset(size.width / 2, size.height + 15);
     final firstEndPoint = Offset(size.width, size.height - 35);
     path.quadraticBezierTo(
@@ -45,7 +39,7 @@ class CurvedHeaderClipper extends CustomClipper<Path> {
       firstEndPoint.dx,
       firstEndPoint.dy,
     );
-    
+
     path.lineTo(size.width, 0);
     path.close();
     return path;
@@ -55,9 +49,6 @@ class CurvedHeaderClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-
-
-
 /// Facebook, Google, and Instagram circular social buttons.
 class SocialRow extends StatelessWidget {
   const SocialRow({super.key});
@@ -65,7 +56,9 @@ class SocialRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final circleColor = isDark ? const Color(0xFF2C221D) : const Color(0xFFEAE2DA);
+    final circleColor = isDark
+        ? const Color(0xFF2C221D)
+        : const Color(0xFFEAE2DA);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -74,21 +67,30 @@ class SocialRow extends StatelessWidget {
         const SizedBox(width: 16),
         _buildSocialCircle('G', circleColor, isDark),
         const SizedBox(width: 16),
-        _buildSocialCircle(null, circleColor, isDark, icon: Icons.camera_alt_outlined),
+        _buildSocialCircle(
+          null,
+          circleColor,
+          isDark,
+          icon: Icons.camera_alt_outlined,
+        ),
       ],
     );
   }
 
-  Widget _buildSocialCircle(String? text, Color bgColor, bool isDark, {IconData? icon}) {
-    final textColor = isDark ? Colors.white.withValues(alpha: 0.9) : const Color(0xFF5A4535);
+  Widget _buildSocialCircle(
+    String? text,
+    Color bgColor,
+    bool isDark, {
+    IconData? icon,
+  }) {
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.9)
+        : const Color(0xFF5A4535);
 
     return Container(
       width: 44,
       height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: bgColor,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor),
       child: Center(
         child: text != null
             ? Text(
@@ -98,11 +100,7 @@ class SocialRow extends StatelessWidget {
                   fontFamily: 'serif',
                 ),
               )
-            : Icon(
-                icon,
-                size: 18,
-                color: textColor,
-              ),
+            : Icon(icon, size: 18, color: textColor),
       ),
     );
   }
