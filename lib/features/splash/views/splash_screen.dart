@@ -1,4 +1,4 @@
-import 'package:dailypulse/features/mood/presentation/screens/home_mood_screen.dart';
+import 'package:dailypulse/features/splash/views/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,16 +24,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(splashViewModelProvider.notifier).startSplashSequence(() {
-          _navigateToHome();
+          _navigateToWelcome();
         });
       }
     });
   }
 
-  void _navigateToHome() {
+  void _navigateToWelcome() {
     Navigator.of(context).pushReplacement(
       FadePageRoute(
-        page: const HomeMoodScreen(),
+        page: const WelcomeScreen(),
         duration: const Duration(milliseconds: 600),
       ),
     );
@@ -74,7 +74,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       case SplashPhase.fetchingData:
         return const FetchingDataPhase();
       case SplashPhase.quote:
-        return QuotePhase(onContinue: _navigateToHome);
+        return QuotePhase(onContinue: _navigateToWelcome);
     }
   }
 
@@ -111,7 +111,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   onPressed: () {
                     ref
                         .read(splashViewModelProvider.notifier)
-                        .skipSplash(_navigateToHome);
+                        .skipSplash(_navigateToWelcome);
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: _getSkipButtonColor(

@@ -26,6 +26,7 @@ dependencies:
   objectbox: ^5.3.2
   objectbox_flutter_libs: any
   path_provider: ^2.1.2
+  flutter_svg: ^2.3.0
   
 
 dev_dependencies:
@@ -47,6 +48,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/svg/
     - assets/general_ui/
     - assets/mindfull/
     - assets/navigation/
