@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import '../../mood/data/local/objectbox_service.dart';
 import '../../../core/constant/constants.dart';
 import '../../../features/insights/presentation/providers/insights_provider.dart';
 import '../../../core/utils/analytics_utils.dart';
@@ -45,11 +45,13 @@ class _InsightsScreenState extends State<InsightsScreen> {
 
     return Consumer<InsightsProvider>(
       builder: (context, insightsProvider, _) {
-        return ValueListenableBuilder(
-          valueListenable: Hive.box<MoodEntry>(
-            AppConstants.hiveBoxName,
-          ).listenable(),
-          builder: (context, Box<MoodEntry> box, _) {
+        return StreamBuilder<List<MoodEntry>>(
+          stream: ObjectBoxService.store
+              .box<MoodEntry>()
+              .query()
+              .watch(triggerImmediately: true)
+              .map((q) => q.find()),
+          builder: (context, snapshot) {
             final allEntries = _getFilteredEntries(
               insightsProvider.getAllEntries(),
             );

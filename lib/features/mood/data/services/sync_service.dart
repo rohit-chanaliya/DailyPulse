@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dailypulse/features/mood/data/models/mood_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
-import '../local/hive_service.dart';
+import '../local/objectbox_service.dart';
 import '../remote/firestore_service.dart';
 
 class SyncService {
@@ -113,18 +112,13 @@ class SyncService {
     _isSyncing = true;
 
     try {
-      final box = HiveService.getMoodBox();
-      final pendingEntries = <dynamic, MoodEntry>{};
-
-      for (final key in box.keys) {
-        final entry = box.get(key);
-        if (entry != null &&
-            entry.id == null &&
-            entry.userId != null &&
-            entry.userId == user.uid) {
-          pendingEntries[key] = entry;
-        }
-      }
+      final box = ObjectBoxService.moodBox;
+      final allEntries = box.getAll();
+      final pendingEntries = allEntries.where((entry) =>
+          entry.id == null &&
+          entry.userId != null &&
+          entry.userId == user.uid
+      ).toList();
 
       if (pendingEntries.isEmpty) {
         return;
@@ -134,13 +128,13 @@ class SyncService {
         'Starting sync for ${pendingEntries.length} pending entries',
       );
 
-      for (final entry in pendingEntries.entries) {
-        final docId = await _firestoreService.addMoodEntry(entry.value);
+      for (final entry in pendingEntries) {
+        final docId = await _firestoreService.addMoodEntry(entry);
 
         if (docId != null) {
-          final updatedEntry = entry.value.copyWith(id: docId);
-          await box.put(entry.key, updatedEntry);
-          appLogger.d('Synced entry with key ${entry.key}');
+          final updatedEntry = entry.copyWith(id: docId);
+          box.put(updatedEntry);
+          appLogger.d('Synced entry with obxId ${entry.obxId}');
         }
       }
 
@@ -174,8 +168,8 @@ class SyncService {
       return false;
     }
 
-    final box = HiveService.getMoodBox();
-    return box.values.any(
+    final box = ObjectBoxService.moodBox;
+    return box.getAll().any(
       (entry) =>
           entry.id == null &&
           entry.userId != null &&
@@ -189,8 +183,8 @@ class SyncService {
       return 0;
     }
 
-    final box = HiveService.getMoodBox();
-    return box.values
+    final box = ObjectBoxService.moodBox;
+    return box.getAll()
         .where(
           (entry) =>
               entry.id == null &&

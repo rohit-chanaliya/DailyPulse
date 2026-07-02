@@ -1,18 +1,18 @@
-import 'package:hive/hive.dart';
+import 'package:objectbox/objectbox.dart';
 import '../models/mood_entry.dart';
-import '../local/hive_service.dart';
+import '../local/objectbox_service.dart';
 import '../services/sync_service.dart';
 import '../remote/firestore_service.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 
 class MoodRepository {
-  final Box<MoodEntry> _box = HiveService.getMoodBox();
+  final Box<MoodEntry> _box = ObjectBoxService.moodBox;
   final SyncService _syncService = SyncService();
   final FirestoreService _firestoreService = FirestoreService();
 
   Future<void> addMoodEntry(MoodEntry entry, String userId) async {
     final entryWithUser = entry.copyWith(userId: userId);
-    await _box.add(entryWithUser);
+    _box.put(entryWithUser);
     appLogger.d('Added mood entry locally for user: $userId');
     _syncService.syncPendingEntries();
   }
@@ -34,7 +34,7 @@ class MoodRepository {
   }
 
   List<MoodEntry> getAllEntries() {
-    return _box.values.toList();
+    return _box.getAll();
   }
 
   // Fetch mood entries from Firebase and sync to local storage
@@ -46,12 +46,10 @@ class MoodRepository {
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
       
       // Clear local storage and add all Firebase entries
-      await _box.clear();
-      for (var entry in firebaseEntries) {
-        await _box.add(entry);
-      }
+      _box.removeAll();
+      _box.putMany(firebaseEntries);
       
-      appLogger.i('Synced ${firebaseEntries.length} entries to local Hive');
+      appLogger.i('Synced ${firebaseEntries.length} entries to local ObjectBox');
       return firebaseEntries;
     } catch (e, stackTrace) {
       appLogger.e('Error in fetchAndSyncFromFirebase', error: e, stackTrace: stackTrace);

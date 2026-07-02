@@ -1,26 +1,20 @@
-import 'package:hive/hive.dart';
+import 'package:objectbox/objectbox.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-part 'mood_entry.g.dart';
+@Entity()
+class MoodEntry {
+  @Id()
+  int obxId;
 
-@HiveType(typeId: 0)
-class MoodEntry extends HiveObject {
-  @HiveField(0)
+  @Property(type: PropertyType.date)
   final DateTime timestamp;
-
-  @HiveField(1)
   final int moodLevel;
-
-  @HiveField(2)
   final String? note;
-
-  @HiveField(3)
   final String? id; // Firestore document ID
-
-  @HiveField(4)
   final String? userId; // User who created this entry
 
   MoodEntry({
+    this.obxId = 0,
     required this.timestamp,
     required this.moodLevel,
     this.note,
@@ -49,6 +43,7 @@ class MoodEntry extends HiveObject {
   }
 
   MoodEntry copyWith({
+    int? obxId,
     DateTime? timestamp,
     int? moodLevel,
     String? note,
@@ -56,6 +51,7 @@ class MoodEntry extends HiveObject {
     String? userId,
   }) {
     return MoodEntry(
+      obxId: obxId ?? this.obxId,
       timestamp: timestamp ?? this.timestamp,
       moodLevel: moodLevel ?? this.moodLevel,
       note: note ?? this.note,

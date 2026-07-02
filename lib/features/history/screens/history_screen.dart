@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constant/constants.dart';
+import '../../mood/data/local/objectbox_service.dart';
 import '../../../features/auth/presentation/providers/auth_provider.dart';
 import '../../../features/mood/data/models/mood_entry.dart';
 import '../../../features/mood/presentation/providers/mood_provider.dart';
@@ -58,7 +57,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-   // final moodProvider = context.read<MoodProvider>();
 
     return Column(
       children: [
@@ -94,12 +92,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: ValueListenableBuilder(
-            valueListenable: Hive.box<MoodEntry>(
-              AppConstants.hiveBoxName,
-            ).listenable(),
-            builder: (context, Box<MoodEntry> box, _) {
-              final allEntries = box.values.toList();
+          child: StreamBuilder<List<MoodEntry>>(
+            stream: ObjectBoxService.store
+                .box<MoodEntry>()
+                .query()
+                .watch(triggerImmediately: true)
+                .map((q) => q.find()),
+            builder: (context, snapshot) {
+              final allEntries = snapshot.data ?? [];
               final entries = _getEntriesForSelectedDate(allEntries);
 
               if (entries.isEmpty) {
