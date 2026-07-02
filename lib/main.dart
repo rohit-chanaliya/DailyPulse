@@ -41,6 +41,7 @@ class DailyPulseApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: theme.themeMode,
+            debugShowCheckedModeBanner: false,
             home: const SplashScreen(),
           );
         },

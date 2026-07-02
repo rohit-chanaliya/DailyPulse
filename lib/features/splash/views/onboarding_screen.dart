@@ -149,18 +149,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Bottom Card Overlay
           Align(
             alignment: Alignment.bottomCenter,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: OnboardingBottomCard(
-                key: ValueKey(_currentIndex),
-                step: currentPageData.step,
-                titlePart1: currentPageData.titlePart1,
-                highlightedTitle: currentPageData.highlightedTitle,
-                titlePart2: currentPageData.titlePart2,
-                highlightColor: currentPageData.highlightColor,
-                badgeColor: currentPageData.badgeColor,
-                onNext: _onNext,
-              ),
+            child: OnboardingBottomCard(
+              step: currentPageData.step,
+              titlePart1: currentPageData.titlePart1,
+              highlightedTitle: currentPageData.highlightedTitle,
+              titlePart2: currentPageData.titlePart2,
+              highlightColor: currentPageData.highlightColor,
+              badgeColor: currentPageData.badgeColor,
+              onNext: _onNext,
             ),
           ),
         ],

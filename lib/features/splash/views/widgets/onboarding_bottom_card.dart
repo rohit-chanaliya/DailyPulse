@@ -24,79 +24,116 @@ class OnboardingBottomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(32, 48, 32, 40),
-      decoration: const BoxDecoration(
-        color: AppColors.gray100, // Very dark background like the design
-        borderRadius: BorderRadius.vertical(
-          top: Radius.elliptical(250, 40), // Creates the curved convex shape
+    return ClipPath(
+      clipper: _TopArcClipper(arcHeight: 40),
+      child: Container(
+        width: double.infinity,
+        height: 320,
+        // Increased top padding to account for the arc height
+        padding: const EdgeInsets.fromLTRB(32, 60, 32, 40),
+        decoration: const BoxDecoration(
+          color: AppColors.brown100, // Very dark background like the design
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Column(
+            key: ValueKey(step),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+            // Step Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: badgeColor.withValues(alpha: 0.8), // Translucent badge
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'STEP $step',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Title
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: context.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  height: 1.4,
+                ),
+                children: [
+                  if (titlePart1.isNotEmpty) TextSpan(text: titlePart1),
+                  TextSpan(
+                    text: highlightedTitle,
+                    style: TextStyle(color: highlightColor),
+                  ),
+                  if (titlePart2.isNotEmpty) TextSpan(text: titlePart2),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            // Next Button
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onNext,
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: AppColors
+                        .brown70, // Brown button for consistency as per design
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Step Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: badgeColor.withValues(alpha: 0.8), // Translucent badge
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'STEP $step',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Title
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: context.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                height: 1.4,
-              ),
-              children: [
-                if (titlePart1.isNotEmpty) TextSpan(text: titlePart1),
-                TextSpan(
-                  text: highlightedTitle,
-                  style: TextStyle(color: highlightColor),
-                ),
-                if (titlePart2.isNotEmpty) TextSpan(text: titlePart2),
-              ],
-            ),
-          ),
-          const SizedBox(height: 40),
-          // Next Button
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onNext,
-              borderRadius: BorderRadius.circular(30),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: AppColors.brown70, // Brown button for consistency as per design
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
     );
+  }
+}
+
+class _TopArcClipper extends CustomClipper<Path> {
+  final double arcHeight;
+
+  _TopArcClipper({required this.arcHeight});
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // Start at left edge, below the top by 'arcHeight'
+    path.moveTo(0, arcHeight);
+
+    // Create a smooth bezier curve that reaches y=0 at the center
+    // For a quadratic bezier to reach exactly y=0 when passing through (0, h) and (w, h),
+    // the control point must be at y = -h.
+    path.quadraticBezierTo(size.width / 2, -arcHeight, size.width, arcHeight);
+
+    // Draw lines to the bottom corners to complete the shape
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant _TopArcClipper oldClipper) {
+    return oldClipper.arcHeight != arcHeight;
   }
 }
