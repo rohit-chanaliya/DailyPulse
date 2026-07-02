@@ -52,6 +52,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
   }
 
+  Color _getPhaseBackgroundColor(SplashPhase phase, SplashColors splashColors) {
+    switch (phase) {
+      case SplashPhase.brandLogo:
+        return splashColors.brandLogoBg;
+      case SplashPhase.progressLoading:
+        return splashColors.progressLoadingBg;
+      case SplashPhase.fetchingData:
+        return splashColors.fetchingDataBg;
+      case SplashPhase.quote:
+        return splashColors.quoteBg;
+    }
+  }
+
   Widget _buildPhaseContent(SplashPhase phase, double progressValue) {
     switch (phase) {
       case SplashPhase.brandLogo:
@@ -71,9 +84,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final currentPhase = splashState.currentPhase;
     final progressValue = splashState.progressValue;
     final splashColors = context.splash;
-    
 
     return Scaffold(
+      backgroundColor: _getPhaseBackgroundColor(currentPhase, splashColors),
       body: Stack(
         children: [
           // Content layer with animated transitions between phases

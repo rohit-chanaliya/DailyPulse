@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'four_circle_logo.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
 class BrandLogoPhase extends StatelessWidget {
@@ -19,17 +18,19 @@ class BrandLogoPhase extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FourCircleLogo(
-              size: 80,
-              color: splashColors.brandLogoColor,
+            Image.asset(
+              'assets/mindful_yoga_logo.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
             ),
-            const SizedBox(height: 24),
+
             Text(
               'dailypulse.ai',
               style: context.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: splashColors.brandLogoColor,
-                letterSpacing: -1.0,
+                letterSpacing: 0,
               ),
             ),
           ],

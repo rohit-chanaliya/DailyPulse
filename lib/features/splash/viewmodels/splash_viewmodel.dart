@@ -4,25 +4,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'splash_viewmodel.g.dart';
 
 enum SplashPhase {
-  brandLogo,       // Cream background with terracotta logo
+  brandLogo, // Cream background with terracotta logo
   progressLoading, // Dark warm charcoal background with 0-100% counter
-  fetchingData,    // Sage green background with "Fetching Data"
-  quote,           // Terracotta orange background with Albert Camus quote
+  fetchingData, // Sage green background with "Fetching Data"
+  quote, // Terracotta orange background with Albert Camus quote
 }
 
 class SplashState {
   final SplashPhase currentPhase;
   final double progressValue;
 
-  SplashState({
-    required this.currentPhase,
-    required this.progressValue,
-  });
+  SplashState({required this.currentPhase, required this.progressValue});
 
-  SplashState copyWith({
-    SplashPhase? currentPhase,
-    double? progressValue,
-  }) {
+  SplashState copyWith({SplashPhase? currentPhase, double? progressValue}) {
     return SplashState(
       currentPhase: currentPhase ?? this.currentPhase,
       progressValue: progressValue ?? this.progressValue,
@@ -41,10 +35,7 @@ class SplashViewModel extends _$SplashViewModel {
       _isDisposed = true;
       _phaseTimer?.cancel();
     });
-    return SplashState(
-      currentPhase: SplashPhase.brandLogo,
-      progressValue: 0.0,
-    );
+    return SplashState(currentPhase: SplashPhase.brandLogo, progressValue: 0.0);
   }
 
   void startSplashSequence(void Function() onComplete) {
@@ -52,6 +43,7 @@ class SplashViewModel extends _$SplashViewModel {
   }
 
   void _startPhase1(void Function() onComplete) {
+    // Commented out to stay on BrandLogoPhase for debugging
     _phaseTimer = Timer(const Duration(milliseconds: 2200), () {
       if (_isDisposed) return;
       state = state.copyWith(currentPhase: SplashPhase.progressLoading);

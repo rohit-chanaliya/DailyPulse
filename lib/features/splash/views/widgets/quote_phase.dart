@@ -27,7 +27,8 @@ class QuotePhase extends StatelessWidget {
           const Spacer(flex: 3),
           FourCircleLogo(
             size: 60,
-            color: splashColors.quoteText,
+            isBadge: true,
+            color: splashColors.quoteBg,
           ),
           const Spacer(flex: 2),
           Text(

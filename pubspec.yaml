@@ -39,6 +39,10 @@ dev_dependencies:
   riverpod_lint: any
   objectbox_generator: any
 
+dependency_overrides:
+  objectbox_flutter_libs:
+    path: third_party/objectbox_flutter_libs
+
 flutter:
   uses-material-design: true
   assets:
