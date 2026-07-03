@@ -4,7 +4,7 @@ import 'package:dailypulse/features/insights/presentation/providers/insights_pro
 import 'package:dailypulse/features/mood/data/local/objectbox_service.dart';
 import 'package:dailypulse/features/mood/presentation/providers/mood_provider.dart';
 import 'package:dailypulse/features/settings/presentation/providers/theme_provider.dart';
-import 'package:dailypulse/features/splash/views/splash_screen.dart';
+import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

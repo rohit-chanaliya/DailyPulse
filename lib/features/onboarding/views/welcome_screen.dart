@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/core/theme/colors/app_colors.dart';
+
 import 'package:dailypulse/features/auth/screens/sign_in_screen.dart';
-import 'package:dailypulse/features/splash/views/onboarding_screen.dart';
+import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
 import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/widgets/app_logo_widget.dart';
 

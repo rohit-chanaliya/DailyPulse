@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/core/theme/colors/app_colors.dart';
+
 
 class OnboardingBottomCard extends StatelessWidget {
   final int step;

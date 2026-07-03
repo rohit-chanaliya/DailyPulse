@@ -1,4 +1,4 @@
-import 'package:dailypulse/features/splash/views/welcome_screen.dart';
+import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,7 +89,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       backgroundColor: _getPhaseBackgroundColor(currentPhase, splashColors),
       body: Stack(
         children: [
-          // Content layer with animated transitions between phases
+         
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 800),
@@ -99,7 +99,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             ),
           ),
 
-          // Global skip button overlay
+          
           Positioned(
             top: 16,
             right: 16,
