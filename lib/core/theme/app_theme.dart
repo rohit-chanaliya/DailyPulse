@@ -9,6 +9,7 @@ export 'extensions/status_colors.dart';
 export 'extensions/card_colors.dart';
 export 'extensions/app_gradients.dart';
 export 'extensions/splash_colors.dart';
+export 'extensions/onboarding_colors.dart';
 export 'context_extensions.dart';
 
 class AppTheme {

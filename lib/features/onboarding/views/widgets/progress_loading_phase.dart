@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'background_circle.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -72,7 +73,7 @@ class ProgressLoadingPhase extends StatelessWidget {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  '%',
+                  OnboardingStrings.splashLoadingPercentageSign,
                   style: context.textTheme.displayMedium?.copyWith(
                     fontSize: 36,
                     fontWeight: FontWeight.w700,

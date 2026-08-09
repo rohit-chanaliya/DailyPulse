@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'background_circle.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
@@ -177,7 +178,7 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Fetching Data...',
+                      OnboardingStrings.splashFetchingData,
                       style: context.textTheme.headlineMedium?.copyWith(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
@@ -187,7 +188,7 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Shake your screen to interact!',
+                      OnboardingStrings.splashInteractPrompt,
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: splashColors.fetchingDataText.withValues(alpha: 0.75),

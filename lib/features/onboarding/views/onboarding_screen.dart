@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:dailypulse/core/theme/colors/app_colors.dart';
+import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'package:dailypulse/features/auth/screens/sign_in_screen.dart';
 import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'widgets/onboarding_bottom_card.dart';
@@ -16,51 +17,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
-  final List<_OnboardingData> _pages = [
-    _OnboardingData(
-      image: 'assets/svg/welcome_2.svg',
-      bgColor: AppColors.green80,
-      badgeColor: AppColors.green90,
-      step: 1,
-      titlePart1: 'Personalize Your Mental\n',
-      highlightedTitle: 'Health State',
-      titlePart2: ' With AI',
-      highlightColor: AppColors.green40,
-    ),
-    _OnboardingData(
-      image: 'assets/svg/welcome_3.svg',
-      bgColor: AppColors.orange80,
-      badgeColor: AppColors.orange90,
-      step: 2,
-      titlePart1: 'Intelligent ',
-      highlightedTitle: 'Mood Tracking',
-      titlePart2: '\n& Emotion Insights',
-      highlightColor: AppColors.orange40,
-    ),
-    _OnboardingData(
-      image: 'assets/svg/welcome_4.svg',
-      bgColor: AppColors.yellow80,
-      badgeColor: AppColors.yellow90,
-      step: 3,
-      titlePart1: 'Mindful ',
-      highlightedTitle: 'Resources',
-      titlePart2: ' That\nMakes You Happy',
-      highlightColor: AppColors.yellow40,
-    ),
-    _OnboardingData(
-      image: 'assets/svg/welcome_5.svg',
-      bgColor: AppColors.purple80,
-      badgeColor: AppColors.purple90,
-      step: 4,
-      titlePart1: 'Loving & Supportive\n',
-      highlightedTitle: 'Community',
-      titlePart2: '',
-      highlightColor: AppColors.purple40,
-    ),
-  ];
-
-  void _onNext() {
-    if (_currentIndex < _pages.length - 1) {
+  void _onNext(int pageCount) {
+    if (_currentIndex < pageCount - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
@@ -80,7 +38,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentPageData = _pages[_currentIndex];
+    final colors = context.onboarding;
+
+    final List<_OnboardingData> pages = [
+      _OnboardingData(
+        image: 'assets/svg/welcome_2.svg',
+        bgColor: colors.page1Bg,
+        badgeColor: colors.page1Badge,
+        step: 1,
+        titlePart1: OnboardingStrings.onboardingPage1TitlePart1,
+        highlightedTitle: OnboardingStrings.onboardingPage1Highlight,
+        titlePart2: OnboardingStrings.onboardingPage1TitlePart2,
+        highlightColor: colors.page1Highlight,
+      ),
+      _OnboardingData(
+        image: 'assets/svg/welcome_3.svg',
+        bgColor: colors.page2Bg,
+        badgeColor: colors.page2Badge,
+        step: 2,
+        titlePart1: OnboardingStrings.onboardingPage2TitlePart1,
+        highlightedTitle: OnboardingStrings.onboardingPage2Highlight,
+        titlePart2: OnboardingStrings.onboardingPage2TitlePart2,
+        highlightColor: colors.page2Highlight,
+      ),
+      _OnboardingData(
+        image: 'assets/svg/welcome_4.svg',
+        bgColor: colors.page3Bg,
+        badgeColor: colors.page3Badge,
+        step: 3,
+        titlePart1: OnboardingStrings.onboardingPage3TitlePart1,
+        highlightedTitle: OnboardingStrings.onboardingPage3Highlight,
+        titlePart2: OnboardingStrings.onboardingPage3TitlePart2,
+        highlightColor: colors.page3Highlight,
+      ),
+      _OnboardingData(
+        image: 'assets/svg/welcome_5.svg',
+        bgColor: colors.page4Bg,
+        badgeColor: colors.page4Badge,
+        step: 4,
+        titlePart1: OnboardingStrings.onboardingPage4TitlePart1,
+        highlightedTitle: OnboardingStrings.onboardingPage4Highlight,
+        titlePart2: OnboardingStrings.onboardingPage4TitlePart2,
+        highlightColor: colors.page4Highlight,
+      ),
+    ];
+
+    final currentPageData = pages[_currentIndex];
 
     return Scaffold(
       backgroundColor: currentPageData.bgColor,
@@ -102,14 +105,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       _currentIndex = index;
                     });
                   },
-                  itemCount: _pages.length,
+                  itemCount: pages.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(
                         bottom: 240.0,
                       ), // give space for the bottom card
                       child: SvgPicture.asset(
-                        _pages[index].image,
+                        pages[index].image,
                         fit: BoxFit.fill,
                       ),
                     );
@@ -126,18 +129,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_pages.length, (index) {
+                  children: List.generate(pages.length, (index) {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4),
-
                       height: 8,
                       width: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _currentIndex == index
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.4),
+                            ? colors.indicatorActive
+                            : colors.indicatorInactive,
                       ),
                     );
                   }),
@@ -156,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               titlePart2: currentPageData.titlePart2,
               highlightColor: currentPageData.highlightColor,
               badgeColor: currentPageData.badgeColor,
-              onNext: _onNext,
+              onNext: () => _onNext(pages.length),
             ),
           ),
         ],

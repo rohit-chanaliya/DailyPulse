@@ -6,6 +6,7 @@ import 'extensions/status_colors.dart';
 import 'extensions/card_colors.dart';
 import 'extensions/app_gradients.dart';
 import 'extensions/splash_colors.dart';
+import 'extensions/onboarding_colors.dart';
 
 final ThemeData darkTheme = ThemeData(
   useMaterial3: true,
@@ -141,6 +142,31 @@ final ThemeData darkTheme = ThemeData(
       progressLoadingText: AppColors.white,
       fetchingDataText: AppColors.white,
       quoteText: AppColors.white,
+    ),
+    OnboardingColors(
+      welcomeBg: AppColors.gray80,
+      welcomeHighlight: AppColors.orange60,
+      welcomeText: AppColors.white,
+      welcomeSubtitle: Colors.white70,
+      page1Bg: AppColors.green80,
+      page1Badge: AppColors.green90,
+      page1Highlight: AppColors.green40,
+      page2Bg: AppColors.orange80,
+      page2Badge: AppColors.orange90,
+      page2Highlight: AppColors.orange40,
+      page3Bg: AppColors.yellow80,
+      page3Badge: AppColors.yellow90,
+      page3Highlight: AppColors.yellow40,
+      page4Bg: AppColors.purple80,
+      page4Badge: AppColors.purple90,
+      page4Highlight: AppColors.purple40,
+      bottomCardBg: AppColors.brown100,
+      bottomCardText: AppColors.white,
+      bottomCardButtonBg: AppColors.brown70,
+      bottomCardButtonIcon: AppColors.white,
+      bottomCardBadgeText: AppColors.white,
+      indicatorActive: AppColors.white,
+      indicatorInactive: const Color(0x66FFFFFF),
     ),
   ],
 );

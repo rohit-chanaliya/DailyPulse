@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import '../../../core/widgets/navigation/fade_page_route.dart';
 import '../viewmodels/splash_viewmodel.dart';
-import 'widgets/brand_logo_phase.dart';
-import 'widgets/fetching_data_phase.dart';
-import 'widgets/progress_loading_phase.dart';
-import 'widgets/quote_phase.dart';
+import 'widgets/splash_phase_content.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -65,19 +63,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
   }
 
-  Widget _buildPhaseContent(SplashPhase phase, double progressValue) {
-    switch (phase) {
-      case SplashPhase.brandLogo:
-        return const BrandLogoPhase();
-      case SplashPhase.progressLoading:
-        return ProgressLoadingPhase(progressValue: progressValue);
-      case SplashPhase.fetchingData:
-        return const FetchingDataPhase();
-      case SplashPhase.quote:
-        return QuotePhase(onContinue: _navigateToWelcome);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final splashState = ref.watch(splashViewModelProvider);
@@ -95,7 +80,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               duration: const Duration(milliseconds: 800),
               switchInCurve: Curves.easeInOut,
               switchOutCurve: Curves.easeInOut,
-              child: _buildPhaseContent(currentPhase, progressValue),
+              child: SplashPhaseContent(
+                phase: currentPhase,
+                progressValue: progressValue,
+                onContinue: _navigateToWelcome,
+              ),
             ),
           ),
 
@@ -122,7 +111,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Skip', style: context.textTheme.labelMedium),
+                      Text(
+                        OnboardingStrings.splashSkip,
+                        style: context.textTheme.labelMedium,
+                      ),
                       const SizedBox(width: 4),
                       const Icon(Icons.chevron_right_rounded, size: 18),
                     ],

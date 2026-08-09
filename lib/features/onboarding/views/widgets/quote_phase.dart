@@ -1,6 +1,7 @@
 import 'package:dailypulse/core/widgets/app_logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import '../../viewmodels/splash_viewmodel.dart';
 
 class QuotePhase extends StatelessWidget {
@@ -24,15 +25,15 @@ class QuotePhase extends StatelessWidget {
           const Spacer(flex: 3),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: splashColors.brandLogoBg,
               shape: BoxShape.circle,
             ),
             child: const AppLogoWidget(size: 80),
           ),
           const Spacer(flex: 2),
           Text(
-            '"In the midst of winter, I found there was within me an invincible summer."',
+            OnboardingStrings.splashQuoteText,
             textAlign: TextAlign.center,
             style: context.textTheme.titleLarge?.copyWith(
               fontSize: 20,
@@ -44,7 +45,7 @@ class QuotePhase extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            '— ALBERT CAMUS',
+            OnboardingStrings.splashQuoteAuthor,
             style: context.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w800,
               color: splashColors.quoteText.withValues(alpha: 0.8),

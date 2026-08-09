@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 
 class OnboardingBottomCard extends StatelessWidget {
   final int step;
@@ -24,6 +24,8 @@ class OnboardingBottomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.onboarding;
+
     return ClipPath(
       clipper: _TopArcClipper(arcHeight: 40),
       child: Container(
@@ -31,8 +33,8 @@ class OnboardingBottomCard extends StatelessWidget {
         height: 320,
         // Increased top padding to account for the arc height
         padding: const EdgeInsets.fromLTRB(32, 60, 32, 40),
-        decoration: const BoxDecoration(
-          color: AppColors.brown100, // Very dark background like the design
+        decoration: BoxDecoration(
+          color: colors.bottomCardBg,
         ),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
@@ -48,9 +50,9 @@ class OnboardingBottomCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'STEP $step',
-                style: const TextStyle(
-                  color: Colors.white,
+                '${OnboardingStrings.onboardingStepPrefix} $step',
+                style: TextStyle(
+                  color: colors.bottomCardBadgeText,
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
@@ -63,7 +65,7 @@ class OnboardingBottomCard extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: context.textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
+                  color: colors.bottomCardText,
                   fontWeight: FontWeight.w700,
                   height: 1.4,
                 ),
@@ -86,14 +88,13 @@ class OnboardingBottomCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: AppColors
-                        .brown70, // Brown button for consistency as per design
+                  decoration: BoxDecoration(
+                    color: colors.bottomCardButtonBg,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward_rounded,
-                    color: Colors.white,
+                    color: colors.bottomCardButtonIcon,
                     size: 24,
                   ),
                 ),

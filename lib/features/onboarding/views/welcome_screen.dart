@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 
 import 'package:dailypulse/features/auth/screens/sign_in_screen.dart';
 import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
@@ -12,11 +13,10 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use shade 80 for the background color as requested
-    final backgroundColor = AppColors.gray80;
+    final onboardingColors = context.onboarding;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: onboardingColors.welcomeBg,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -33,26 +33,26 @@ class WelcomeScreen extends StatelessWidget {
                 text: TextSpan(
                   style: context.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: onboardingColors.welcomeText,
                     height: 1.2,
                   ),
-                  children: const [
-                    TextSpan(text: 'Welcome to the ultimate\n'),
+                  children: [
+                    const TextSpan(text: OnboardingStrings.welcomeTitlePart1),
                     TextSpan(
-                      text: 'freud',
-                      style: TextStyle(color: AppColors.orange60),
+                      text: OnboardingStrings.welcomeTitleHighlight,
+                      style: TextStyle(color: onboardingColors.welcomeHighlight),
                     ),
-                    TextSpan(text: ' UI Kit!'),
+                    const TextSpan(text: OnboardingStrings.welcomeTitlePart2),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               // Subtitle
               Text(
-                'Your mindful mental health AI companion\nfor everyone anywhere \u2714',
+                OnboardingStrings.welcomeSubtitle,
                 textAlign: TextAlign.center,
                 style: context.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white70,
+                  color: onboardingColors.welcomeSubtitle,
                   height: 1.5,
                 ),
               ),
@@ -72,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange60,
+                  backgroundColor: onboardingColors.welcomeHighlight,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
                   shape: RoundedRectangleBorder(
@@ -83,7 +83,10 @@ class WelcomeScreen extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Get Started', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                    Text(
+                      OnboardingStrings.welcomeGetStarted,
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
                     SizedBox(width: 8),
                     Icon(Icons.arrow_forward, size: 20),
                   ],
@@ -95,8 +98,10 @@ class WelcomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Already have an account? ',
-                    style: context.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                    OnboardingStrings.welcomeAlreadyHaveAccount,
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: onboardingColors.welcomeSubtitle,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -105,9 +110,9 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      'Sign In',
+                      OnboardingStrings.welcomeSignIn,
                       style: context.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.orange60,
+                        color: onboardingColors.welcomeHighlight,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

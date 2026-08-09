@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-
+import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'package:dailypulse/core/widgets/app_logo_widget.dart';
 import '../../viewmodels/splash_viewmodel.dart';
+
 class BrandLogoPhase extends StatelessWidget {
   const BrandLogoPhase({super.key});
 
@@ -20,12 +21,11 @@ class BrandLogoPhase extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const AppLogoWidget(size: 150),
-
             Text(
-              'dailypulse.ai',
+              OnboardingStrings.splashBrandName,
               style: context.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppColors.brownGray10,
+                color: splashColors.brandLogoColor,
                 letterSpacing: 0,
               ),
             ),
