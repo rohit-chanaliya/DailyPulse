@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../mood/data/local/objectbox_service.dart';
-import '../../../features/auth/presentation/providers/auth_provider.dart';
+import 'package:signals_flutter/signals_flutter.dart';
+import '../../../features/auth/presentation/signals/auth_signal.dart';
 import '../../../features/mood/data/models/mood_entry.dart';
-import '../../../features/mood/presentation/providers/mood_provider.dart';
+import '../../../features/mood/presentation/signals/mood_signal.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/date_utils.dart' as date_utils;
 import '../widgets/date_selector.dart';
@@ -20,6 +19,12 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   DateTime _selectedDate = DateTime.now();
 
+  @override
+  void initState() {
+    super.initState();
+    moodSignal.reloadLocalEntries();
+  }
+
   void _selectDate(DateTime date) {
     setState(() {
       _selectedDate = date;
@@ -27,11 +32,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _refreshData() async {
-    final authProvider = context.read<AuthProvider>();
-    final moodProvider = context.read<MoodProvider>();
-
-    if (authProvider.user != null) {
-      await moodProvider.fetchMoodEntries(authProvider.user!.uid);
+    if (authSignal.user.value != null) {
+      await moodSignal.fetchMoodEntries(authSignal.user.value!.uid);
     }
   }
 
@@ -74,16 +76,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
-              Consumer<MoodProvider>(
-                builder: (context, provider, _) => IconButton(
-                  icon: provider.isLoading
+              SignalBuilder(
+                builder: (context) => IconButton(
+                  icon: moodSignal.isLoading.value
                       ? const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.refresh),
-                  onPressed: provider.isLoading ? null : _refreshData,
+                  onPressed: moodSignal.isLoading.value ? null : _refreshData,
                   tooltip: 'Refresh from Firebase',
                 ),
               ),
@@ -93,11 +95,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         const SizedBox(height: 12),
         Expanded(
           child: StreamBuilder<List<MoodEntry>>(
-            stream: ObjectBoxService.store
-                .box<MoodEntry>()
-                .query()
-                .watch(triggerImmediately: true)
-                .map((q) => q.find()),
+            stream: moodSignal.watchLocalEntries(),
+            initialData: moodSignal.entries.value,
             builder: (context, snapshot) {
               final allEntries = snapshot.data ?? [];
               final entries = _getEntriesForSelectedDate(allEntries);

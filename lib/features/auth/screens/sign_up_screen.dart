@@ -1,6 +1,6 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
 
 import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
@@ -8,7 +8,7 @@ import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import 'sign_in_screen.dart';
 
@@ -24,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
   bool _showEmailErrorBanner = false;
@@ -54,20 +54,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (_formKey.currentState!.validate()) {
       if (!_agreeToTerms) {
-        SnackBarUtils.showError(context, 'You must agree to the Terms & Conditions');
+        SnackBarUtils.showError(
+          context,
+          'You must agree to the Terms & Conditions',
+        );
         return;
       }
 
-      final authProvider = context.read<AuthProvider>();
-      await authProvider.handleSignUp(
+      await authSignal.handleSignUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         name: _nameController.text.trim(),
         onSuccess: () {
           if (mounted) {
-            Navigator.of(context).pushReplacement(
-              FadePageRoute(page: const SignInScreen()),
-            );
+            Navigator.of(
+              context,
+            ).pushReplacement(FadePageRoute(page: const SignInScreen()));
             SnackBarUtils.showSuccess(context, 'Account created successfully!');
           }
         },
@@ -85,12 +87,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF161210) : AppColors.splashCreamBg, // cream bg matching mockup
+      backgroundColor: isDark
+          ? const Color(0xFF161210)
+          : AppColors.splashCreamBg, // cream bg matching mockup
       body: SingleChildScrollView(
         child: Column(
           children: [
-            
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
               child: Form(
@@ -102,7 +104,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Text(
                       'Sign Up For Free',
                       style: AppTypography.heading2xlBold.copyWith(
-                        color: isDark ? Colors.white : const Color(0xFF402B20), // dark brown title
+                        color: isDark
+                            ? Colors.white
+                            : const Color(0xFF402B20), // dark brown title
                       ),
                     ),
                     const SizedBox(height: 36),
@@ -126,7 +130,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       keyboardType: TextInputType.emailAddress,
                       suffixIcon: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : const Color(0xFF5A4535),
                       ),
                       validator: Validators.validateEmail,
                     ),
@@ -135,12 +141,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (_showEmailErrorBanner) ...[
                       const SizedBox(height: 10),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF421C15) : const Color(0xFFFEDCD6), // soft red/pink alert
+                          color: isDark
+                              ? const Color(0xFF421C15)
+                              : const Color(0xFFFEDCD6), // soft red/pink alert
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
-                            color: isDark ? const Color(0xFF6B2014) : const Color(0xFFFEADA0),
+                            color: isDark
+                                ? const Color(0xFF6B2014)
+                                : const Color(0xFFFEADA0),
                             width: 1,
                           ),
                         ),
@@ -148,14 +161,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             Icon(
                               Icons.error_outline_rounded,
-                              color: isDark ? const Color(0xFFFF8B78) : const Color(0xFFD32F2F),
+                              color: isDark
+                                  ? const Color(0xFFFF8B78)
+                                  : const Color(0xFFD32F2F),
                               size: 18,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Invalid Email Address!!',
                               style: AppTypography.textXsBold.copyWith(
-                                color: isDark ? const Color(0xFFFF8B78) : const Color(0xFFD32F2F),
+                                color: isDark
+                                    ? const Color(0xFFFF8B78)
+                                    : const Color(0xFFD32F2F),
                               ),
                             ),
                           ],
@@ -177,7 +194,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
                           size: 18,
-                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                          color: isDark
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade400,
                         ),
                         onPressed: () => setState(
                           () => _obscurePassword = !_obscurePassword,
@@ -203,7 +222,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Text(
                           'I Agree with the ',
                           style: AppTypography.textXsMedium.copyWith(
-                            color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : const Color(0xFF5A4535),
                           ),
                         ),
                         Text(
@@ -218,12 +239,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 32),
 
                     // Sign Up Button
-                    Consumer<AuthProvider>(
-                      builder: (context, authProvider, _) {
+                    SignalBuilder(
+                      builder: (context) {
                         return AppButton(
                           text: 'Sign Up',
                           suffixIcon: Icons.arrow_forward_rounded,
-                          isLoading: authProvider.status == AuthStatus.loading,
+                          isLoading:
+                              authSignal.status.value == AuthStatus.loading,
                           onPressed: _signUp,
                         );
                       },
@@ -237,7 +259,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Text(
                           'Already have an account? ',
                           style: AppTypography.paragraphSm.copyWith(
-                            color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : const Color(0xFF5A4535),
                           ),
                         ),
                         GestureDetector(

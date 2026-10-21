@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../viewmodels/splash_viewmodel.dart';
+import '../../viewmodels/splash_signal.dart';
 import 'brand_logo_phase.dart';
 import 'fetching_data_phase.dart';
 import 'progress_loading_phase.dart';

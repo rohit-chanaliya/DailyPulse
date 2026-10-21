@@ -1,23 +1,20 @@
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
-import 'package:dailypulse/features/insights/presentation/providers/insights_provider.dart';
-import 'package:dailypulse/features/mood/data/local/objectbox_service.dart';
-import 'package:dailypulse/features/mood/presentation/providers/mood_provider.dart';
-import 'package:dailypulse/features/settings/presentation/providers/theme_provider.dart';
+import 'package:dailypulse/features/mood/data/local/hive_service.dart';
 import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
+import 'package:dailypulse/features/settings/presentation/signals/theme_signal.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as legacy_provider;
+import 'package:signals_flutter/signals_flutter.dart';
+
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await ObjectBoxService.init();
+  await HiveService.init();
 
-  runApp(const ProviderScope(child: DailyPulseApp()));
+  runApp(const DailyPulseApp());
 }
 
 class DailyPulseApp extends StatelessWidget {
@@ -25,26 +22,14 @@ class DailyPulseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return legacy_provider.MultiProvider(
-      providers: [
-        legacy_provider.ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        legacy_provider.ChangeNotifierProvider(create: (_) => AuthProvider()),
-        legacy_provider.ChangeNotifierProvider(create: (_) => MoodProvider()),
-        legacy_provider.ChangeNotifierProvider(
-          create: (_) => InsightsProvider(),
-        ),
-      ],
-      child: legacy_provider.Consumer<ThemeProvider>(
-        builder: (context, theme, _) {
-          return MaterialApp(
-            title: 'DailyPulse',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: theme.themeMode,
-            debugShowCheckedModeBanner: false,
-            home: const SplashScreen(),
-          );
-        },
+    return SignalBuilder(
+      builder: (context) => MaterialApp(
+        title: 'DailyPulse',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeSignal.themeMode,
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
       ),
     );
   }

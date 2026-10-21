@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'splash_viewmodel.g.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 enum SplashPhase {
   brandLogo, // Cream background with terracotta logo
@@ -10,33 +9,13 @@ enum SplashPhase {
   quote, // Terracotta orange background with Albert Camus quote
 }
 
-class SplashState {
-  final SplashPhase currentPhase;
-  final double progressValue;
+/// Drives the splash sequence with signals.
+class SplashSignal {
+  final currentPhase = signal(SplashPhase.brandLogo);
+  final progressValue = signal(0.0);
 
-  SplashState({required this.currentPhase, required this.progressValue});
-
-  SplashState copyWith({SplashPhase? currentPhase, double? progressValue}) {
-    return SplashState(
-      currentPhase: currentPhase ?? this.currentPhase,
-      progressValue: progressValue ?? this.progressValue,
-    );
-  }
-}
-
-@riverpod
-class SplashViewModel extends _$SplashViewModel {
   Timer? _phaseTimer;
   bool _isDisposed = false;
-
-  @override
-  SplashState build() {
-    ref.onDispose(() {
-      _isDisposed = true;
-      _phaseTimer?.cancel();
-    });
-    return SplashState(currentPhase: SplashPhase.brandLogo, progressValue: 0.0);
-  }
 
   void startSplashSequence(void Function() onComplete) {
     _startPhase1(onComplete);
@@ -45,7 +24,7 @@ class SplashViewModel extends _$SplashViewModel {
   void _startPhase1(void Function() onComplete) {
     _phaseTimer = Timer(const Duration(milliseconds: 2200), () {
       if (_isDisposed) return;
-      state = state.copyWith(currentPhase: SplashPhase.progressLoading);
+      currentPhase.value = SplashPhase.progressLoading;
       _startPhase2(onComplete);
     });
   }
@@ -54,7 +33,7 @@ class SplashViewModel extends _$SplashViewModel {
     const duration = Duration(milliseconds: 1800);
     const interval = Duration(milliseconds: 30);
     final totalSteps = duration.inMilliseconds ~/ interval.inMilliseconds;
-    int step = 0;
+    var step = 0;
 
     _phaseTimer = Timer.periodic(interval, (timer) {
       if (_isDisposed) {
@@ -64,15 +43,15 @@ class SplashViewModel extends _$SplashViewModel {
       step++;
       final nextProgress = (step / totalSteps) * 100;
       if (nextProgress >= 100) {
-        state = state.copyWith(progressValue: 100);
+        progressValue.value = 100;
         timer.cancel();
         Future.delayed(const Duration(milliseconds: 300), () {
           if (_isDisposed) return;
-          state = state.copyWith(currentPhase: SplashPhase.fetchingData);
+          currentPhase.value = SplashPhase.fetchingData;
           _startPhase3(onComplete);
         });
       } else {
-        state = state.copyWith(progressValue: nextProgress);
+        progressValue.value = nextProgress;
       }
     });
   }
@@ -80,7 +59,7 @@ class SplashViewModel extends _$SplashViewModel {
   void _startPhase3(void Function() onComplete) {
     _phaseTimer = Timer(const Duration(milliseconds: 3200), () {
       if (_isDisposed) return;
-      state = state.copyWith(currentPhase: SplashPhase.quote);
+      currentPhase.value = SplashPhase.quote;
       _startPhase4(onComplete);
     });
   }
@@ -96,4 +75,11 @@ class SplashViewModel extends _$SplashViewModel {
     _phaseTimer?.cancel();
     onComplete();
   }
+
+  void dispose() {
+    _isDisposed = true;
+    _phaseTimer?.cancel();
+  }
 }
+
+final splashSignal = SplashSignal();

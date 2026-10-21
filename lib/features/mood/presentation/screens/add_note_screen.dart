@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../mood/presentation/providers/mood_provider.dart';
+import '../../../mood/presentation/signals/mood_signal.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../models/mood_option.dart';
 
@@ -26,9 +24,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   }
 
   Future<void> _saveMood() async {
-    final moodProvider = context.read<MoodProvider>();
-
-    final success = await moodProvider.saveMood(
+    final success = await moodSignal.saveMood(
       moodLevel: widget.mood.level,
       userId: widget.userId,
       note: _noteController.text,

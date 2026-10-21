@@ -4,7 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
-import '../local/objectbox_service.dart';
+import '../local/hive_service.dart';
 import '../remote/firestore_service.dart';
 
 class SyncService {
@@ -12,9 +12,9 @@ class SyncService {
     FirestoreService? firestoreService,
     Connectivity? connectivity,
     FirebaseAuth? auth,
-  })  : _firestoreService = firestoreService ?? FirestoreService(),
-        _connectivity = connectivity ?? Connectivity(),
-        _auth = auth ?? FirebaseAuth.instance;
+  }) : _firestoreService = firestoreService ?? FirestoreService(),
+       _connectivity = connectivity ?? Connectivity(),
+       _auth = auth ?? FirebaseAuth.instance;
 
   final FirestoreService _firestoreService;
   final Connectivity _connectivity;
@@ -112,29 +112,29 @@ class SyncService {
     _isSyncing = true;
 
     try {
-      final box = ObjectBoxService.moodBox;
-      final allEntries = box.getAll();
-      final pendingEntries = allEntries.where((entry) =>
-          entry.id == null &&
-          entry.userId != null &&
-          entry.userId == user.uid
-      ).toList();
+      final allEntries = HiveService.getAll();
+      final pendingEntries = allEntries
+          .where(
+            (entry) =>
+                entry.id == null &&
+                entry.userId != null &&
+                entry.userId == user.uid,
+          )
+          .toList();
 
       if (pendingEntries.isEmpty) {
         return;
       }
 
-      appLogger.d(
-        'Starting sync for ${pendingEntries.length} pending entries',
-      );
+      appLogger.d('Starting sync for ${pendingEntries.length} pending entries');
 
       for (final entry in pendingEntries) {
         final docId = await _firestoreService.addMoodEntry(entry);
 
         if (docId != null) {
           final updatedEntry = entry.copyWith(id: docId);
-          box.put(updatedEntry);
-          appLogger.d('Synced entry with obxId ${entry.obxId}');
+          await HiveService.put(updatedEntry);
+          appLogger.d('Synced entry with localId ${entry.localId}');
         }
       }
 
@@ -168,12 +168,9 @@ class SyncService {
       return false;
     }
 
-    final box = ObjectBoxService.moodBox;
-    return box.getAll().any(
+    return HiveService.getAll().any(
       (entry) =>
-          entry.id == null &&
-          entry.userId != null &&
-          entry.userId == userId,
+          entry.id == null && entry.userId != null && entry.userId == userId,
     );
   }
 
@@ -183,8 +180,7 @@ class SyncService {
       return 0;
     }
 
-    final box = ObjectBoxService.moodBox;
-    return box.getAll()
+    return HiveService.getAll()
         .where(
           (entry) =>
               entry.id == null &&
