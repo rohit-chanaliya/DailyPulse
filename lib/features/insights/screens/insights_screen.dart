@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../mood/data/local/objectbox_service.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 import '../../../core/constant/constants.dart';
-import '../../../features/insights/presentation/providers/insights_provider.dart';
+import '../../../features/insights/presentation/signals/insights_signal.dart';
+import '../../../features/mood/presentation/signals/mood_signal.dart';
 import '../../../core/utils/analytics_utils.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../features/mood/data/models/mood_entry.dart';
@@ -16,6 +16,12 @@ class InsightsScreen extends StatefulWidget {
 
 class _InsightsScreenState extends State<InsightsScreen> {
   String _selectedTimeWindow = 'all'; // 'week', 'month', 'all'
+
+  @override
+  void initState() {
+    super.initState();
+    moodSignal.reloadLocalEntries();
+  }
 
   void _changeTimeWindow(String window) {
     setState(() {
@@ -43,77 +49,58 @@ class _InsightsScreenState extends State<InsightsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Consumer<InsightsProvider>(
-      builder: (context, insightsProvider, _) {
-        return StreamBuilder<List<MoodEntry>>(
-          stream: ObjectBoxService.store
-              .box<MoodEntry>()
-              .query()
-              .watch(triggerImmediately: true)
-              .map((q) => q.find()),
-          builder: (context, snapshot) {
-            final allEntries = _getFilteredEntries(
-              insightsProvider.getAllEntries(),
-            );
+    return SignalBuilder(
+      builder: (context) {
+        final allEntries = _getFilteredEntries(insightsSignal.getAllEntries());
 
-            if (allEntries.isEmpty) {
-              return const EmptyState(
-                message: 'Log some moods to see insights',
-              );
-            }
+        if (allEntries.isEmpty) {
+          return const EmptyState(message: 'Log some moods to see insights');
+        }
 
-            final analytics = AnalyticsUtils.calculateAnalytics(allEntries);
+        final analytics = AnalyticsUtils.calculateAnalytics(allEntries);
 
-            if (analytics.isEmpty) {
-              return const EmptyState(message: 'No data available');
-            }
+        if (analytics.isEmpty) {
+          return const EmptyState(message: 'No data available');
+        }
 
-            final avgMood = analytics['avgMood'] as double;
-            final totalEntries = analytics['totalEntries'] as int;
-            final moodCounts = analytics['moodCounts'] as Map<int, int>;
+        final avgMood = analytics['avgMood'] as double;
+        final totalEntries = analytics['totalEntries'] as int;
+        final moodCounts = analytics['moodCounts'] as Map<int, int>;
 
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Mood Insights',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your emotional journey at a glance',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: isDark
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  _buildTimeWindowFilter(isDark),
-                  const SizedBox(height: 24),
-
-                  _buildAverageMoodCard(avgMood, totalEntries, isDark),
-                  const SizedBox(height: 20),
-
-                  Expanded(
-                    child: _buildMoodDistribution(
-                      moodCounts,
-                      totalEntries,
-                      isDark,
-                    ),
-                  ),
-                ],
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Mood Insights',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
-            );
-          },
+              const SizedBox(height: 8),
+              Text(
+                'Your emotional journey at a glance',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              _buildTimeWindowFilter(isDark),
+              const SizedBox(height: 24),
+
+              _buildAverageMoodCard(avgMood, totalEntries, isDark),
+              const SizedBox(height: 20),
+
+              Expanded(
+                child: _buildMoodDistribution(moodCounts, totalEntries, isDark),
+              ),
+            ],
+          ),
         );
       },
     );

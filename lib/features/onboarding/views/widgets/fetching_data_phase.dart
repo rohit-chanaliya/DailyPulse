@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'background_circle.dart';
-import '../../viewmodels/splash_viewmodel.dart';
+import '../../viewmodels/splash_signal.dart';
 
 class TouchRipple {
   final Offset position;
   final AnimationController controller;
 
-  TouchRipple({
-    required this.position,
-    required this.controller,
-  });
+  TouchRipple({required this.position, required this.controller});
 }
 
 class RipplePainter extends CustomPainter {
@@ -19,7 +16,9 @@ class RipplePainter extends CustomPainter {
   final Color color;
 
   RipplePainter({required this.ripples, required this.color})
-      : super(repaint: Listenable.merge(ripples.map((r) => r.controller).toList()));
+    : super(
+        repaint: Listenable.merge(ripples.map((r) => r.controller).toList()),
+      );
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -44,7 +43,8 @@ class FetchingDataPhase extends StatefulWidget {
   State<FetchingDataPhase> createState() => _FetchingDataPhaseState();
 }
 
-class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProviderStateMixin {
+class _FetchingDataPhaseState extends State<FetchingDataPhase>
+    with TickerProviderStateMixin {
   final List<TouchRipple> _ripples = [];
   late final AnimationController _shakeController;
   late final Animation<double> _shakeAnimation;
@@ -56,15 +56,18 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _shakeAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 12.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 12.0, end: -12.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -12.0, end: 10.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 10.0, end: -8.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -8.0, end: 5.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 5.0, end: -3.0), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
+    _shakeAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.0, end: 12.0), weight: 1),
+          TweenSequenceItem(tween: Tween(begin: 12.0, end: -12.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -12.0, end: 10.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 10.0, end: -8.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -8.0, end: 5.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 5.0, end: -3.0), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -3.0, end: 0.0), weight: 1),
+        ]).animate(
+          CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+        );
   }
 
   @override
@@ -191,7 +194,9 @@ class _FetchingDataPhaseState extends State<FetchingDataPhase> with TickerProvid
                       OnboardingStrings.splashInteractPrompt,
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: splashColors.fetchingDataText.withValues(alpha: 0.75),
+                        color: splashColors.fetchingDataText.withValues(
+                          alpha: 0.75,
+                        ),
                       ),
                     ),
                   ],

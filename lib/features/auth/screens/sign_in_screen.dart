@@ -1,17 +1,15 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
 
-import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'sign_up_screen.dart';
-import 'forgot_password_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -35,8 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = context.read<AuthProvider>();
-      await authProvider.handleSignIn(
+      await authSignal.handleSignIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         onError: (message) {
@@ -53,12 +50,12 @@ class _SignInScreenState extends State<SignInScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF161210) : AppColors.splashCreamBg, // cream bg matching mockup
+      backgroundColor: isDark
+          ? const Color(0xFF161210)
+          : AppColors.splashCreamBg, // cream bg matching mockup
       body: SingleChildScrollView(
         child: Column(
           children: [
-            
-            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
               child: Form(
@@ -70,7 +67,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     Text(
                       'Sign In To dailypulse.ai',
                       style: AppTypography.heading2xlBold.copyWith(
-                        color: isDark ? Colors.white : const Color(0xFF402B20), // dark brown title
+                        color: isDark
+                            ? Colors.white
+                            : const Color(0xFF402B20), // dark brown title
                       ),
                     ),
                     const SizedBox(height: 36),
@@ -84,7 +83,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       keyboardType: TextInputType.emailAddress,
                       suffixIcon: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : const Color(0xFF5A4535),
                       ),
                       validator: Validators.validateEmail,
                     ),
@@ -103,7 +104,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
                           size: 18,
-                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                          color: isDark
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade400,
                         ),
                         onPressed: () => setState(
                           () => _obscurePassword = !_obscurePassword,
@@ -114,19 +117,19 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 32),
 
                     // Sign In Button
-                    Consumer<AuthProvider>(
-                      builder: (context, authProvider, _) {
+                    SignalBuilder(
+                      builder: (context) {
                         return AppButton(
                           text: 'Sign In',
                           suffixIcon: Icons.arrow_forward_rounded,
-                          isLoading: authProvider.status == AuthStatus.loading,
+                          isLoading:
+                              authSignal.status.value == AuthStatus.loading,
                           onPressed: _signIn,
                         );
                       },
                     ),
                     const SizedBox(height: 36),
 
-                    
                     const SizedBox(height: 36),
 
                     // Navigation Links
@@ -136,15 +139,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         Text(
                           "Don't have an account? ",
                           style: AppTypography.paragraphSm.copyWith(
-                            color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : const Color(0xFF5A4535),
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pushReplacement(
-                              FadePageRoute(page: const SignUpScreen()),
-                            );
-                          },
+                          onTap: () => context.push(AppRoutes.signUp),
                           child: Text(
                             'Sign Up',
                             style: AppTypography.textSmBold.copyWith(
@@ -156,11 +157,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          FadePageRoute(page: const ForgotPasswordScreen()),
-                        );
-                      },
+                      onTap: () => context.push(AppRoutes.forgotPassword),
                       child: Text(
                         'Forgot Password',
                         style: AppTypography.textSmBold.copyWith(

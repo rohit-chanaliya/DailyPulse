@@ -1,60 +1,44 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
-class AuthProvider extends ChangeNotifier {
-  final FirebaseAuth _auth;
-  late final StreamSubscription<User?> _authSubscription;
-  User? _user;
-  AuthStatus _status = AuthStatus.initial;
-  String? _errorMessage;
-  bool _isDisposed = false;
-
-  User? get user => _user;
-
-  AuthStatus get status => _status;
-
-  String? get errorMessage => _errorMessage;
-
-  bool get isAuthenticated => _status == AuthStatus.authenticated;
-
-  AuthProvider({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance {
+/// Authentication state backed by signals instead of ChangeNotifier.
+class AuthSignal {
+  AuthSignal({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance {
     _authSubscription = _auth.authStateChanges().listen(
       _onAuthStateChanged,
       onError: (Object error, StackTrace stackTrace) {
-        _errorMessage = 'Failed to listen for auth changes';
+        errorMessage.value = 'Failed to listen for auth changes';
         appLogger.e('Auth stream error', error: error, stackTrace: stackTrace);
-        _safeNotifyListeners();
       },
     );
   }
 
-  void _onAuthStateChanged(User? user) {
-    if (_isDisposed) return;
+  final FirebaseAuth _auth;
+  late final StreamSubscription<User?> _authSubscription;
 
-    if (user == null) {
-      _user = null;
-      _status = AuthStatus.unauthenticated;
-      _safeNotifyListeners();
+  final status = signal<AuthStatus>(AuthStatus.initial);
+  final user = signal<User?>(null);
+  final errorMessage = signal<String?>(null);
+
+  bool get isAuthenticated => status.value == AuthStatus.authenticated;
+
+  void _onAuthStateChanged(User? value) {
+    if (value == null) {
+      user.value = null;
+      status.value = AuthStatus.unauthenticated;
       return;
     }
-    _user = user;
-    _status = AuthStatus.authenticated;
-
-    appLogger.i('Auth state changed: ${_status.name}, User: ${user.email}');
-    _safeNotifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _isDisposed = true;
-    _authSubscription.cancel();
-    super.dispose();
+    user.value = value;
+    status.value = AuthStatus.authenticated;
+    appLogger.i(
+      'Auth state changed: ${status.value.name}, User: ${value.email}',
+    );
   }
 
   Future<bool> signUp({
@@ -63,9 +47,8 @@ class AuthProvider extends ChangeNotifier {
     required String name,
   }) async {
     try {
-      _status = AuthStatus.loading;
-      _errorMessage = null;
-      _safeNotifyListeners();
+      status.value = AuthStatus.loading;
+      errorMessage.value = null;
 
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -74,66 +57,60 @@ class AuthProvider extends ChangeNotifier {
 
       await credential.user?.updateDisplayName(name);
       await credential.user?.reload();
-      _user = _auth.currentUser;
+      user.value = _auth.currentUser;
 
-      appLogger.i('User signed up successfully: ${_user?.email}');
+      appLogger.i('User signed up successfully: ${user.value?.email}');
       return true;
     } on FirebaseAuthException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = _getErrorMessage(e.code);
+      status.value = AuthStatus.unauthenticated;
+      errorMessage.value = _getErrorMessage(e.code);
       appLogger.w('Sign up failed: ${e.code}');
-      _safeNotifyListeners();
       return false;
     } catch (e, stackTrace) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = 'An unexpected error occurred';
+      status.value = AuthStatus.unauthenticated;
+      errorMessage.value = 'An unexpected error occurred';
       appLogger.e(
         'Unexpected error during sign up',
         error: e,
         stackTrace: stackTrace,
       );
-      _safeNotifyListeners();
       return false;
     }
   }
 
   Future<bool> signIn({required String email, required String password}) async {
     try {
-      _status = AuthStatus.loading;
-      _errorMessage = null;
-      _safeNotifyListeners();
+      status.value = AuthStatus.loading;
+      errorMessage.value = null;
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       appLogger.i('User signed in successfully: $email');
       return true;
     } on FirebaseAuthException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = _getErrorMessage(e.code);
+      status.value = AuthStatus.unauthenticated;
+      errorMessage.value = _getErrorMessage(e.code);
       appLogger.w('Sign in failed: ${e.code}');
-      _safeNotifyListeners();
       return false;
     } catch (e, stackTrace) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = 'An unexpected error occurred';
+      status.value = AuthStatus.unauthenticated;
+      errorMessage.value = 'An unexpected error occurred';
       appLogger.e(
         'Unexpected error during sign in',
         error: e,
         stackTrace: stackTrace,
       );
-      _safeNotifyListeners();
       return false;
     }
   }
 
   Future<void> signOut() async {
-    appLogger.i('User signed out: ${_user?.email}');
+    appLogger.i('User signed out: ${user.value?.email}');
     await _auth.signOut();
   }
 
   void clearError() {
-    _errorMessage = null;
-    _safeNotifyListeners();
+    errorMessage.value = null;
   }
 
   Future<void> handleSignIn({
@@ -142,8 +119,9 @@ class AuthProvider extends ChangeNotifier {
     required Function(String) onError,
   }) async {
     final success = await signIn(email: email, password: password);
-    if (!success && _errorMessage != null) {
-      onError(_errorMessage!);
+    final message = errorMessage.value;
+    if (!success && message != null) {
+      onError(message);
     }
   }
 
@@ -157,8 +135,8 @@ class AuthProvider extends ChangeNotifier {
     final success = await signUp(email: email, password: password, name: name);
     if (success) {
       onSuccess();
-    } else if (_errorMessage != null) {
-      onError(_errorMessage!);
+    } else if (errorMessage.value != null) {
+      onError(errorMessage.value!);
     }
   }
 
@@ -181,10 +159,9 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  void _safeNotifyListeners() {
-    if (_isDisposed) {
-      return;
-    }
-    super.notifyListeners();
+  void dispose() {
+    _authSubscription.cancel();
   }
 }
+
+final authSignal = AuthSignal();

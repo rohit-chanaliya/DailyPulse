@@ -1,0 +1,15 @@
+{
+  "safety-gate": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/rohit/StudioProjects/DailyPulse/.agents/scripts/block-dangerous.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

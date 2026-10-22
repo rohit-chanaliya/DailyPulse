@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'package:dailypulse/core/widgets/app_logo_widget.dart';
-import '../../viewmodels/splash_viewmodel.dart';
+import '../../viewmodels/splash_signal.dart';
 
 class BrandLogoPhase extends StatelessWidget {
   const BrandLogoPhase({super.key});

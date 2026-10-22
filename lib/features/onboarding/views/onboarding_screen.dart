@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
+import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
-import 'package:dailypulse/features/auth/screens/sign_in_screen.dart';
-import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'widgets/onboarding_bottom_card.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -24,9 +25,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.of(
-        context,
-      ).pushReplacement(FadePageRoute(page: const SignInScreen()));
+      _completeOnboarding();
+    }
+  }
+
+  Future<void> _completeOnboarding() async {
+    await AppPreferences.setHasSeenOnboarding(true);
+    if (mounted) {
+      context.go(AppRoutes.signIn);
     }
   }
 
@@ -143,6 +149,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     );
                   }),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4, right: 12),
+                child: TextButton(
+                  onPressed: _completeOnboarding,
+                  style: TextButton.styleFrom(
+                    foregroundColor: colors.indicatorActive,
+                  ),
+                  child: const Text(OnboardingStrings.onboardingSkip),
                 ),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../mood/presentation/providers/mood_provider.dart';
+import 'package:go_router/go_router.dart';
+import '../../../mood/presentation/signals/mood_signal.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../models/mood_option.dart';
 
@@ -26,16 +25,13 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   }
 
   Future<void> _saveMood() async {
-    final moodProvider = context.read<MoodProvider>();
-
-    final success = await moodProvider.saveMood(
+    final success = await moodSignal.saveMood(
       moodLevel: widget.mood.level,
       userId: widget.userId,
       note: _noteController.text,
     );
 
     if (mounted) {
-      Navigator.pop(context);
       if (success) {
         SnackBarUtils.showSuccess(context, 'Mood logged successfully!');
       } else {
@@ -44,6 +40,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
           'Mood saved locally, will sync when online',
         );
       }
+      context.pop();
     }
   }
 
@@ -66,7 +63,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => context.pop(),
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(

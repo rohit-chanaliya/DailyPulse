@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'background_circle.dart';
-import '../../viewmodels/splash_viewmodel.dart';
+import '../../viewmodels/splash_signal.dart';
 
 class ProgressLoadingPhase extends StatelessWidget {
   final double progressValue;
 
-  const ProgressLoadingPhase({
-    super.key,
-    required this.progressValue,
-  });
+  const ProgressLoadingPhase({super.key, required this.progressValue});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +74,9 @@ class ProgressLoadingPhase extends StatelessWidget {
                   style: context.textTheme.displayMedium?.copyWith(
                     fontSize: 36,
                     fontWeight: FontWeight.w700,
-                    color: splashColors.progressLoadingText.withValues(alpha: 0.7),
+                    color: splashColors.progressLoadingText.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                 ),
               ],

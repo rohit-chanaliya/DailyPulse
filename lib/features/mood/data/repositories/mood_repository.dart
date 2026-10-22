@@ -1,18 +1,17 @@
-import 'package:objectbox/objectbox.dart';
-import '../models/mood_entry.dart';
-import '../local/objectbox_service.dart';
-import '../services/sync_service.dart';
-import '../remote/firestore_service.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 
+import '../local/hive_service.dart';
+import '../models/mood_entry.dart';
+import '../remote/firestore_service.dart';
+import '../services/sync_service.dart';
+
 class MoodRepository {
-  final Box<MoodEntry> _box = ObjectBoxService.moodBox;
   final SyncService _syncService = SyncService();
   final FirestoreService _firestoreService = FirestoreService();
 
   Future<void> addMoodEntry(MoodEntry entry, String userId) async {
     final entryWithUser = entry.copyWith(userId: userId);
-    _box.put(entryWithUser);
+    await HiveService.put(entryWithUser);
     appLogger.d('Added mood entry locally for user: $userId');
     _syncService.syncPendingEntries();
   }
@@ -34,7 +33,12 @@ class MoodRepository {
   }
 
   List<MoodEntry> getAllEntries() {
-    return _box.getAll();
+    return HiveService.getAll();
+  }
+
+  /// Emits local entries whenever they change.
+  Stream<List<MoodEntry>> watchEntries() {
+    return HiveService.watchAll();
   }
 
   // Fetch mood entries from Firebase and sync to local storage
@@ -42,17 +46,21 @@ class MoodRepository {
     try {
       appLogger.i('Starting Firebase fetch for user: $userId');
       final firebaseEntries = await _firestoreService.fetchMoodEntries(userId);
-      
+
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
-      
-      // Clear local storage and add all Firebase entries
-      _box.removeAll();
-      _box.putMany(firebaseEntries);
-      
-      appLogger.i('Synced ${firebaseEntries.length} entries to local ObjectBox');
-      return firebaseEntries;
+
+      // Replace local storage with the Firebase snapshot
+      await HiveService.clear();
+      await HiveService.putAll(firebaseEntries);
+
+      appLogger.i('Synced ${firebaseEntries.length} entries to local Hive');
+      return HiveService.getAll();
     } catch (e, stackTrace) {
-      appLogger.e('Error in fetchAndSyncFromFirebase', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error in fetchAndSyncFromFirebase',
+        error: e,
+        stackTrace: stackTrace,
+      );
       // Return local entries if Firebase fetch fails
       return getAllEntries();
     }
