@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/mood_utils.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/widgets/navigation/fade_page_route.dart';
 import '../../../auth/presentation/signals/auth_signal.dart';
 import '../models/mood_option.dart';
-import 'add_note_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class HomeMoodScreen extends StatelessWidget {
@@ -22,12 +22,7 @@ class HomeMoodScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.push(
-      context,
-      FadePageRoute(
-        page: AddNoteScreen(mood: mood, userId: userId),
-      ),
-    );
+    context.push(AppRoutes.addNote, extra: mood);
   }
 
   @override

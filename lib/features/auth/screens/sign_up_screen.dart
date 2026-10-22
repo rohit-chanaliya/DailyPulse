@@ -1,16 +1,15 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
 import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
 
-import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
-
-import 'sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -67,9 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         name: _nameController.text.trim(),
         onSuccess: () {
           if (mounted) {
-            Navigator.of(
-              context,
-            ).pushReplacement(FadePageRoute(page: const SignInScreen()));
             SnackBarUtils.showSuccess(context, 'Account created successfully!');
           }
         },
@@ -265,11 +261,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pushReplacement(
-                              FadePageRoute(page: const SignInScreen()),
-                            );
-                          },
+                          onTap: () => context.go(AppRoutes.signIn),
                           child: Text(
                             'Sign In.',
                             style: AppTypography.textSmBold.copyWith(

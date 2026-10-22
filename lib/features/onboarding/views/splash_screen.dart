@@ -1,10 +1,10 @@
-import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import 'package:dailypulse/core/router/app_router.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
-import '../../../core/widgets/navigation/fade_page_route.dart';
 import '../viewmodels/splash_signal.dart';
 import 'widgets/splash_phase_content.dart';
 
@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        splashSignal.startSplashSequence(_navigateToWelcome);
+        splashSignal.startSplashSequence(_navigateNext);
       }
     });
   }
@@ -32,13 +32,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.dispose();
   }
 
-  void _navigateToWelcome() {
-    Navigator.of(context).pushReplacement(
-      FadePageRoute(
-        page: const WelcomeScreen(),
-        duration: const Duration(milliseconds: 600),
-      ),
-    );
+  void _navigateNext() {
+    if (!mounted) return;
+    context.go(resolveAppStartLocation());
   }
 
   Color _getSkipButtonColor(SplashPhase phase, SplashColors splashColors) {
@@ -87,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: SplashPhaseContent(
                     phase: currentPhase,
                     progressValue: progressValue,
-                    onContinue: _navigateToWelcome,
+                    onContinue: _navigateNext,
                   ),
                 ),
               ),
@@ -101,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: TextButton(
                       key: ValueKey(currentPhase),
                       onPressed: () {
-                        splashSignal.skipSplash(_navigateToWelcome);
+                        splashSignal.skipSplash(_navigateNext);
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: _getSkipButtonColor(

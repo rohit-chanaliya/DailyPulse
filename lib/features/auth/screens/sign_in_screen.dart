@@ -1,17 +1,15 @@
 import 'package:dailypulse/core/theme/colors.dart';
 import 'package:dailypulse/core/theme/typography.dart';
 import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
 
-import 'package:dailypulse/core/widgets/navigation/fade_page_route.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
-
-import 'sign_up_screen.dart';
-import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -147,11 +145,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pushReplacement(
-                              FadePageRoute(page: const SignUpScreen()),
-                            );
-                          },
+                          onTap: () => context.push(AppRoutes.signUp),
                           child: Text(
                             'Sign Up',
                             style: AppTypography.textSmBold.copyWith(
@@ -163,11 +157,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          FadePageRoute(page: const ForgotPasswordScreen()),
-                        );
-                      },
+                      onTap: () => context.push(AppRoutes.forgotPassword),
                       child: Text(
                         'Forgot Password',
                         style: AppTypography.textSmBold.copyWith(
