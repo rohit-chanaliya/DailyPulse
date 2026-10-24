@@ -35,8 +35,11 @@ features/<feature>/
 ```
 Use only the layers the feature needs. Do not restructure existing features unless asked.
 
-### State (signals_flutter)
-- A `XSignal` class owns `signal<T>()` fields, `computed()` derived values and action methods; one top-level instance per file (`final xSignal = XSignal();`).
+### State (signals_flutter) & DI
+- A `XSignal` class owns `signal<T>()` fields, `computed()` derived values and action methods.
+- Signals are DI singletons: `@singleton` on the class, `@inject` on the constructor, a getter on `AppComponent`. Use `appComponent.xSignal`; no top-level `final xSignal` globals.
+- Dependencies are constructor-injected (`@inject`), never constructed inside the class.
+- Register new dependencies in `lib/core/di/app_component.dart`, then run `dart run build_runner build`. Generated `app_component.inject.dart` is committed and never edited by hand.
 - Read signals in the UI with `Watch((context) => ...)` or `SignalBuilder`; keep the reactive region small.
 - No new `ChangeNotifier` / `notifyListeners()`. No Riverpod, Bloc, GetX, Provider, GetIt.
 
@@ -59,7 +62,7 @@ Use only the layers the feature needs. Do not restructure existing features unle
 ### Naming
 - Classes / enums / extension types: `UpperCamelCase`. Files: `snake_case.dart`.
 - Variables, methods, constants, enum values: `lowerCamelCase`.
-- Signal classes `<Name>Signal`, top-level instance `<name>Signal`; strings classes `<Feature>Strings`.
+- Signal classes `<Name>Signal`, accessed via `appComponent.<name>Signal`; strings classes `<Feature>Strings`.
 
 ### Imports (flutter_lints)
 1. `dart:` imports
@@ -70,6 +73,8 @@ Use only the layers the feature needs. Do not restructure existing features unle
 - One-line docstrings for public classes/methods when they add information. No narration of obvious code, no commented-out code.
 
 ### Do NOT
+- Add top-level `final xSignal = XSignal();` globals or construct repositories/services inside signals/widgets — use the DI graph.
+- Hand-edit `app_component.inject.dart` or skip `dart run build_runner build` after changing DI annotations.
 - Write tests, docs or abstractions the user didn't ask for.
 - Silence the analyzer with `// ignore:` instead of fixing the cause.
 - Add a dependency without telling the user (package, reason, what it replaces).

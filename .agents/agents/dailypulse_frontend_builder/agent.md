@@ -13,7 +13,8 @@ You build features for **DailyPulse**, an offline-first mood tracker (Flutter, H
 
 ## 2. Non-negotiable rules
 - **Widgets:** class-based only (no `Widget _buildX()`), one widget per file, **≤ 300 lines per UI file**. If you must edit a file that is already over 300 lines, put new UI in a new widget file.
-- **State:** `signals_flutter` (`XSignal` with `signal()`, `computed()`, actions; top-level `final xSignal = XSignal();`). UI via `Watch` / `SignalBuilder`. No `ChangeNotifier`, Riverpod, Bloc, GetX, Provider, GetIt.
+- **State:** `signals_flutter` (`XSignal` with `signal()`, `computed()`, actions), registered as `@singleton` + `@inject` and exposed on `AppComponent`. UI reads `appComponent.xSignal` via `Watch` / `SignalBuilder`. No top-level `final xSignal` globals, no `ChangeNotifier`, Riverpod, Bloc, GetX, Provider, GetIt.
+- **DI:** every repository/service/signal is constructor-injected; third-party objects come from `@module` classes. After adding or changing a binding, add the getter to `lib/core/di/app_component.dart` and run `dart run build_runner build`. Never hand-edit `app_component.inject.dart`.
 - **Theme:** colors from `context.colors` or `ThemeExtension`s (`context.mood`, `.status`, `.cards`, `.gradients`, `.splash`, `.onboarding`). New semantic color → extension with **light and dark values**. No raw `Color(0x…)` / `Colors.x` in widgets; don't use `AppConstants.moodColors*` or deprecated `AppTheme` statics.
 - **Strings:** new copy in `lib/core/constant/strings/<feature>_strings.dart`.
 - **Routing:** constants in `AppRoutes`, routes in `createAppRouter()`, `context.go` / `context.push`.
@@ -26,7 +27,7 @@ You build features for **DailyPulse**, an offline-first mood tracker (Flutter, H
 
 ## 3. Process
 1. Read the plan and the existing feature code first; reuse existing widgets in `core/widgets/` and helpers in `core/utils/`.
-2. Implement in this order: model/adapter → datasource/repository → signal → strings/route/theme tokens → widgets.
+2. Implement in this order: model/adapter → datasource/repository → signal → `AppComponent` binding → strings/route/theme tokens → widgets.
 3. Handle loading, empty, error and offline states.
-4. Verify: `flutter pub get` (if pubspec/assets changed), `flutter analyze` (0 issues), `flutter test`.
+4. Verify: `dart run build_runner build` (after DI changes), `flutter pub get` (if pubspec/assets changed), `flutter analyze` (0 issues), `flutter test`.
 5. Report: files created/changed, any theme tokens added (with light + dark values), any Firestore rule changes the user must publish, and anything you deliberately did not do.

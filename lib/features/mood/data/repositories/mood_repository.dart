@@ -1,13 +1,19 @@
 import 'package:dailypulse/core/utils/app_logger.dart';
+import 'package:inject_annotation/inject_annotation.dart';
 
 import '../local/hive_service.dart';
 import '../models/mood_entry.dart';
 import '../remote/firestore_service.dart';
 import '../services/sync_service.dart';
 
+/// Coordinates local mood storage with background cloud sync.
+@singleton
 class MoodRepository {
-  final SyncService _syncService = SyncService();
-  final FirestoreService _firestoreService = FirestoreService();
+  @inject
+  MoodRepository(this._syncService, this._firestoreService);
+
+  final SyncService _syncService;
+  final FirestoreService _firestoreService;
 
   Future<void> addMoodEntry(MoodEntry entry, String userId) async {
     final entryWithUser = entry.copyWith(userId: userId);

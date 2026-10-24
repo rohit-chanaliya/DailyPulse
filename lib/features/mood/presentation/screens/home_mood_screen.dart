@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import 'package:dailypulse/core/di/injection.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/mood_utils.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../auth/presentation/signals/auth_signal.dart';
 import '../models/mood_option.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -15,7 +15,7 @@ class HomeMoodScreen extends StatelessWidget {
   const HomeMoodScreen({super.key});
 
   void _onMoodSelected(BuildContext context, MoodOption mood) {
-    final userId = authSignal.user.value?.uid;
+    final userId = appComponent.authSignal.user.value?.uid;
 
     if (userId == null) {
       SnackBarUtils.showError(context, 'Please sign in to log your mood');
@@ -32,7 +32,8 @@ class HomeMoodScreen extends StatelessWidget {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final moods = MoodUtils.getMoodOptions();
         final userName =
-            authSignal.user.value?.displayName?.split(' ').first ?? 'Friend';
+            appComponent.authSignal.user.value?.displayName?.split(' ').first ??
+            'Friend';
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light.copyWith(

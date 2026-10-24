@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 enum SplashPhase {
@@ -10,7 +11,11 @@ enum SplashPhase {
 }
 
 /// Drives the splash sequence with signals.
+@singleton
 class SplashSignal {
+  @inject
+  SplashSignal();
+
   final currentPhase = signal(SplashPhase.brandLogo);
   final progressValue = signal(0.0);
 
@@ -81,5 +86,3 @@ class SplashSignal {
     _phaseTimer?.cancel();
   }
 }
-
-final splashSignal = SplashSignal();

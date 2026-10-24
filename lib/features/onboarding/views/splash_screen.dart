@@ -5,6 +5,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import 'package:dailypulse/core/router/app_router.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
+import 'package:dailypulse/core/di/injection.dart';
 import '../viewmodels/splash_signal.dart';
 import 'widgets/splash_phase_content.dart';
 
@@ -21,14 +22,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        splashSignal.startSplashSequence(_navigateNext);
+        appComponent.splashSignal.startSplashSequence(_navigateNext);
       }
     });
   }
 
   @override
   void dispose() {
-    splashSignal.dispose();
+    appComponent.splashSignal.dispose();
     super.dispose();
   }
 
@@ -67,8 +68,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return SignalBuilder(
       builder: (context) {
-        final currentPhase = splashSignal.currentPhase.value;
-        final progressValue = splashSignal.progressValue.value;
+        final currentPhase = appComponent.splashSignal.currentPhase.value;
+        final progressValue = appComponent.splashSignal.progressValue.value;
         final splashColors = context.splash;
 
         return Scaffold(
@@ -97,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: TextButton(
                       key: ValueKey(currentPhase),
                       onPressed: () {
-                        splashSignal.skipSplash(_navigateNext);
+                        appComponent.splashSignal.skipSplash(_navigateNext);
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: _getSkipButtonColor(

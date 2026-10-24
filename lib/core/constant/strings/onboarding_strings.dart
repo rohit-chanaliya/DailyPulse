@@ -10,14 +10,22 @@ class OnboardingStrings {
   static const String splashSkip = 'Skip';
 
   // Welcome Screen
-  static const String welcomeTitlePart1 = 'Welcome to the ultimate\n';
-  static const String welcomeTitleHighlight = 'freud';
-  static const String welcomeTitlePart2 = ' UI Kit!';
+  static const String welcomeTitlePart1 = 'Welcome to\n';
+  static const String welcomeTitleHighlight = 'DailyPulse';
+  static const String welcomeTitlePart2 = '!';
   static const String welcomeSubtitle =
-      'Your mindful mental health AI companion\nfor everyone anywhere \u2714';
+      'Your mindful mental health companion\nfor everyone, anywhere 🌿';
   static const String welcomeGetStarted = 'Get Started';
   static const String welcomeAlreadyHaveAccount = 'Already have an account? ';
-  static const String welcomeSignIn = 'Sign In';
+  static const String welcomeSignIn = 'Sign In.';
+  static const String welcomePointCalmTitle = 'Mindful Calm';
+  static const String welcomePointCalmSubtitle = 'Daily peace';
+  static const String welcomePointMoodTitle = 'Mood Patterns';
+  static const String welcomePointMoodSubtitle = 'Self awareness';
+  static const String welcomePointBalanceTitle = 'Inner Joy';
+  static const String welcomePointBalanceSubtitle = 'Emotional health';
+  static const String welcomePointSelfCareTitle = 'Self Care';
+  static const String welcomePointSelfCareSubtitle = 'Daily balance';
 
   // Onboarding Screen
   static const String onboardingStepPrefix = 'STEP';

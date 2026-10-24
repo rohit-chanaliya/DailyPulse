@@ -1,6 +1,6 @@
-import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
 import 'package:dailypulse/features/settings/presentation/signals/theme_signal.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
+import 'package:dailypulse/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import '../widgets/settings_card.dart';
@@ -34,7 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (confirm && context.mounted) {
-      await authSignal.signOut();
+      await appComponent.authSignal.signOut();
     }
   }
 
@@ -79,8 +79,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       UserProfileCard(
-                        displayName: authSignal.user.value?.displayName,
-                        email: authSignal.user.value?.email,
+                        displayName:
+                            appComponent.authSignal.user.value?.displayName,
+                        email: appComponent.authSignal.user.value?.email,
                       ),
                       const SizedBox(height: 32),
 
@@ -93,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               icon: Icons.palette_outlined,
                               iconColor: Colors.purple,
                               title: 'Theme Mode',
-                              subtitle: _getThemeName(themeSignal),
+                              subtitle: _getThemeName(appComponent.themeSignal),
                               onTap: _toggleAppearance,
                               trailing: AnimatedRotation(
                                 turns: _isAppearanceExpanded ? 0.5 : 0,
@@ -114,12 +115,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   16,
                                 ),
                                 child: ThemeSelector(
-                                  isLightMode: themeSignal.isLightMode,
-                                  isDarkMode: themeSignal.isDarkMode,
-                                  isSystemMode: themeSignal.isSystemMode,
-                                  onLightMode: themeSignal.setLightTheme,
-                                  onDarkMode: themeSignal.setDarkTheme,
-                                  onSystemMode: themeSignal.setSystemTheme,
+                                  isLightMode:
+                                      appComponent.themeSignal.isLightMode,
+                                  isDarkMode:
+                                      appComponent.themeSignal.isDarkMode,
+                                  isSystemMode:
+                                      appComponent.themeSignal.isSystemMode,
+                                  onLightMode:
+                                      appComponent.themeSignal.setLightTheme,
+                                  onDarkMode:
+                                      appComponent.themeSignal.setDarkTheme,
+                                  onSystemMode:
+                                      appComponent.themeSignal.setSystemTheme,
                                 ),
                               ),
                               crossFadeState: _isAppearanceExpanded

@@ -13,7 +13,7 @@ Use for any work under `lib/features/` or `lib/core/`. Rules: `AGENTS.md`, `.age
 
 ## Principles
 1. **Offline-first:** Hive is written first; Firestore sync is background-only.
-2. **Signals:** `signals_flutter` for all new state. No `ChangeNotifier`, Riverpod, Bloc, GetX, Provider.
+2. **Signals:** `signals_flutter` for all new state, exposed through `AppComponent` (compile-time DI). No `ChangeNotifier`, Riverpod, Bloc, GetX, Provider.
 3. **Class-based widgets**, one per file, ≤ 300 lines.
 4. **Theme tokens:** `context.colors` / `ThemeExtension`s with light **and** dark values.
 5. **Scope discipline:** touch only what the task needs. No extra tests unless asked.
@@ -56,12 +56,14 @@ class StreakRepository {
 ## Step 4 — Signal
 
 ```dart
+import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 /// Streak state backed by signals.
+@singleton
 class StreakSignal {
-  StreakSignal({StreakRepository? repository})
-    : _repository = repository ?? StreakRepository();
+  @inject
+  StreakSignal(this._repository);
 
   final StreakRepository _repository;
 
@@ -80,19 +82,38 @@ class StreakSignal {
     }
   }
 }
-
-final streakSignal = StreakSignal();
 ```
 
-## Step 5 — Strings, route, theme tokens
+No top-level `final streakSignal = ...` — the instance comes from the DI graph.
+
+## Step 5 — Register in `AppComponent`
+
+In `lib/core/di/app_component.dart` add getters for every new repository/service/signal:
+
+```dart
+StreakRepository get streakRepository;
+StreakSignal get streakSignal;
+```
+
+Annotate the classes with `@singleton` and their constructors with `@inject`. Third-party objects (Firebase, connectivity, plugins) go into a `@module` with `@provides @singleton` (`firebase_module.dart`, `infrastructure_module.dart`). Then regenerate the graph:
+
+```bash
+dart run build_runner build
+```
+
+Never edit `app_component.inject.dart` by hand.
+
+## Step 6 — Strings, route, theme tokens
 - Copy → `lib/core/constant/strings/<feature>_strings.dart` (`abstract final class <Feature>Strings`).
 - Route → constant in `AppRoutes` (+ `publicRoutes` if unauthenticated) and a `GoRoute` in `createAppRouter()`.
 - New semantic color → add to a `ThemeExtension` with light + dark values and wire it in both themes.
 
-## Step 6 — View
-- Separate `StatelessWidget` classes in separate files; read signals via `Watch` / `SignalBuilder`.
+## Step 7 — View
+- Separate `StatelessWidget` classes in separate files; read signals via `Watch` / `SignalBuilder` and access state through `appComponent`.
 
 ```dart
+import 'package:dailypulse/core/di/injection.dart';
+
 class StreakCard extends StatelessWidget {
   const StreakCard({super.key});
 
@@ -103,7 +124,7 @@ class StreakCard extends StatelessWidget {
       return Card(
         color: context.cards.journalCard,
         child: Text(
-          '${streakSignal.count.value}',
+          '${appComponent.streakSignal.count.value}',
           style: context.textTheme.headlineMedium?.copyWith(
             color: colors.onSurface,
           ),
@@ -117,11 +138,12 @@ class StreakCard extends StatelessWidget {
 - No `Widget _buildX()` helpers; no raw colors; no raw strings; guard `BuildContext` after `await`.
 - Handle empty, loading, error and offline states.
 
-## Step 7 — Verify
+## Step 8 — Verify
 
 ```bash
-flutter pub get      # only if pubspec or assets changed
-flutter analyze      # 0 issues
+dart run build_runner build   # after DI annotation changes
+flutter pub get               # only if pubspec or assets changed
+flutter analyze               # 0 issues
 flutter test
 ```
 Then run the app and check the screen in **light and dark**, online and offline.

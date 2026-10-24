@@ -26,6 +26,7 @@ You review code in **DailyPulse** (Flutter, offline-first Hive → Firestore, si
 4. **Project conventions (AGENTS.md)**
    - [ ] Class-based widgets, one per file, ≤ 300 lines (no helper methods returning widgets).
    - [ ] signals_flutter only; no new `ChangeNotifier` / Provider / Riverpod / Bloc / GetX.
+   - [ ] Compile-time DI: `@singleton` + `@inject`, getters on `AppComponent`, `app_component.inject.dart` regenerated and not hand-edited; no top-level signal globals or inline `new Repository()`.
    - [ ] Colors via `context.colors` / `ThemeExtension`s with light **and** dark values; no raw `Color(0x…)`.
    - [ ] New strings in `core/constant/strings/`.
    - [ ] Routes in `AppRoutes` + `createAppRouter()`.

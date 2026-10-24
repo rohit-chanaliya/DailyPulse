@@ -10,6 +10,7 @@
 |---|---|
 | **App** | Offline-first mood tracker. Flutter + Dart 3, Firebase Auth, Hive CE → Firestore sync |
 | **State** | `signals_flutter` (`signal()`, `computed()`, `Watch`). No new `ChangeNotifier`; no Riverpod/Bloc/GetX/Provider |
+| **DI** | Compile-time: `@singleton` + `@inject` → `AppComponent`; access via `appComponent`; run `dart run build_runner build` |
 | **Routing** | `go_router`; paths in `AppRoutes`, routes in `createAppRouter()` |
 | **Widgets** | Class-based only, one per file, ≤ 300 lines. No `Widget _buildX()` helpers |
 | **Theme** | Light **and** dark. Colors via `context.colors` / `ThemeExtension`s. No raw `Color(0x…)` in widgets |

@@ -4,8 +4,10 @@ import 'package:dailypulse/core/router/router_refresh_stream.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/features/app/presentation/app_shell.dart';
 import 'package:dailypulse/features/auth/screens/forgot_password_screen.dart';
+import 'package:dailypulse/features/auth/screens/reset_password_screen.dart';
 import 'package:dailypulse/features/auth/screens/sign_in_screen.dart';
 import 'package:dailypulse/features/auth/screens/sign_up_screen.dart';
+import 'package:dailypulse/features/auth/screens/verify_email_screen.dart';
 import 'package:dailypulse/features/history/screens/history_screen.dart';
 import 'package:dailypulse/features/insights/screens/insights_screen.dart';
 import 'package:dailypulse/features/mood/presentation/models/mood_option.dart';
@@ -22,18 +24,28 @@ import 'package:go_router/go_router.dart';
 /// Decides where a cold start should land.
 ///
 /// Authenticated users skip the whole onboarding/auth funnel.
+/// Unverified email/password users are sent to sign-in.
 String resolveAppStartLocation() {
-  if (FirebaseAuth.instance.currentUser != null) {
-    return AppRoutes.home;
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    // Google users are always verified; email/password users must verify.
+    final isGoogleUser =
+        user.providerData.any((info) => info.providerId == 'google.com');
+    if (user.emailVerified || isGoogleUser) {
+      return AppRoutes.home;
+    }
+    // Unverified email user — send to sign-in.
+    return AppRoutes.signIn;
   }
   return AppPreferences.hasSeenOnboarding
       ? AppRoutes.signIn
       : AppRoutes.welcome;
 }
 
-GoRouter createAppRouter() {
+GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
   return GoRouter(
-    initialLocation: AppRoutes.splash,
+    navigatorKey: navigatorKey,
+    initialLocation: AppRoutes.welcome,
     refreshListenable: RouterRefreshStream(
       FirebaseAuth.instance.authStateChanges(),
     ),
@@ -65,6 +77,26 @@ GoRouter createAppRouter() {
         path: AppRoutes.forgotPassword,
         pageBuilder: (context, state) =>
             _fadePage(state, const ForgotPasswordScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.verifyEmail,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, String>? ?? {};
+          return _fadePage(
+            state,
+            VerifyEmailScreen(
+              email: extra['email'] ?? '',
+              password: extra['password'] ?? '',
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        pageBuilder: (context, state) {
+          final oobCode = state.extra as String? ?? '';
+          return _fadePage(state, ResetPasswordScreen(oobCode: oobCode));
+        },
       ),
       GoRoute(
         path: AppRoutes.addNote,
@@ -128,6 +160,11 @@ String? _redirect(BuildContext context, GoRouterState state) {
     return null;
   }
 
+  // Password reset must stay reachable even when a user is already signed in.
+  if (location == AppRoutes.resetPassword) {
+    return null;
+  }
+
   final user = FirebaseAuth.instance.currentUser;
 
   if (user == null) {
@@ -139,6 +176,18 @@ String? _redirect(BuildContext context, GoRouterState state) {
       return null;
     }
     return AppRoutes.signIn;
+  }
+
+  // User is logged in — check if email is verified (Google users are always verified).
+  final isGoogleUser =
+      user.providerData.any((info) => info.providerId == 'google.com');
+  if (!user.emailVerified && !isGoogleUser) {
+    // Unverified user tried to go somewhere protected: sign them out and
+    // send to sign-in so they can re-authenticate after verifying.
+    if (!AppRoutes.publicRoutes.contains(location)) {
+      return AppRoutes.signIn;
+    }
+    return null;
   }
 
   if (AppRoutes.publicRoutes.contains(location)) {

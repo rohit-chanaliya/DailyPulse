@@ -2,19 +2,17 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
 import '../local/hive_service.dart';
 import '../remote/firestore_service.dart';
 
+/// Pushes pending local entries to Firestore when online.
+@singleton
 class SyncService {
-  SyncService({
-    FirestoreService? firestoreService,
-    Connectivity? connectivity,
-    FirebaseAuth? auth,
-  }) : _firestoreService = firestoreService ?? FirestoreService(),
-       _connectivity = connectivity ?? Connectivity(),
-       _auth = auth ?? FirebaseAuth.instance;
+  @inject
+  SyncService(this._firestoreService, this._connectivity, this._auth);
 
   final FirestoreService _firestoreService;
   final Connectivity _connectivity;

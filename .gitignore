@@ -44,6 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Firebase CLI local cache
+.firebase/
+
 # Firebase Configuration Files
 # Note: Firebase API keys in mobile apps are not secret, but we ignore these
 # to avoid accidentally committing sensitive configuration changes

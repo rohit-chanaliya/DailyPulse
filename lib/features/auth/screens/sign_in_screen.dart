@@ -1,16 +1,22 @@
-import 'package:dailypulse/core/theme/colors.dart';
-import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
-import 'package:dailypulse/core/router/app_routes.dart';
-
-import 'package:dailypulse/core/utils/snackbar_utils.dart';
-import 'package:dailypulse/core/utils/validators.dart';
-import 'package:dailypulse/core/widgets/custom_text_field.dart';
-import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'package:dailypulse/core/constant/strings/auth_strings.dart';
+import 'package:dailypulse/core/di/injection.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
+import 'package:dailypulse/core/utils/snackbar_utils.dart';
+import 'package:dailypulse/core/utils/validators.dart';
+import 'package:dailypulse/core/widgets/custom_text_field.dart';
+import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import '../widgets/auth_back_button.dart';
+import '../widgets/auth_card.dart';
+import '../widgets/auth_google_button.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/auth_trust_badge.dart';
 
+/// Minimalist, mindful Sign In screen with balanced full-screen layout.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -33,7 +39,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      await authSignal.handleSignIn(
+      await appComponent.authSignal.handleSignIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         onError: (message) {
@@ -47,131 +53,222 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onboardingColors = context.onboarding;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF161210)
-          : AppColors.splashCreamBg, // cream bg matching mockup
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-              child: Form(
-                key: _formKey,
+      backgroundColor: onboardingColors.welcomeBg,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32,
+                ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(height: 10),
-                    // Title
-                    Text(
-                      'Sign In To dailypulse.ai',
-                      style: AppTypography.heading2xlBold.copyWith(
-                        color: isDark
-                            ? Colors.white
-                            : const Color(0xFF402B20), // dark brown title
+                    // Top Navigation
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: AuthBackButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go(AppRoutes.welcome);
+                          }
+                        },
                       ),
                     ),
-                    const SizedBox(height: 36),
 
-                    // Email Address Field
-                    CustomTextField(
-                      controller: _emailController,
-                      label: 'Email Address',
-                      hintText: 'Enter your email...',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      suffixIcon: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : const Color(0xFF5A4535),
-                      ),
-                      validator: Validators.validateEmail,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Password Field
-                    CustomTextField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      hintText: 'Enter your password...',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      obscureText: _obscurePassword,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          size: 18,
-                          color: isDark
-                              ? Colors.grey.shade500
-                              : Colors.grey.shade400,
-                        ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
-                      ),
-                      validator: Validators.validatePassword,
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Sign In Button
-                    SignalBuilder(
-                      builder: (context) {
-                        return AppButton(
-                          text: 'Sign In',
-                          suffixIcon: Icons.arrow_forward_rounded,
-                          isLoading:
-                              authSignal.status.value == AuthStatus.loading,
-                          onPressed: _signIn,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 36),
-
-                    const SizedBox(height: 36),
-
-                    // Navigation Links
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account? ",
-                          style: AppTypography.paragraphSm.copyWith(
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : const Color(0xFF5A4535),
+                    // Centered Core: Hero Header + Form Card + Switch Link
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const AuthHeader(
+                            title: AuthStrings.signInTitle,
+                            subtitle: AuthStrings.signInSubtitle,
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.push(AppRoutes.signUp),
-                          child: Text(
-                            'Sign Up',
-                            style: AppTypography.textSmBold.copyWith(
-                              color: AppColors.splashOrangeBg, // orange accent
+                          const SizedBox(height: 24),
+
+                          // Form Card grouping inputs and primary action
+                          AuthCard(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  CustomTextField(
+                                    controller: _emailController,
+                                    label: AuthStrings.emailLabel,
+                                    hintText: AuthStrings.emailHint,
+                                    prefixIcon: Icons.email_outlined,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: Validators.validateEmail,
+                                  ),
+                                  const SizedBox(height: 18),
+                                  CustomTextField(
+                                    controller: _passwordController,
+                                    label: AuthStrings.passwordLabel,
+                                    hintText: AuthStrings.passwordHint,
+                                    prefixIcon: Icons.lock_outline_rounded,
+                                    obscureText: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        size: 20,
+                                        color: onboardingColors.welcomeSubtitle,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _obscurePassword = !_obscurePassword,
+                                      ),
+                                    ),
+                                    validator: Validators.validatePassword,
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Forgot Password link
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          context.push(AppRoutes.forgotPassword),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0,
+                                        ),
+                                        child: Text(
+                                          AuthStrings.forgotPasswordLink,
+                                          style: TextStyle(
+                                            color:
+                                                onboardingColors.welcomeHighlight,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Primary Sign In Button
+                                  SignalBuilder(
+                                    builder: (context) {
+                                      final isLoading =
+                                          appComponent.authSignal.status.value ==
+                                              AuthStatus.loading;
+
+                                      return AuthPrimaryButton(
+                                        text: AuthStrings.signInButton,
+                                        isLoading: isLoading,
+                                        onPressed: _signIn,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Mindful OR Divider
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Divider(
+                                          color: onboardingColors.welcomeSubtitle
+                                              .withValues(alpha: 0.25),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0,
+                                        ),
+                                        child: Text(
+                                          AuthStrings.orDivider,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                onboardingColors.welcomeSubtitle,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Divider(
+                                          color: onboardingColors.welcomeSubtitle
+                                              .withValues(alpha: 0.25),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Google Sign-In Button
+                                  SignalBuilder(
+                                    builder: (context) {
+                                      final isLoading =
+                                          appComponent.authSignal.status.value ==
+                                              AuthStatus.loading;
+
+                                      return AuthGoogleButton(
+                                        isLoading: isLoading,
+                                        onPressed: () async {
+                                          await appComponent.authSignal
+                                              .handleGoogleSignIn(
+                                            onError: (message) {
+                                              if (mounted) {
+                                                SnackBarUtils.showError(
+                                                  context,
+                                                  message,
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => context.push(AppRoutes.forgotPassword),
-                      child: Text(
-                        'Forgot Password',
-                        style: AppTypography.textSmBold.copyWith(
-                          color: AppColors.splashOrangeBg,
-                          decoration: TextDecoration.underline,
-                        ),
+                          const SizedBox(height: 20),
+
+                          // Switch to Sign Up row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AuthStrings.dontHaveAccount,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: onboardingColors.welcomeSubtitle,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => context.push(AppRoutes.signUp),
+                                child: Text(
+                                  AuthStrings.signUpAction,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: onboardingColors.welcomeHighlight,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+
+                    // Bottom Mindful Trust Badge
+                    const AuthTrustBadge(),
                   ],
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

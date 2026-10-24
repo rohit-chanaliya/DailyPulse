@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.scanflowstudio.dailypulse",
+      "sha256_cert_fingerprints": [
+        "66:03:23:29:17:DB:12:BE:4F:82:13:FC:26:39:18:98:68:7A:1B:E5:86:E3:07:FA:55:5C:36:79:56:1A:0B:99"
+      ]
+    }
+  }
+]

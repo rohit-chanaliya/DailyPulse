@@ -49,6 +49,7 @@ Phases are modular. **Skip any phase that doesn't apply** (e.g. a pure UI polish
 - **Specialist:** `dailypulse_frontend_builder`.
 - Models/adapters: only additive Hive changes (new field index, null-tolerant reads). Never renumber or remove fields.
 - Writes: Hive first, then `SyncService`. Firestore only via `FirestoreService`, always with `userId`.
+- Services and repositories are `@singleton` + `@inject`; third-party objects come from `@module` classes. Run `dart run build_runner build` after binding changes.
 - Update `firestore.rules.template` for any new collection; remind the user to publish the rules (never deploy yourself).
 - Offline, empty and error states handled and logged via `appLogger`.
 
@@ -59,7 +60,8 @@ Phases are modular. **Skip any phase that doesn't apply** (e.g. a pure UI polish
 
 ### Phase C — UI & state
 - **Specialist:** `dailypulse_frontend_builder`.
-- Signal in `viewmodels/` (or the feature's existing signals folder), widgets as separate classes in separate files, route + `AppRoutes` constant, strings in `core/constant/strings/`.
+- Signal in `viewmodels/` (or the feature's existing signals folder), registered as `@singleton` + `@inject` with a getter on `AppComponent`; widgets as separate classes in separate files; route + `AppRoutes` constant; strings in `core/constant/strings/`.
+- After changing DI annotations, run `dart run build_runner build` and commit the regenerated `app_component.inject.dart`.
 - Colors only via `context.colors` / `ThemeExtension`s; add tokens for both themes.
 - Shared helpers in `core/utils/`.
 - Check the screen in **light and dark** and with an empty / offline state.
@@ -69,7 +71,7 @@ Phases are modular. **Skip any phase that doesn't apply** (e.g. a pure UI polish
 ## 5. Review & auto-fix
 Before staging anything, invoke **`dailypulse_pr_reviewer`**:
 
-1. **Architecture & style audit/auto-fix:** class-based widgets, ≤ 300 lines, signals only, theme tokens, strings, `AppRoutes`, offline-first rules, no `print()`.
+1. **Architecture & style audit/auto-fix:** class-based widgets, ≤ 300 lines, signals via `AppComponent`, compile-time DI bindings regenerated, theme tokens, strings, `AppRoutes`, offline-first rules, no `print()`.
 2. **Verification:**
    ```bash
    flutter analyze   # must report 0 issues

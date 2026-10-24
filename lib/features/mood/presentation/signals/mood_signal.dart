@@ -1,3 +1,4 @@
+import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
@@ -5,9 +6,10 @@ import '../../data/models/mood_entry.dart';
 import '../../data/repositories/mood_repository.dart';
 
 /// Mood entries and loading state backed by signals.
+@singleton
 class MoodSignal {
-  MoodSignal({MoodRepository? repository})
-    : _repository = repository ?? MoodRepository();
+  @inject
+  MoodSignal(this._repository);
 
   final MoodRepository _repository;
 
@@ -82,5 +84,3 @@ class MoodSignal {
     return _repository.getPendingSyncCount();
   }
 }
-
-final moodSignal = MoodSignal();

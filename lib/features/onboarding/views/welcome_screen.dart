@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
-import 'package:dailypulse/core/theme/app_theme.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
+import 'widgets/welcome_hero_visual.dart';
 
-import 'package:dailypulse/core/widgets/app_logo_widget.dart';
-
+/// Minimalist welcome screen with central app emblem and key mental health pillars.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -30,18 +29,16 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 16),
-              // Logo
-              const AppLogoWidget(size: 48),
-              const SizedBox(height: 24),
-              // Title
+              const SizedBox(height: 20),
+              // Main Headline
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   style: context.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: onboardingColors.welcomeText,
-                    height: 1.2,
+                    height: 1.25,
+                    letterSpacing: -0.5,
                   ),
                   children: [
                     const TextSpan(text: OnboardingStrings.welcomeTitlePart1),
@@ -55,8 +52,8 @@ class WelcomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              // Subtitle
+              const SizedBox(height: 12),
+              // Mindful Subtitle
               Text(
                 OnboardingStrings.welcomeSubtitle,
                 textAlign: TextAlign.center,
@@ -65,46 +62,45 @@ class WelcomeScreen extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
-              const Spacer(),
-              // Graphic
-              SvgPicture.asset(
-                'assets/svg/welcome_1.svg',
-                height: 320,
-                fit: BoxFit.contain,
+              const SizedBox(height: 16),
+              // Centerpiece: Yoga Logo + Flanking Mental Health Points
+              const Expanded(
+                child: Center(
+                  child: WelcomeHeroVisual(),
+                ),
               ),
-              const Spacer(),
-              // Get Started Button
+              const SizedBox(height: 20),
+              // Get Started CTA Button
               ElevatedButton(
                 onPressed: () => context.push(AppRoutes.onboarding),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: onboardingColors.welcomeHighlight,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 18,
-                  ),
+                  minimumSize: const Size(double.infinity, 56),
+                  elevation: 6,
+                  shadowColor: onboardingColors.welcomeHighlight.withValues(alpha: 0.45),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  elevation: 0,
                 ),
                 child: const Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       OnboardingStrings.welcomeGetStarted,
                       style: TextStyle(
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         fontSize: 16,
+                        letterSpacing: 0.3,
                       ),
                     ),
                     SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, size: 20),
+                    Icon(Icons.arrow_forward_rounded, size: 20),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              // Sign In Text
+              const SizedBox(height: 18),
+              // Already have an account row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -126,7 +122,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
             ],
           ),
         ),

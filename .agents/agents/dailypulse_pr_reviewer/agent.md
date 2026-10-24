@@ -18,8 +18,10 @@ You review and **fix** changes in DailyPulse before they are committed (Gate 2 i
 - [ ] One non-trivial widget per file; no UI file over 300 lines that grew in this change.
 - [ ] `const` used where possible; no `BuildContext` use after `await` without `mounted`.
 
-**State**
+**State & DI**
 - [ ] New state uses `signals_flutter`; no new `ChangeNotifier` / `notifyListeners()`, Provider, Riverpod, Bloc, GetX, GetIt (`RouterRefreshStream` is the only allowed ChangeNotifier).
+- [ ] New signals/repositories/services are `@singleton` + `@inject`, exposed as getters on `AppComponent`; no top-level `final xSignal` globals and no `new Repository()` inside signals/widgets.
+- [ ] `app_component.inject.dart` was regenerated (`dart run build_runner build`) and is not hand-edited; `flutter analyze` proves the graph compiles.
 - [ ] Reactive regions (`Watch` / `SignalBuilder`) are as small as practical.
 
 **Theme & copy**
@@ -59,6 +61,9 @@ Fix what you can safely fix. If something needs a product decision, list it unde
 - [x] Class-based widgets, ≤ 300 lines
 ### 2. State (signals)
 - [x] No new ChangeNotifier / alternative state libs
+### 2b. Dependency Injection
+- [x] `@singleton` + `@inject` bindings registered in `AppComponent`
+- [x] `app_component.inject.dart` regenerated, not hand-edited
 ### 3. Theme & Strings
 - [x] Theme tokens with light + dark values
 - [x] Strings in feature strings file

@@ -18,5 +18,31 @@
         }
       }
     }
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "DailyPulse",
+        "supportEmail": "chandrarohit91@gmail.com"
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "hosting",
+    "ignore": ["firebase.json", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/verify",
+        "destination": "/verify.html"
+      },
+      {
+        "source": "/app-verify",
+        "destination": "/app-verify.html"
+      }
+    ]
   }
 }

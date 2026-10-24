@@ -1,20 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:inject_annotation/inject_annotation.dart';
+
 import '../models/mood_entry.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 
+/// Firestore access for mood entries.
+@singleton
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  @inject
+  FirestoreService(this._firestore);
+
+  final FirebaseFirestore _firestore;
   static const String _moodsCollection = 'moods';
 
   Future<String?> addMoodEntry(MoodEntry entry) async {
     try {
-      final docRef = await _firestore.collection(_moodsCollection).add(
-            entry.toFirestore(),
-          );
+      final docRef = await _firestore
+          .collection(_moodsCollection)
+          .add(entry.toFirestore());
       appLogger.d('Added mood entry to Firestore: ${docRef.id}');
       return docRef.id;
     } catch (e, stackTrace) {
-      appLogger.e('Error adding mood entry to Firestore', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error adding mood entry to Firestore',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -40,8 +51,10 @@ class FirestoreService {
             .collection(_moodsCollection)
             .where('userId', isEqualTo: userId)
             .get();
-        
-        appLogger.i('Fetched ${querySnapshot.docs.length} entries (without orderBy)');
+
+        appLogger.i(
+          'Fetched ${querySnapshot.docs.length} entries (without orderBy)',
+        );
         final entries = querySnapshot.docs
             .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
             .toList();
@@ -49,7 +62,11 @@ class FirestoreService {
         entries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
         return entries;
       } catch (e2, stackTrace2) {
-        appLogger.e('Error fetching without orderBy', error: e2, stackTrace: stackTrace2);
+        appLogger.e(
+          'Error fetching without orderBy',
+          error: e2,
+          stackTrace: stackTrace2,
+        );
         return [];
       }
     }
@@ -62,8 +79,10 @@ class FirestoreService {
         .where('userId', isEqualTo: userId)
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 }

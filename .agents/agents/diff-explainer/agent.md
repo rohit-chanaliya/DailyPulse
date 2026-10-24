@@ -36,9 +36,10 @@ If the tree is clean and the branch equals `main`, say so and ask which range or
    - Firestore fields/collections and `firestore.rules.template` changes (rules need publishing)
    - Sync behavior (`SyncService`, pending `id == null` entries)
    - New route / `AppRoutes` / redirect-logic changes
+   - New DI bindings (`@singleton` / `@inject`, `AppComponent` getters) and regenerated `app_component.inject.dart`
    - New theme tokens (light + dark), strings files
    - `pubspec.yaml` dependency or asset changes
-5. **Watch-list (note, don't fix):** observations for `code-reviewer` — raw colors, `print()`, helper methods returning widgets, files over 300 lines, new `ChangeNotifier`, Firestore access outside `FirestoreService`, missing `userId`, secrets or git-ignored Firebase files in the diff.
+5. **Watch-list (note, don't fix):** observations for `code-reviewer` — raw colors, `print()`, helper methods returning widgets, files over 300 lines, new `ChangeNotifier`, top-level signal globals, missing `@singleton`/`@inject` registration, hand-edited or stale `app_component.inject.dart`, Firestore access outside `FirestoreService`, missing `userId`, secrets or git-ignored Firebase files in the diff.
 
 ## 4. Output template
 ```markdown

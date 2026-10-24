@@ -1,16 +1,23 @@
-import 'package:dailypulse/core/theme/colors.dart';
-import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
-import 'package:dailypulse/core/router/app_routes.dart';
-
-import 'package:dailypulse/core/utils/snackbar_utils.dart';
-import 'package:dailypulse/core/utils/validators.dart';
-import 'package:dailypulse/core/widgets/custom_text_field.dart';
-import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'package:dailypulse/core/constant/strings/auth_strings.dart';
+import 'package:dailypulse/core/di/injection.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
+import 'package:dailypulse/core/utils/snackbar_utils.dart';
+import 'package:dailypulse/core/utils/validators.dart';
+import 'package:dailypulse/core/widgets/custom_text_field.dart';
+import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import '../widgets/auth_back_button.dart';
+import '../widgets/auth_card.dart';
+import '../widgets/auth_google_button.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/auth_terms_checkbox.dart';
+import '../widgets/auth_trust_badge.dart';
 
+/// Minimalist, mindful Sign Up screen with balanced full-screen layout.
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -26,7 +33,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _obscurePassword = true;
   bool _agreeToTerms = false;
-  bool _showEmailErrorBanner = false;
 
   @override
   void dispose() {
@@ -37,36 +43,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _signUp() async {
-    // 1. Reset email error state
-    setState(() {
-      _showEmailErrorBanner = false;
-    });
-
-    // 2. Validate email format specifically to trigger mockup error banner
-    final emailVal = Validators.validateEmail(_emailController.text);
-    if (emailVal != null) {
-      setState(() {
-        _showEmailErrorBanner = true;
-      });
+    if (!_agreeToTerms) {
+      SnackBarUtils.showError(
+        context,
+        AuthStrings.termsRequiredError,
+      );
       return;
     }
 
     if (_formKey.currentState!.validate()) {
-      if (!_agreeToTerms) {
-        SnackBarUtils.showError(
-          context,
-          'You must agree to the Terms & Conditions',
-        );
-        return;
-      }
-
-      await authSignal.handleSignUp(
+      await appComponent.authSignal.handleSignUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         name: _nameController.text.trim(),
         onSuccess: () {
           if (mounted) {
-            SnackBarUtils.showSuccess(context, 'Account created successfully!');
+            SnackBarUtils.showSuccess(
+              context,
+              AuthStrings.verificationSentSuccess,
+            );
+            context.go(
+              AppRoutes.verifyEmail,
+              extra: {
+                'email': _emailController.text.trim(),
+                'password': _passwordController.text,
+              },
+            );
           }
         },
         onError: (message) {
@@ -80,203 +82,232 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onboardingColors = context.onboarding;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF161210)
-          : AppColors.splashCreamBg, // cream bg matching mockup
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-              child: Form(
-                key: _formKey,
+      backgroundColor: onboardingColors.welcomeBg,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32,
+                ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(height: 10),
-                    // Title
-                    Text(
-                      'Sign Up For Free',
-                      style: AppTypography.heading2xlBold.copyWith(
-                        color: isDark
-                            ? Colors.white
-                            : const Color(0xFF402B20), // dark brown title
+                    // Top Navigation
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: AuthBackButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go(AppRoutes.signIn);
+                          }
+                        },
                       ),
                     ),
-                    const SizedBox(height: 36),
 
-                    // Full Name Field (Helper for registration completeness)
-                    CustomTextField(
-                      controller: _nameController,
-                      label: 'Full Name',
-                      hintText: 'Enter your name...',
-                      prefixIcon: Icons.person_outline_rounded,
-                      validator: Validators.validateName,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Email Address Field
-                    CustomTextField(
-                      controller: _emailController,
-                      label: 'Email Address',
-                      hintText: 'Enter your email...',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      suffixIcon: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : const Color(0xFF5A4535),
-                      ),
-                      validator: Validators.validateEmail,
-                    ),
-
-                    // Mockup Warning Banner for Invalid Email (drawn matching sign_up image)
-                    if (_showEmailErrorBanner) ...[
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF421C15)
-                              : const Color(0xFFFEDCD6), // soft red/pink alert
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF6B2014)
-                                : const Color(0xFFFEADA0),
-                            width: 1,
+                    // Centered Core: Hero Header + Form Card + Switch Link
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const AuthHeader(
+                            title: AuthStrings.signUpTitle,
+                            subtitle: AuthStrings.signUpSubtitle,
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline_rounded,
-                              color: isDark
-                                  ? const Color(0xFFFF8B78)
-                                  : const Color(0xFFD32F2F),
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Invalid Email Address!!',
-                              style: AppTypography.textXsBold.copyWith(
-                                color: isDark
-                                    ? const Color(0xFFFF8B78)
-                                    : const Color(0xFFD32F2F),
+                          const SizedBox(height: 24),
+
+                          // Form Card grouping inputs, terms, and primary action
+                          AuthCard(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  CustomTextField(
+                                    controller: _nameController,
+                                    label: AuthStrings.nameLabel,
+                                    hintText: AuthStrings.nameHint,
+                                    prefixIcon: Icons.person_outline_rounded,
+                                    keyboardType: TextInputType.name,
+                                    validator: Validators.validateName,
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  CustomTextField(
+                                    controller: _emailController,
+                                    label: AuthStrings.emailLabel,
+                                    hintText: AuthStrings.emailHint,
+                                    prefixIcon: Icons.email_outlined,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: Validators.validateEmail,
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  CustomTextField(
+                                    controller: _passwordController,
+                                    label: AuthStrings.passwordLabel,
+                                    hintText: AuthStrings.passwordHint,
+                                    prefixIcon: Icons.lock_outline_rounded,
+                                    obscureText: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        size: 20,
+                                        color: onboardingColors.welcomeSubtitle,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _obscurePassword = !_obscurePassword,
+                                      ),
+                                    ),
+                                    validator: Validators.validatePasswordStrength,
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  // Terms & Conditions Checkbox
+                                  AuthTermsCheckbox(
+                                    isChecked: _agreeToTerms,
+                                    onChanged: (val) =>
+                                        setState(() => _agreeToTerms = val),
+                                  ),
+                                  const SizedBox(height: 22),
+
+                                  // Primary Sign Up Button
+                                  SignalBuilder(
+                                    builder: (context) {
+                                      final isLoading =
+                                          appComponent.authSignal.status.value ==
+                                              AuthStatus.loading;
+
+                                      return AuthPrimaryButton(
+                                        text: AuthStrings.signUpButton,
+                                        isLoading: isLoading,
+                                        onPressed: _signUp,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Mindful OR Divider
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Divider(
+                                          color: onboardingColors.welcomeSubtitle
+                                              .withValues(alpha: 0.25),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0,
+                                        ),
+                                        child: Text(
+                                          AuthStrings.orDivider,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                onboardingColors.welcomeSubtitle,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Divider(
+                                          color: onboardingColors.welcomeSubtitle
+                                              .withValues(alpha: 0.25),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Google Sign-In Button
+                                  SignalBuilder(
+                                    builder: (context) {
+                                      final isLoading =
+                                          appComponent.authSignal.status.value ==
+                                              AuthStatus.loading;
+
+                                      return AuthGoogleButton(
+                                        isLoading: isLoading,
+                                        onPressed: () async {
+                                          await appComponent.authSignal
+                                              .handleGoogleSignIn(
+                                            onSuccess: () {
+                                              if (mounted) {
+                                                SnackBarUtils.showSuccess(
+                                                  context,
+                                                  AuthStrings.accountCreatedSuccess,
+                                                );
+                                                context.go(AppRoutes.home);
+                                              }
+                                            },
+                                            onError: (message) {
+                                              if (mounted) {
+                                                SnackBarUtils.showError(
+                                                  context,
+                                                  message,
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Switch to Sign In row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AuthStrings.alreadyHaveAccount,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: onboardingColors.welcomeSubtitle,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (context.canPop()) {
+                                    context.pop();
+                                  } else {
+                                    context.go(AppRoutes.signIn);
+                                  }
+                                },
+                                child: Text(
+                                  AuthStrings.signInAction,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: onboardingColors.welcomeHighlight,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                    const SizedBox(height: 20),
-
-                    // Password Field
-                    CustomTextField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      hintText: 'Enter your password...',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      obscureText: _obscurePassword,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          size: 18,
-                          color: isDark
-                              ? Colors.grey.shade500
-                              : Colors.grey.shade400,
-                        ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
-                      ),
-                      validator: Validators.validatePasswordStrength,
                     ),
-                    const SizedBox(height: 24),
 
-                    // I Agree Terms & Conditions Checkbox
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _agreeToTerms,
-                          activeColor: AppColors.splashGreenBg,
-                          checkColor: Colors.white,
-                          onChanged: (val) {
-                            setState(() {
-                              _agreeToTerms = val ?? false;
-                            });
-                          },
-                        ),
-                        Text(
-                          'I Agree with the ',
-                          style: AppTypography.textXsMedium.copyWith(
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : const Color(0xFF5A4535),
-                          ),
-                        ),
-                        Text(
-                          'Terms & Conditions',
-                          style: AppTypography.textXsBold.copyWith(
-                            color: AppColors.splashGreenBg,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Sign Up Button
-                    SignalBuilder(
-                      builder: (context) {
-                        return AppButton(
-                          text: 'Sign Up',
-                          suffixIcon: Icons.arrow_forward_rounded,
-                          isLoading:
-                              authSignal.status.value == AuthStatus.loading,
-                          onPressed: _signUp,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 36),
-
-                    // Navigation back to Sign In
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account? ',
-                          style: AppTypography.paragraphSm.copyWith(
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : const Color(0xFF5A4535),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.go(AppRoutes.signIn),
-                          child: Text(
-                            'Sign In.',
-                            style: AppTypography.textSmBold.copyWith(
-                              color: AppColors.splashOrangeBg,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                    // Bottom Mindful Trust Badge
+                    const AuthTrustBadge(),
                   ],
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

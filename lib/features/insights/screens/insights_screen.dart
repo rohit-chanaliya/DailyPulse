@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'package:dailypulse/core/di/injection.dart';
 import '../../../core/constant/constants.dart';
-import '../../../features/insights/presentation/signals/insights_signal.dart';
-import '../../../features/mood/presentation/signals/mood_signal.dart';
 import '../../../core/utils/analytics_utils.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../features/mood/data/models/mood_entry.dart';
@@ -20,7 +19,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
   @override
   void initState() {
     super.initState();
-    moodSignal.reloadLocalEntries();
+    appComponent.moodSignal.reloadLocalEntries();
   }
 
   void _changeTimeWindow(String window) {
@@ -51,7 +50,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
 
     return SignalBuilder(
       builder: (context) {
-        final allEntries = _getFilteredEntries(insightsSignal.getAllEntries());
+        final allEntries = _getFilteredEntries(
+          appComponent.insightsSignal.getAllEntries(),
+        );
 
         if (allEntries.isEmpty) {
           return const EmptyState(message: 'Log some moods to see insights');

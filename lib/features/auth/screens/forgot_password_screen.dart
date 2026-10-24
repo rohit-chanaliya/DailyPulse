@@ -1,9 +1,21 @@
-import 'package:dailypulse/core/theme/colors.dart';
-import 'package:dailypulse/core/theme/typography.dart';
-import 'package:dailypulse/core/utils/snackbar_utils.dart';
-import 'package:dailypulse/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:signals_flutter/signals_flutter.dart';
+import 'package:dailypulse/core/constant/strings/auth_strings.dart';
+import 'package:dailypulse/core/di/injection.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
+import 'package:dailypulse/core/utils/snackbar_utils.dart';
+import 'package:dailypulse/core/utils/validators.dart';
+import 'package:dailypulse/core/widgets/custom_text_field.dart';
+import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
+import '../widgets/auth_back_button.dart';
+import '../widgets/auth_card.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/auth_trust_badge.dart';
 
+/// Minimalist, mindful Forgot Password screen with balanced full-screen layout.
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -12,183 +24,196 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  int _selectedOptionIndex = 0; // 0: Password (Email), 1: 2FA, 2: Google Auth
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  bool _isSuccessSent = false;
 
-  void _handleSendPassword() {
-    String option = 'Password Reset Link';
-    if (_selectedOptionIndex == 1) option = '2FA Code';
-    if (_selectedOptionIndex == 2) option = 'Google Authenticator setup';
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
-    SnackBarUtils.showSuccess(context, 'Reset method via $option sent successfully!');
+  Future<void> _handleSendResetLink() async {
+    if (_formKey.currentState!.validate()) {
+      final success = await appComponent.authSignal.sendPasswordReset(
+        _emailController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        setState(() {
+          _isSuccessSent = true;
+        });
+        SnackBarUtils.showSuccess(
+          context,
+          AuthStrings.resetLinkSentSuccess,
+        );
+      } else {
+        final error = appComponent.authSignal.errorMessage.value ??
+            AuthStrings.failedToSendResetLink;
+        SnackBarUtils.showError(context, error);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textDarkColor = isDark ? Colors.white : const Color(0xFF402B20); // dark brown title
+    final onboardingColors = context.onboarding;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF161210) : AppColors.splashCreamBg, // cream bg matching mockup
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leadingWidth: 72,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 24.0, top: 20.0),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDark ? const Color(0xFF38302B) : const Color(0xFFEAE2DA),
-                  width: 1.2,
-                ),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.chevron_left_rounded,
-                  color: isDark ? Colors.white : const Color(0xFF5A4535),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: onboardingColors.welcomeBg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              // Title
-              Text(
-                'Forgot Password',
-                style: AppTypography.displaySmExtraBold.copyWith(
-                  color: textDarkColor,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32,
                 ),
-              ),
-              const SizedBox(height: 8),
-              
-              // Subtitle
-              Text(
-                'Select contact details where you want to reset your password.',
-                style: AppTypography.paragraphSm.copyWith(
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 36),
-
-              // Options list
-              Expanded(
-                child: ListView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildOptionCard(
-                      index: 0,
-                      title: 'Password',
-                      icon: Icons.lock_outline_rounded,
-                      isDark: isDark,
+                    // Top Navigation
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: AuthBackButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go(AppRoutes.signIn);
+                          }
+                        },
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildOptionCard(
-                      index: 1,
-                      title: 'Use 2FA',
-                      icon: Icons.security_rounded,
-                      isDark: isDark,
+
+                    // Centered Core: Hero Header + Form Card + Switch Link
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const AuthHeader(
+                            title: AuthStrings.forgotPasswordTitle,
+                            subtitle: AuthStrings.forgotPasswordSubtitle,
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Form Card grouping inputs and primary action
+                          AuthCard(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  if (_isSuccessSent) ...[
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: onboardingColors.welcomeHighlight
+                                            .withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: onboardingColors.welcomeHighlight
+                                              .withValues(alpha: 0.3),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.check_circle_outline_rounded,
+                                            color: onboardingColors.welcomeHighlight,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Text(
+                                              AuthStrings.resetLinkSentSuccess,
+                                              style: context.textTheme.bodySmall?.copyWith(
+                                                color: onboardingColors.welcomeText,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                  ],
+                                  CustomTextField(
+                                    controller: _emailController,
+                                    label: AuthStrings.emailLabel,
+                                    hintText: AuthStrings.emailHint,
+                                    prefixIcon: Icons.email_outlined,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: Validators.validateEmail,
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Primary Reset Button
+                                  SignalBuilder(
+                                    builder: (context) {
+                                      final isLoading =
+                                          appComponent.authSignal.status.value ==
+                                              AuthStatus.loading;
+
+                                      return AuthPrimaryButton(
+                                        text: _isSuccessSent
+                                            ? AuthStrings.resendResetLinkButton
+                                            : AuthStrings.sendResetLinkButton,
+                                        isLoading: isLoading,
+                                        onPressed: _handleSendResetLink,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Return to Sign In row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AuthStrings.rememberPasswordPrefix,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: onboardingColors.welcomeSubtitle,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (context.canPop()) {
+                                    context.pop();
+                                  } else {
+                                    context.go(AppRoutes.signIn);
+                                  }
+                                },
+                                child: Text(
+                                  AuthStrings.backToSignInAction,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: onboardingColors.welcomeHighlight,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildOptionCard(
-                      index: 2,
-                      title: 'Google Authenticator',
-                      icon: Icons.vpn_key_rounded,
-                      isDark: isDark,
-                    ),
+
+                    // Bottom Mindful Trust Badge
+                    const AuthTrustBadge(),
                   ],
                 ),
               ),
-
-              // Send Password Button
-              AppButton(
-                text: 'Send Password',
-                suffixIcon: Icons.lock_outline_rounded,
-                onPressed: _handleSendPassword,
-              ),
-              const SizedBox(height: 12),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOptionCard({
-    required int index,
-    required String title,
-    required IconData icon,
-    required bool isDark,
-  }) {
-    final isSelected = _selectedOptionIndex == index;
-    
-    // Selection Border Color: light green matching mockup
-    final border = isSelected
-        ? Border.all(color: const Color(0xFF98AF86), width: 1.5)
-        : Border.all(color: isDark ? const Color(0xFF2C221D) : const Color(0xFFEAE2DA).withValues(alpha: 0.5), width: 1.2);
-
-    final cardBg = isDark ? const Color(0xFF231E1B) : Colors.white;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedOptionIndex = index;
-        });
-      },
-      child: Container(
-        height: 84,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(42), // highly rounded pill card matching mockup
-          border: border,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Left custom green circle icon
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? const Color(0xFF2A3620) : const Color(0xFFC8D9B8), // light sage background
-              ),
-              child: Icon(
-                icon,
-                color: isDark ? const Color(0xFFBCC9AE) : const Color(0xFF4A6532), // dark sage icon
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 16),
-            // Title
-            Expanded(
-              child: Text(
-                title,
-                style: AppTypography.textMdSemiBold.copyWith(
-                  color: isDark ? Colors.white : const Color(0xFF402B20),
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

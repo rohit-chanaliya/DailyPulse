@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 /// App-wide theme selection backed by a signal.
+@singleton
 class ThemeSignal {
+  @inject
+  ThemeSignal();
+
   final mode = signal<ThemeMode>(ThemeMode.system);
 
   ThemeMode get themeMode => mode.value;
@@ -32,5 +37,3 @@ class ThemeSignal {
   void setDarkTheme() => setThemeMode(ThemeMode.dark);
   void setSystemTheme() => setThemeMode(ThemeMode.system);
 }
-
-final themeSignal = ThemeSignal();
