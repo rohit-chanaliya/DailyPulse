@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:signals_flutter/signals_flutter.dart';
+
+import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
-import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
+import '../viewmodels/onboarding_signal.dart';
 import 'widgets/onboarding_bottom_card.dart';
+import 'widgets/onboarding_page_indicator.dart';
+import 'widgets/onboarding_page_view.dart';
+import 'widgets/onboarding_skip_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,24 +20,12 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  int _currentIndex = 0;
+  late final OnboardingSignal _signal = appComponent.onboardingSignal;
 
-  void _onNext(int pageCount) {
-    if (_currentIndex < pageCount - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      _completeOnboarding();
-    }
-  }
-
-  Future<void> _completeOnboarding() async {
-    await AppPreferences.setHasSeenOnboarding(true);
-    if (mounted) {
-      context.go(AppRoutes.signIn);
-    }
+  @override
+  void initState() {
+    super.initState();
+    _signal.reset();
   }
 
   @override
@@ -42,172 +34,90 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
+  void _onNext() {
+    if (_signal.isLastPage.value) {
+      _completeOnboarding();
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> _completeOnboarding() async {
+    await _signal.complete();
+    if (mounted) {
+      context.go(AppRoutes.signIn);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.onboarding;
 
-    final List<_OnboardingData> pages = [
-      _OnboardingData(
-        image: 'assets/svg/welcome_2.svg',
-        bgColor: colors.page1Bg,
-        badgeColor: colors.page1Badge,
-        step: 1,
-        titlePart1: OnboardingStrings.onboardingPage1TitlePart1,
-        highlightedTitle: OnboardingStrings.onboardingPage1Highlight,
-        titlePart2: OnboardingStrings.onboardingPage1TitlePart2,
-        highlightColor: colors.page1Highlight,
-      ),
-      _OnboardingData(
-        image: 'assets/svg/welcome_3.svg',
-        bgColor: colors.page2Bg,
-        badgeColor: colors.page2Badge,
-        step: 2,
-        titlePart1: OnboardingStrings.onboardingPage2TitlePart1,
-        highlightedTitle: OnboardingStrings.onboardingPage2Highlight,
-        titlePart2: OnboardingStrings.onboardingPage2TitlePart2,
-        highlightColor: colors.page2Highlight,
-      ),
-      _OnboardingData(
-        image: 'assets/svg/welcome_4.svg',
-        bgColor: colors.page3Bg,
-        badgeColor: colors.page3Badge,
-        step: 3,
-        titlePart1: OnboardingStrings.onboardingPage3TitlePart1,
-        highlightedTitle: OnboardingStrings.onboardingPage3Highlight,
-        titlePart2: OnboardingStrings.onboardingPage3TitlePart2,
-        highlightColor: colors.page3Highlight,
-      ),
-      _OnboardingData(
-        image: 'assets/svg/welcome_5.svg',
-        bgColor: colors.page4Bg,
-        badgeColor: colors.page4Badge,
-        step: 4,
-        titlePart1: OnboardingStrings.onboardingPage4TitlePart1,
-        highlightedTitle: OnboardingStrings.onboardingPage4Highlight,
-        titlePart2: OnboardingStrings.onboardingPage4TitlePart2,
-        highlightColor: colors.page4Highlight,
-      ),
-    ];
+    return SignalBuilder(
+      builder: (context) {
+        final index = _signal.currentIndex.value;
+        final page = _signal.currentPage.value;
 
-    final currentPageData = pages[_currentIndex];
-
-    return Scaffold(
-      backgroundColor: currentPageData.bgColor,
-      body: Stack(
-        children: [
-          // Background Color Transition
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            color: currentPageData.bgColor,
-          ),
-
-          Column(
+        return Scaffold(
+          backgroundColor: colors.pageBg(index),
+          body: Stack(
             children: [
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                  itemCount: pages.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: 240.0,
-                      ), // give space for the bottom card
-                      child: SvgPicture.asset(
-                        pages[index].image,
-                        fit: BoxFit.fill,
-                      ),
-                    );
-                  },
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                color: colors.pageBg(index),
+              ),
+              Column(
+                children: [
+                  Expanded(
+                    child: OnboardingPageView(
+                      pages: OnboardingSignal.pages,
+                      controller: _pageController,
+                      onPageChanged: _signal.onPageChanged,
+                    ),
+                  ),
+                ],
+              ),
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: OnboardingPageIndicator(
+                      count: OnboardingSignal.pages.length,
+                      currentIndex: index,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4, right: 12),
+                    child: OnboardingSkipButton(onPressed: _completeOnboarding),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: OnboardingBottomCard(
+                  step: page.step,
+                  titlePart1: page.titlePart1,
+                  highlightedTitle: page.highlightedTitle,
+                  titlePart2: page.titlePart2,
+                  highlightColor: colors.pageHighlight(index),
+                  badgeColor: colors.pageBadge(index),
+                  onNext: _onNext,
                 ),
               ),
             ],
           ),
-
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(pages.length, (index) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 8,
-                      width: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentIndex == index
-                            ? colors.indicatorActive
-                            : colors.indicatorInactive,
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4, right: 12),
-                child: TextButton(
-                  onPressed: _completeOnboarding,
-                  style: TextButton.styleFrom(
-                    foregroundColor: colors.indicatorActive,
-                  ),
-                  child: const Text(OnboardingStrings.onboardingSkip),
-                ),
-              ),
-            ),
-          ),
-
-          // Bottom Card Overlay
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: OnboardingBottomCard(
-              step: currentPageData.step,
-              titlePart1: currentPageData.titlePart1,
-              highlightedTitle: currentPageData.highlightedTitle,
-              titlePart2: currentPageData.titlePart2,
-              highlightColor: currentPageData.highlightColor,
-              badgeColor: currentPageData.badgeColor,
-              onNext: () => _onNext(pages.length),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
-}
-
-class _OnboardingData {
-  final String image;
-  final Color bgColor;
-  final Color badgeColor;
-  final int step;
-  final String titlePart1;
-  final String highlightedTitle;
-  final String titlePart2;
-  final Color highlightColor;
-
-  _OnboardingData({
-    required this.image,
-    required this.bgColor,
-    required this.badgeColor,
-    required this.step,
-    required this.titlePart1,
-    required this.highlightedTitle,
-    required this.titlePart2,
-    required this.highlightColor,
-  });
 }

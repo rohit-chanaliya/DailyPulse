@@ -5,6 +5,7 @@ class OnboardingColors extends ThemeExtension<OnboardingColors> {
   final Color welcomeHighlight;
   final Color welcomeText;
   final Color welcomeSubtitle;
+  final Color welcomeButtonText;
 
   final Color page1Bg;
   final Color page1Badge;
@@ -36,6 +37,7 @@ class OnboardingColors extends ThemeExtension<OnboardingColors> {
     required this.welcomeHighlight,
     required this.welcomeText,
     required this.welcomeSubtitle,
+    required this.welcomeButtonText,
     required this.page1Bg,
     required this.page1Badge,
     required this.page1Highlight,
@@ -57,12 +59,37 @@ class OnboardingColors extends ThemeExtension<OnboardingColors> {
     required this.indicatorInactive,
   });
 
+  /// Background of the 0-based onboarding [page].
+  Color pageBg(int page) => switch (page) {
+    0 => page1Bg,
+    1 => page2Bg,
+    2 => page3Bg,
+    _ => page4Bg,
+  };
+
+  /// Step-badge color of the 0-based onboarding [page].
+  Color pageBadge(int page) => switch (page) {
+    0 => page1Badge,
+    1 => page2Badge,
+    2 => page3Badge,
+    _ => page4Badge,
+  };
+
+  /// Title highlight color of the 0-based onboarding [page].
+  Color pageHighlight(int page) => switch (page) {
+    0 => page1Highlight,
+    1 => page2Highlight,
+    2 => page3Highlight,
+    _ => page4Highlight,
+  };
+
   @override
   OnboardingColors copyWith({
     Color? welcomeBg,
     Color? welcomeHighlight,
     Color? welcomeText,
     Color? welcomeSubtitle,
+    Color? welcomeButtonText,
     Color? page1Bg,
     Color? page1Badge,
     Color? page1Highlight,
@@ -88,6 +115,7 @@ class OnboardingColors extends ThemeExtension<OnboardingColors> {
       welcomeHighlight: welcomeHighlight ?? this.welcomeHighlight,
       welcomeText: welcomeText ?? this.welcomeText,
       welcomeSubtitle: welcomeSubtitle ?? this.welcomeSubtitle,
+      welcomeButtonText: welcomeButtonText ?? this.welcomeButtonText,
       page1Bg: page1Bg ?? this.page1Bg,
       page1Badge: page1Badge ?? this.page1Badge,
       page1Highlight: page1Highlight ?? this.page1Highlight,
@@ -118,6 +146,7 @@ class OnboardingColors extends ThemeExtension<OnboardingColors> {
       welcomeHighlight: Color.lerp(welcomeHighlight, other.welcomeHighlight, t)!,
       welcomeText: Color.lerp(welcomeText, other.welcomeText, t)!,
       welcomeSubtitle: Color.lerp(welcomeSubtitle, other.welcomeSubtitle, t)!,
+      welcomeButtonText: Color.lerp(welcomeButtonText, other.welcomeButtonText, t)!,
       page1Bg: Color.lerp(page1Bg, other.page1Bg, t)!,
       page1Badge: Color.lerp(page1Badge, other.page1Badge, t)!,
       page1Highlight: Color.lerp(page1Highlight, other.page1Highlight, t)!,

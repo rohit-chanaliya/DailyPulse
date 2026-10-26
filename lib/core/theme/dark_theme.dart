@@ -148,6 +148,7 @@ final ThemeData darkTheme = ThemeData(
       welcomeHighlight: AppColors.splashOrangeBg,
       welcomeText: AppColors.white,
       welcomeSubtitle: const Color(0xFFC1C6CD),
+      welcomeButtonText: AppColors.white,
       page1Bg: AppColors.green80,
       page1Badge: AppColors.green90,
       page1Highlight: AppColors.green40,
