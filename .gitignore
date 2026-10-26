@@ -71,5 +71,6 @@ keystore.properties
 
 # Local configuration
 local.properties
+opencode.json
 .agents/AGENTS.md
-.agents/AGENTS.md
+opencode.json

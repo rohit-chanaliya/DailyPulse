@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
-import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/constant/strings/onboarding_strings.dart';
 import 'widgets/welcome_hero_visual.dart';
@@ -11,7 +11,7 @@ class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   Future<void> _openSignIn(BuildContext context) async {
-    await AppPreferences.setHasSeenOnboarding(true);
+    await appComponent.onboardingSignal.complete();
     if (context.mounted) {
       context.go(AppRoutes.signIn);
     }
@@ -64,38 +64,35 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Centerpiece: Yoga Logo + Flanking Mental Health Points
-              const Expanded(
-                child: Center(
-                  child: WelcomeHeroVisual(),
-                ),
-              ),
+              const Expanded(child: Center(child: WelcomeHeroVisual())),
               const SizedBox(height: 20),
               // Get Started CTA Button
               ElevatedButton(
                 onPressed: () => context.push(AppRoutes.onboarding),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: onboardingColors.welcomeHighlight,
-                  foregroundColor: Colors.white,
+                  foregroundColor: onboardingColors.welcomeButtonText,
                   minimumSize: const Size(double.infinity, 56),
                   elevation: 6,
-                  shadowColor: onboardingColors.welcomeHighlight.withValues(alpha: 0.45),
+                  shadowColor: onboardingColors.welcomeHighlight.withValues(
+                    alpha: 0.45,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       OnboardingStrings.welcomeGetStarted,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                      style: context.textTheme.titleLarge?.copyWith(
+                        color: onboardingColors.welcomeButtonText,
                         letterSpacing: 0.3,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward_rounded, size: 20),
                   ],
                 ),
               ),

@@ -6,6 +6,8 @@ import 'package:dailypulse/features/mood/data/repositories/mood_repository.dart'
 import 'package:dailypulse/features/mood/data/remote/firestore_service.dart';
 import 'package:dailypulse/features/mood/data/services/sync_service.dart';
 import 'package:dailypulse/features/mood/presentation/signals/mood_signal.dart';
+import 'package:dailypulse/features/onboarding/repository/onboarding_repository.dart';
+import 'package:dailypulse/features/onboarding/viewmodels/onboarding_signal.dart';
 import 'package:dailypulse/features/onboarding/viewmodels/splash_signal.dart';
 import 'package:dailypulse/features/settings/presentation/signals/theme_signal.dart';
 
@@ -21,10 +23,12 @@ abstract class AppComponent {
   FirestoreService get firestoreService;
   SyncService get syncService;
   MoodRepository get moodRepository;
+  OnboardingRepository get onboardingRepository;
 
   MoodSignal get moodSignal;
   InsightsSignal get insightsSignal;
   ThemeSignal get themeSignal;
   AuthSignal get authSignal;
   SplashSignal get splashSignal;
+  OnboardingSignal get onboardingSignal;
 }

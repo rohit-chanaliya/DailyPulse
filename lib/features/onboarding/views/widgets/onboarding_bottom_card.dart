@@ -33,76 +33,76 @@ class OnboardingBottomCard extends StatelessWidget {
         height: 320,
         // Increased top padding to account for the arc height
         padding: const EdgeInsets.fromLTRB(32, 60, 32, 40),
-        decoration: BoxDecoration(
-          color: colors.bottomCardBg,
-        ),
+        decoration: BoxDecoration(color: colors.bottomCardBg),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: Column(
             key: ValueKey(step),
             mainAxisSize: MainAxisSize.min,
             children: [
-            // Step Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: badgeColor.withValues(alpha: 0.8), // Translucent badge
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${OnboardingStrings.onboardingStepPrefix} $step',
-                style: TextStyle(
-                  color: colors.bottomCardBadgeText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
+              // Step Badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Title
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: context.textTheme.titleLarge?.copyWith(
-                  color: colors.bottomCardText,
-                  fontWeight: FontWeight.w700,
-                  height: 1.4,
+                decoration: BoxDecoration(
+                  color: badgeColor.withValues(alpha: 0.8), // Translucent badge
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                children: [
-                  if (titlePart1.isNotEmpty) TextSpan(text: titlePart1),
-                  TextSpan(
-                    text: highlightedTitle,
-                    style: TextStyle(color: highlightColor),
-                  ),
-                  if (titlePart2.isNotEmpty) TextSpan(text: titlePart2),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            // Next Button
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onNext,
-                borderRadius: BorderRadius.circular(30),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: colors.bottomCardButtonBg,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: colors.bottomCardButtonIcon,
-                    size: 24,
+                child: Text(
+                  '${OnboardingStrings.onboardingStepPrefix} $step',
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: colors.bottomCardBadgeText,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
+              const SizedBox(height: 24),
+              // Title
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: context.textTheme.titleLarge?.copyWith(
+                    color: colors.bottomCardText,
+                    fontWeight: FontWeight.w700,
+                    height: 1.4,
+                  ),
+                  children: [
+                    if (titlePart1.isNotEmpty) TextSpan(text: titlePart1),
+                    TextSpan(
+                      text: highlightedTitle,
+                      style: TextStyle(color: highlightColor),
+                    ),
+                    if (titlePart2.isNotEmpty) TextSpan(text: titlePart2),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Next Button
+              Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: onNext,
+                  borderRadius: BorderRadius.circular(30),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.bottomCardButtonBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: colors.bottomCardButtonIcon,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

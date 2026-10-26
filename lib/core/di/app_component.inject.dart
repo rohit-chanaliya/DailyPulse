@@ -9,10 +9,10 @@
 // ignore_for_file: type=lint, type=warning
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'package:cloud_firestore/cloud_firestore.dart' as _i15;
-import 'package:connectivity_plus/connectivity_plus.dart' as _i13;
-import 'package:firebase_auth/firebase_auth.dart' as _i14;
-import 'package:inject_annotation/inject_annotation.dart' as _i12;
+import 'package:cloud_firestore/cloud_firestore.dart' as _i17;
+import 'package:connectivity_plus/connectivity_plus.dart' as _i15;
+import 'package:firebase_auth/firebase_auth.dart' as _i16;
+import 'package:inject_annotation/inject_annotation.dart' as _i14;
 
 import '../../features/auth/presentation/signals/auth_signal.dart' as _i4;
 import '../../features/insights/presentation/signals/insights_signal.dart'
@@ -21,8 +21,11 @@ import '../../features/mood/data/remote/firestore_service.dart' as _i5;
 import '../../features/mood/data/repositories/mood_repository.dart' as _i7;
 import '../../features/mood/data/services/sync_service.dart' as _i6;
 import '../../features/mood/presentation/signals/mood_signal.dart' as _i8;
-import '../../features/onboarding/viewmodels/splash_signal.dart' as _i10;
-import '../../features/settings/presentation/signals/theme_signal.dart' as _i11;
+import '../../features/onboarding/repository/onboarding_repository.dart'
+    as _i10;
+import '../../features/onboarding/viewmodels/onboarding_signal.dart' as _i11;
+import '../../features/onboarding/viewmodels/splash_signal.dart' as _i12;
+import '../../features/settings/presentation/signals/theme_signal.dart' as _i13;
 import 'app_component.dart' as _i1;
 import 'firebase_module.dart' as _i2;
 import 'infrastructure_module.dart' as _i3;
@@ -60,7 +63,14 @@ class AppComponent$Component implements _i1.AppComponent {
     );
     _moodSignal$Provider = _MoodSignal$Provider(_moodRepository$Provider);
     _insightsSignal$Provider = _InsightsSignal$Provider(_moodSignal$Provider);
-    _splashSignal$Provider = _SplashSignal$Provider();
+    _onboardingRepository$Provider = _OnboardingRepository$Provider();
+    _onboardingSignal$Provider = _OnboardingSignal$Provider(
+      _onboardingRepository$Provider,
+    );
+    _splashSignal$Provider = _SplashSignal$Provider(
+      firebaseAuth$Provider,
+      _onboardingRepository$Provider,
+    );
     _themeSignal$Provider = _ThemeSignal$Provider();
   }
 
@@ -75,6 +85,10 @@ class AppComponent$Component implements _i1.AppComponent {
   late final _MoodSignal$Provider _moodSignal$Provider;
 
   late final _InsightsSignal$Provider _insightsSignal$Provider;
+
+  late final _OnboardingRepository$Provider _onboardingRepository$Provider;
+
+  late final _OnboardingSignal$Provider _onboardingSignal$Provider;
 
   late final _SplashSignal$Provider _splashSignal$Provider;
 
@@ -99,13 +113,21 @@ class AppComponent$Component implements _i1.AppComponent {
   _i9.InsightsSignal get insightsSignal => _insightsSignal$Provider.get();
 
   @override
-  _i10.SplashSignal get splashSignal => _splashSignal$Provider.get();
+  _i10.OnboardingRepository get onboardingRepository =>
+      _onboardingRepository$Provider.get();
 
   @override
-  _i11.ThemeSignal get themeSignal => _themeSignal$Provider.get();
+  _i11.OnboardingSignal get onboardingSignal =>
+      _onboardingSignal$Provider.get();
+
+  @override
+  _i12.SplashSignal get splashSignal => _splashSignal$Provider.get();
+
+  @override
+  _i13.ThemeSignal get themeSignal => _themeSignal$Provider.get();
 }
 
-class _AuthSignal$Provider implements _i12.Provider<_i4.AuthSignal> {
+class _AuthSignal$Provider implements _i14.Provider<_i4.AuthSignal> {
   _AuthSignal$Provider(this._firebaseAuth$Provider);
 
   final _FirebaseAuth$Provider _firebaseAuth$Provider;
@@ -118,48 +140,48 @@ class _AuthSignal$Provider implements _i12.Provider<_i4.AuthSignal> {
   _i4.AuthSignal get() => _singleton;
 }
 
-class _Connectivity$Provider implements _i12.Provider<_i13.Connectivity> {
+class _Connectivity$Provider implements _i14.Provider<_i15.Connectivity> {
   _Connectivity$Provider(this._module);
 
   final _i3.InfrastructureModule _module;
 
-  late final _i13.Connectivity _singleton = _create();
+  late final _i15.Connectivity _singleton = _create();
 
-  _i13.Connectivity _create() => _module.provideConnectivity();
+  _i15.Connectivity _create() => _module.provideConnectivity();
 
   @override
-  _i13.Connectivity get() => _singleton;
+  _i15.Connectivity get() => _singleton;
 }
 
-class _FirebaseAuth$Provider implements _i12.Provider<_i14.FirebaseAuth> {
+class _FirebaseAuth$Provider implements _i14.Provider<_i16.FirebaseAuth> {
   _FirebaseAuth$Provider(this._module);
 
   final _i2.FirebaseModule _module;
 
-  late final _i14.FirebaseAuth _singleton = _create();
+  late final _i16.FirebaseAuth _singleton = _create();
 
-  _i14.FirebaseAuth _create() => _module.provideAuth();
+  _i16.FirebaseAuth _create() => _module.provideAuth();
 
   @override
-  _i14.FirebaseAuth get() => _singleton;
+  _i16.FirebaseAuth get() => _singleton;
 }
 
 class _FirebaseFirestore$Provider
-    implements _i12.Provider<_i15.FirebaseFirestore> {
+    implements _i14.Provider<_i17.FirebaseFirestore> {
   _FirebaseFirestore$Provider(this._module);
 
   final _i2.FirebaseModule _module;
 
-  late final _i15.FirebaseFirestore _singleton = _create();
+  late final _i17.FirebaseFirestore _singleton = _create();
 
-  _i15.FirebaseFirestore _create() => _module.provideFirestore();
+  _i17.FirebaseFirestore _create() => _module.provideFirestore();
 
   @override
-  _i15.FirebaseFirestore get() => _singleton;
+  _i17.FirebaseFirestore get() => _singleton;
 }
 
 class _FirestoreService$Provider
-    implements _i12.Provider<_i5.FirestoreService> {
+    implements _i14.Provider<_i5.FirestoreService> {
   _FirestoreService$Provider(this._firebaseFirestore$Provider);
 
   final _FirebaseFirestore$Provider _firebaseFirestore$Provider;
@@ -173,7 +195,7 @@ class _FirestoreService$Provider
   _i5.FirestoreService get() => _singleton;
 }
 
-class _InsightsSignal$Provider implements _i12.Provider<_i9.InsightsSignal> {
+class _InsightsSignal$Provider implements _i14.Provider<_i9.InsightsSignal> {
   _InsightsSignal$Provider(this._moodSignal$Provider);
 
   final _MoodSignal$Provider _moodSignal$Provider;
@@ -187,7 +209,7 @@ class _InsightsSignal$Provider implements _i12.Provider<_i9.InsightsSignal> {
   _i9.InsightsSignal get() => _singleton;
 }
 
-class _MoodRepository$Provider implements _i12.Provider<_i7.MoodRepository> {
+class _MoodRepository$Provider implements _i14.Provider<_i7.MoodRepository> {
   _MoodRepository$Provider(
     this._syncService$Provider,
     this._firestoreService$Provider,
@@ -208,7 +230,7 @@ class _MoodRepository$Provider implements _i12.Provider<_i7.MoodRepository> {
   _i7.MoodRepository get() => _singleton;
 }
 
-class _MoodSignal$Provider implements _i12.Provider<_i8.MoodSignal> {
+class _MoodSignal$Provider implements _i14.Provider<_i8.MoodSignal> {
   _MoodSignal$Provider(this._moodRepository$Provider);
 
   final _MoodRepository$Provider _moodRepository$Provider;
@@ -221,18 +243,55 @@ class _MoodSignal$Provider implements _i12.Provider<_i8.MoodSignal> {
   _i8.MoodSignal get() => _singleton;
 }
 
-class _SplashSignal$Provider implements _i12.Provider<_i10.SplashSignal> {
-  _SplashSignal$Provider();
+class _OnboardingRepository$Provider
+    implements _i14.Provider<_i10.OnboardingRepository> {
+  _OnboardingRepository$Provider();
 
-  late final _i10.SplashSignal _singleton = _create();
+  late final _i10.OnboardingRepository _singleton = _create();
 
-  _i10.SplashSignal _create() => _i10.SplashSignal();
+  _i10.OnboardingRepository _create() => _i10.OnboardingRepository();
 
   @override
-  _i10.SplashSignal get() => _singleton;
+  _i10.OnboardingRepository get() => _singleton;
 }
 
-class _SyncService$Provider implements _i12.Provider<_i6.SyncService> {
+class _OnboardingSignal$Provider
+    implements _i14.Provider<_i11.OnboardingSignal> {
+  _OnboardingSignal$Provider(this._onboardingRepository$Provider);
+
+  final _OnboardingRepository$Provider _onboardingRepository$Provider;
+
+  late final _i11.OnboardingSignal _singleton = _create();
+
+  _i11.OnboardingSignal _create() =>
+      _i11.OnboardingSignal(_onboardingRepository$Provider.get());
+
+  @override
+  _i11.OnboardingSignal get() => _singleton;
+}
+
+class _SplashSignal$Provider implements _i14.Provider<_i12.SplashSignal> {
+  _SplashSignal$Provider(
+    this._firebaseAuth$Provider,
+    this._onboardingRepository$Provider,
+  );
+
+  final _FirebaseAuth$Provider _firebaseAuth$Provider;
+
+  final _OnboardingRepository$Provider _onboardingRepository$Provider;
+
+  late final _i12.SplashSignal _singleton = _create();
+
+  _i12.SplashSignal _create() => _i12.SplashSignal(
+    _firebaseAuth$Provider.get(),
+    _onboardingRepository$Provider.get(),
+  );
+
+  @override
+  _i12.SplashSignal get() => _singleton;
+}
+
+class _SyncService$Provider implements _i14.Provider<_i6.SyncService> {
   _SyncService$Provider(
     this._firestoreService$Provider,
     this._connectivity$Provider,
@@ -257,13 +316,13 @@ class _SyncService$Provider implements _i12.Provider<_i6.SyncService> {
   _i6.SyncService get() => _singleton;
 }
 
-class _ThemeSignal$Provider implements _i12.Provider<_i11.ThemeSignal> {
+class _ThemeSignal$Provider implements _i14.Provider<_i13.ThemeSignal> {
   _ThemeSignal$Provider();
 
-  late final _i11.ThemeSignal _singleton = _create();
+  late final _i13.ThemeSignal _singleton = _create();
 
-  _i11.ThemeSignal _create() => _i11.ThemeSignal();
+  _i13.ThemeSignal _create() => _i13.ThemeSignal();
 
   @override
-  _i11.ThemeSignal get() => _singleton;
+  _i13.ThemeSignal get() => _singleton;
 }

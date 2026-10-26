@@ -52,15 +52,17 @@ flutter:
     - assets/super_ego/
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  color_dark: "#FFFFFF"
+  color: "#FAF8F5"
+  color_dark: "#161210"
   image: assets/app_logo.png
+  image_dark: assets/app_logo.png
   android_gravity: center
   ios_content_mode: scaleAspectFit
   android_12:
-    color: "#FFFFFF"
-    color_dark: "#FFFFFF"
+    color: "#FAF8F5"
+    color_dark: "#161210"
     image: assets/app_logo.png
+    image_dark: assets/app_logo.png
   web: false
 
 flutter_launcher_icons:

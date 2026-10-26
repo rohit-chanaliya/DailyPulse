@@ -141,6 +141,7 @@ final ThemeData lightTheme = ThemeData(
       welcomeHighlight: AppColors.splashOrangeBg,
       welcomeText: AppColors.brown100,
       welcomeSubtitle: AppColors.brown70,
+      welcomeButtonText: AppColors.white,
       page1Bg: AppColors.green10,
       page1Badge: AppColors.green20,
       page1Highlight: AppColors.green70,
