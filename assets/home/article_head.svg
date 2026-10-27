@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Superego head">
+<g clip-path="url(#clip0_0_478)">
+<rect width="64" height="64" rx="32" fill="#3D4A26"/>
+<path id="Vector" d="M23.9619 12.6886C21.8015 16.4136 20.6667 20.6152 20.6667 24.8889L13.3333 40H21.3333V50.6667H32V64H61.3333V50.9633C61.3333 47.4403 63.2027 44.2477 65.5324 41.6049C67.1218 39.802 68.4371 37.7669 69.5051 35.5928C71.4005 31.7345 72.2395 27.468 71.9411 23.2042C71.6428 18.9403 70.2173 14.8228 67.8018 11.2481C65.3864 7.67351 62.0624 4.76221 58.1501 2.79465C54.2377 0.827084 49.8688 -0.130446 45.4642 0.0142777C41.0595 0.159002 36.7674 1.4011 33.0014 3.62095C29.2354 5.8408 26.1223 8.96361 23.9619 12.6886Z" fill="#B4C48D"/>
+<rect id="Vector_2" x="29.3333" y="24" width="5.33333" height="5.33333" rx="2.66667" fill="#7D944D"/>
+<rect id="Vector_3" x="32" y="50.6667" width="29.3333" height="13.3333" fill="#7D944D"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_478">
+<rect width="64" height="64" rx="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>

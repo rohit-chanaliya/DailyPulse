@@ -7,6 +7,7 @@ import 'extensions/card_colors.dart';
 import 'extensions/app_gradients.dart';
 import 'extensions/splash_colors.dart';
 import 'extensions/onboarding_colors.dart';
+import 'extensions/home_colors.dart';
 
 final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
@@ -24,16 +25,16 @@ final ThemeData lightTheme = ThemeData(
     backgroundColor: AppColors.transparent,
     elevation: 0,
     centerTitle: true,
-    titleTextStyle: AppTypography.headingXlSemiBold.copyWith(color: AppColors.textLightPrimary),
+    titleTextStyle: AppTypography.headingXlSemiBold.copyWith(
+      color: AppColors.textLightPrimary,
+    ),
     iconTheme: const IconThemeData(color: AppColors.textLightPrimary),
   ),
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: AppColors.white,
     elevation: 0,
     indicatorColor: AppColors.transparent,
-    labelTextStyle: WidgetStateProperty.all(
-      AppTypography.textXsMedium,
-    ),
+    labelTextStyle: WidgetStateProperty.all(AppTypography.textXsMedium),
   ),
   cardTheme: const CardThemeData(
     color: AppColors.cardLight,
@@ -46,9 +47,7 @@ final ThemeData lightTheme = ThemeData(
     style: FilledButton.styleFrom(
       backgroundColor: AppColors.accentPink,
       foregroundColor: AppColors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       padding: const EdgeInsets.symmetric(vertical: 18),
       textStyle: AppTypography.textMdSemiBold,
     ),
@@ -73,10 +72,7 @@ final ThemeData lightTheme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
-      borderSide: const BorderSide(
-        color: AppColors.primaryBlue,
-        width: 2,
-      ),
+      borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
@@ -88,6 +84,31 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
   extensions: [
+    const HomeColors(
+      background: AppColors.brownGray10,
+      surface: AppColors.white,
+      headerSurface: AppColors.brown80,
+      searchSurface: AppColors.brown70,
+      textPrimary: AppColors.brown100,
+      textSecondary: AppColors.brown70,
+      textMuted: AppColors.brown60,
+      accent: AppColors.brown60,
+      green: AppColors.green50,
+      greenDark: AppColors.green80,
+      greenLight: AppColors.green20,
+      greenPale: AppColors.green10,
+      orange: AppColors.orange40,
+      orangeDark: AppColors.orange80,
+      orangeLight: AppColors.orange30,
+      orangePale: AppColors.orange10,
+      purple: AppColors.purple30,
+      purpleDark: AppColors.purple80,
+      purpleLight: AppColors.purple20,
+      purplePale: AppColors.purple10,
+      yellow: AppColors.yellow50,
+      yellowDark: AppColors.yellow80,
+      onMedia: AppColors.white,
+    ),
     MoodColors(
       frustrated: const Color(0xFFFFB3BA),
       terrible: const Color(0xFFFFCC80),
