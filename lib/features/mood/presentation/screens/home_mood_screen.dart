@@ -9,6 +9,7 @@ import '../widgets/home_articles_section.dart';
 import '../widgets/home_chatbot_section.dart';
 import '../widgets/home_header.dart';
 import '../widgets/home_metrics_section.dart';
+import '../widgets/home_mood_picker.dart';
 import '../widgets/home_tracker_section.dart';
 
 class HomeMoodScreen extends StatelessWidget {
@@ -41,7 +42,12 @@ class HomeMoodScreen extends StatelessWidget {
                 CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(child: HomeHeader(userName: userName)),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    const SliverPadding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverToBoxAdapter(child: HomeMoodPicker()),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
                     const SliverToBoxAdapter(child: HomeMetricsSection()),
                     const SliverToBoxAdapter(child: SizedBox(height: 32)),
                     const SliverPadding(

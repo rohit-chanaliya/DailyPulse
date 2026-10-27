@@ -39,4 +39,7 @@ abstract final class HomeStrings {
       'Will meditation help you get out from the rat race?';
   static const articleLikes = '987 Likes';
   static const articleViews = '5K views';
+  static const moodPickerTitle = 'How are you feeling today?';
+  static const moodPickerSubtitle = 'Tap a mood to log it';
+  static const signInToLogMood = 'Please sign in to log your mood';
 }
