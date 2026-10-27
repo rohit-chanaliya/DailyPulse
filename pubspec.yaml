@@ -50,6 +50,7 @@ flutter:
     - assets/mindfull/
     - assets/navigation/
     - assets/super_ego/
+    - assets/home/
 
 flutter_native_splash:
   color: "#FAF8F5"

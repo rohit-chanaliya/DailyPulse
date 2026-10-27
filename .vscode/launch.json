@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            // Start the emulator first: flutter emulators --launch Pixel_10
+            "name": "dailypulse (emulator)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "deviceId": "emulator-5554"
+        },
+        {
             "name": "dailypulse",
             "request": "launch",
             "type": "dart",

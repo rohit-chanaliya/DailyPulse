@@ -1,0 +1,45 @@
+abstract final class HomeStrings {
+  static const greetingPrefix = 'Hi, ';
+  static const defaultUserName = 'Friend';
+  static const proMember = 'Pro Member';
+  static const progress = '80%';
+  static const currentMood = 'Happy';
+  static const searchHint = 'Search anything...';
+  static const metricsTitle = 'Mental Health Metrics';
+  static const freudScore = 'Freud Score';
+  static const score = '80';
+  static const scoreStatus = 'Healthy';
+  static const mood = 'Mood';
+  static const moodValue = 'Sad';
+  static const healthJournal = 'Health Journal';
+  static const journalProgress = '31/365';
+  static const trackerTitle = 'Mindful Tracker';
+  static const mindfulHours = 'Mindful Hours';
+  static const mindfulHoursValue = '2.5h/8h';
+  static const sleepQuality = 'Sleep Quality';
+  static const sleepValue = 'Insomniac (~2h Avg)';
+  static const sleepScore = '1';
+  static const mindfulJournal = 'Mindful Journal';
+  static const journalStreak = '64 Day Streak';
+  static const stressLevel = 'Stress Level';
+  static const stressValue = 'Level 3 (Normal)';
+  static const moodTracker = 'Mood Tracker';
+  static const sad = 'Sad';
+  static const neutral = 'Neutral';
+  static const happy = 'Happy';
+  static const chatbotTitle = 'AI Therapy Chatbot';
+  static const conversations = '2541';
+  static const conversationsLabel = 'Conversations';
+  static const conversationsLeft = '83 left this month';
+  static const goPro = 'Go Pro, Now!';
+  static const articlesTitle = 'Mindful Articles';
+  static const seeAll = 'See All';
+  static const articleTag = 'Mental Health';
+  static const articleTitle =
+      'Will meditation help you get out from the rat race?';
+  static const articleLikes = '987 Likes';
+  static const articleViews = '5K views';
+  static const moodPickerTitle = 'How are you feeling today?';
+  static const moodPickerSubtitle = 'Tap a mood to log it';
+  static const signInToLogMood = 'Please sign in to log your mood';
+}

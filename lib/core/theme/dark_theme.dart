@@ -7,6 +7,7 @@ import 'extensions/card_colors.dart';
 import 'extensions/app_gradients.dart';
 import 'extensions/splash_colors.dart';
 import 'extensions/onboarding_colors.dart';
+import 'extensions/home_colors.dart';
 
 final ThemeData darkTheme = ThemeData(
   useMaterial3: true,
@@ -36,10 +37,7 @@ final ThemeData darkTheme = ThemeData(
     elevation: 0,
     indicatorColor: AppColors.transparent,
     labelTextStyle: WidgetStatePropertyAll(
-      TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+      TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
     ),
   ),
   cardTheme: const CardThemeData(
@@ -53,9 +51,7 @@ final ThemeData darkTheme = ThemeData(
     style: FilledButton.styleFrom(
       backgroundColor: AppColors.accentPink,
       foregroundColor: AppColors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       padding: const EdgeInsets.symmetric(vertical: 18),
       textStyle: AppTypography.textMdSemiBold,
     ),
@@ -80,10 +76,7 @@ final ThemeData darkTheme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
-      borderSide: const BorderSide(
-        color: AppColors.primaryBlue,
-        width: 2,
-      ),
+      borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(30),
@@ -95,6 +88,31 @@ final ThemeData darkTheme = ThemeData(
     ),
   ),
   extensions: [
+    const HomeColors(
+      background: AppColors.brown100,
+      surface: AppColors.brown90,
+      headerSurface: AppColors.brown80,
+      searchSurface: AppColors.brown70,
+      textPrimary: AppColors.white,
+      textSecondary: AppColors.brown30,
+      textMuted: AppColors.brown60,
+      accent: AppColors.brown60,
+      green: AppColors.green50,
+      greenDark: AppColors.green80,
+      greenLight: AppColors.green20,
+      greenPale: AppColors.green10,
+      orange: AppColors.orange40,
+      orangeDark: AppColors.orange80,
+      orangeLight: AppColors.orange30,
+      orangePale: AppColors.orange10,
+      purple: AppColors.purple30,
+      purpleDark: AppColors.purple80,
+      purpleLight: AppColors.purple20,
+      purplePale: AppColors.purple10,
+      yellow: AppColors.yellow50,
+      yellowDark: AppColors.yellow80,
+      onMedia: AppColors.white,
+    ),
     MoodColors(
       frustrated: const Color(0xFFEF9A9A),
       terrible: const Color(0xFFFFB74D),
