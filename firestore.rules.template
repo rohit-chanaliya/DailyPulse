@@ -10,6 +10,13 @@ service cloud.firestore {
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
+
+    // App uses zero-based mood levels 0..5 (Frustrated..Excited).
+    function moodLevelInRange(data) {
+      return !('moodLevel' in data) ||
+        (data.moodLevel is int &&
+         data.moodLevel >= 0 && data.moodLevel <= 5);
+    }
     
     // Users collection - users can only read/write their own data
     match /users/{userId} {
@@ -21,13 +28,15 @@ service cloud.firestore {
     
     // Mood entries - users can only access their own moods
     match /moods/{moodId} {
-      allow read: if isAuthenticated() && 
+      allow read: if isAuthenticated() &&
                      resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && 
-                       request.resource.data.userId == request.auth.uid;
-      allow update: if isAuthenticated() && 
-                       resource.data.userId == request.auth.uid;
-      allow delete: if isAuthenticated() && 
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       moodLevelInRange(request.resource.data);
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid &&
+                       moodLevelInRange(request.resource.data);
+      allow delete: if isAuthenticated() &&
                        resource.data.userId == request.auth.uid;
     }
     

@@ -67,7 +67,10 @@ class FirestoreService {
           error: e2,
           stackTrace: stackTrace2,
         );
-        return [];
+        // Throw so callers can distinguish failure from an empty list.
+        // Returning [] here would let a merge wipe local (including pending)
+        // entries, so the repository must fall back to local data instead.
+        rethrow;
       }
     }
   }

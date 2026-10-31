@@ -39,5 +39,7 @@ class HiveService {
     return moodBox.putAll({for (final e in entries) e.localId: e});
   }
 
+  static Future<void> delete(String localId) => moodBox.delete(localId);
+
   static Future<void> clear() => moodBox.clear();
 }

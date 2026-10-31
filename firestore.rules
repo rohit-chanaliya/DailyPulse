@@ -8,7 +8,7 @@ rules_version = '2';
 // Document ID: auto-generated document ID (UUID or Firestore push ID)
 // Fields:
 //   - userId: string (required, immutable, must equal request.auth.uid) - owner's auth UID
-//   - moodLevel: int (required, integer in range [1, 6]) - recorded mood level
+//   - moodLevel: int (required, integer in range [0, 5]) - recorded mood level
 //   - timestamp: timestamp (required) - client event timestamp for the mood entry
 //   - note: string (optional, string with max length 1000) - optional mood reflection/journal
 //   - createdAt: timestamp (optional/serverTimestamp) - record creation timestamp
@@ -73,8 +73,8 @@ service cloud.firestore {
              data.keys().hasOnly(['userId', 'moodLevel', 'timestamp', 'note', 'createdAt']) &&
              data.userId == request.auth.uid &&
              data.moodLevel is int &&
-             data.moodLevel >= 1 &&
-             data.moodLevel <= 6 &&
+             data.moodLevel >= 0 &&
+             data.moodLevel <= 5 &&
              data.timestamp is timestamp &&
              isValidOptionalString('note', 0, 1000) &&
              (!('createdAt' in data) || data.createdAt is timestamp);
