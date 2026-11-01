@@ -20,7 +20,7 @@ class HomeMoodPicker extends StatelessWidget {
       return;
     }
 
-    context.push(AppRoutes.addNote, extra: mood);
+    context.push(AppRoutes.logMood, extra: mood.level);
   }
 
   @override
