@@ -8,6 +8,7 @@ import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/features/mood/data/local/hive_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -50,6 +51,19 @@ class DailyPulseApp extends StatelessWidget {
         themeMode: appComponent.themeSignal.themeMode,
         debugShowCheckedModeBanner: false,
         routerConfig: router,
+        builder: (context, child) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: isDark
+                ? SystemUiOverlayStyle.light.copyWith(
+                    statusBarColor: Colors.transparent,
+                  )
+                : SystemUiOverlayStyle.dark.copyWith(
+                    statusBarColor: Colors.transparent,
+                  ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       ),
     );
   }
