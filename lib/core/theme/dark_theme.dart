@@ -9,6 +9,7 @@ import 'extensions/splash_colors.dart';
 import 'extensions/onboarding_colors.dart';
 import 'extensions/home_colors.dart';
 import 'extensions/log_mood_colors.dart';
+import 'extensions/nav_bar_colors.dart';
 
 final ThemeData darkTheme = ThemeData(
   useMaterial3: true,
@@ -115,6 +116,7 @@ final ThemeData darkTheme = ThemeData(
       onMedia: AppColors.white,
     ),
     LogMoodColors.immersive,
+    NavBarColors.brown,
     MoodColors(
       frustrated: const Color(0xFFEF9A9A),
       terrible: const Color(0xFFFFB74D),
