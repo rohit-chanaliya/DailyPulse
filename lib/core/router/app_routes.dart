@@ -14,6 +14,7 @@ abstract final class AppRoutes {
   static const String resetPassword = '/reset-password';
 
   static const String home = '/home';
+  static const String mood = '/home/mood';
   static const String history = '/history';
   static const String insights = '/insights';
   static const String settings = '/settings';

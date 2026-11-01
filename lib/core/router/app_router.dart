@@ -14,6 +14,7 @@ import 'package:dailypulse/features/mood/presentation/models/journal_entry_args.
 import 'package:dailypulse/features/mood/presentation/screens/home_mood_screen.dart';
 import 'package:dailypulse/features/mood/presentation/screens/journal_entry_screen.dart';
 import 'package:dailypulse/features/mood/presentation/screens/log_mood_screen.dart';
+import 'package:dailypulse/features/mood/presentation/screens/mood_screen.dart';
 import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
 import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
@@ -104,6 +105,12 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
               GoRoute(
                 path: AppRoutes.home,
                 builder: (context, state) => const HomeMoodScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'mood',
+                    builder: (context, state) => const MoodScreen(),
+                  ),
+                ],
               ),
             ],
           ),

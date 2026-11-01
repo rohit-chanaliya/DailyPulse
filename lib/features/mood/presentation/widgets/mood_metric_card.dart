@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:dailypulse/core/constant/strings/home_strings.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/features/mood/presentation/models/home_assets.dart';
 import 'home_asset_icon.dart';
@@ -27,58 +29,61 @@ class MoodMetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final home = context.home;
-    return HomeMetricCard(
-      color: home.orange,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const HomeAssetIcon(HomeAssets.moodSad),
-              const SizedBox(width: 8),
-              Text(
-                HomeStrings.mood,
-                style: context.textTheme.titleMedium?.copyWith(
-                  color: home.onMedia,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            HomeStrings.moodValue,
-            style: context.textTheme.headlineLarge?.copyWith(
-              color: home.orangePale,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const Spacer(),
-          SizedBox(
-            height: 101,
-            width: 131,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.mood),
+      child: HomeMetricCard(
+        color: home.orange,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                for (final (index, height) in _barHeights.indexed)
-                  Container(
-                    width: 8,
-                    height: height,
-                    margin: EdgeInsets.only(
-                      right: index == _barHeights.length - 1 ? 0 : 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: index >= 3 && index <= 7
-                          ? home.orangePale
-                          : home.orangeLight,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                const HomeAssetIcon(HomeAssets.moodSad),
+                const SizedBox(width: 8),
+                Text(
+                  HomeStrings.mood,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    color: home.onMedia,
+                    fontSize: 16,
                   ),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              HomeStrings.moodValue,
+              style: context.textTheme.headlineLarge?.copyWith(
+                color: home.orangePale,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              height: 101,
+              width: 131,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  for (final (index, height) in _barHeights.indexed)
+                    Container(
+                      width: 8,
+                      height: height,
+                      margin: EdgeInsets.only(
+                        right: index == _barHeights.length - 1 ? 0 : 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: index >= 3 && index <= 7
+                            ? home.orangePale
+                            : home.orangeLight,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

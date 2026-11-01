@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
-import 'package:dailypulse/core/di/injection.dart';
-import '../../../core/constant/constants.dart';
-import '../../../core/utils/analytics_utils.dart';
-import '../../../core/widgets/empty_state.dart';
-import '../../../features/mood/data/models/mood_entry.dart';
 
+import 'package:dailypulse/core/constant/strings/insights_strings.dart';
+import 'package:dailypulse/core/di/injection.dart';
+import 'package:dailypulse/core/utils/mood_series_utils.dart';
+import 'package:dailypulse/core/widgets/screen_header.dart';
+import 'package:dailypulse/features/insights/widgets/mood_breakdown_card.dart';
+import 'package:dailypulse/features/insights/widgets/mood_curve_chart.dart';
+import 'package:dailypulse/features/insights/widgets/mood_range_pills.dart';
+import 'package:dailypulse/features/insights/widgets/week_mood_row.dart';
+import 'package:dailypulse/core/widgets/empty_state.dart';
+
+/// Mood over time: a grouped curve, this week's faces and the mood breakdown.
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
 
@@ -14,7 +20,7 @@ class InsightsScreen extends StatefulWidget {
 }
 
 class _InsightsScreenState extends State<InsightsScreen> {
-  String _selectedTimeWindow = 'all'; // 'week', 'month', 'all'
+  MoodGranularity _granularity = MoodGranularity.all;
 
   @override
   void initState() {
@@ -22,356 +28,74 @@ class _InsightsScreenState extends State<InsightsScreen> {
     appComponent.moodSignal.reloadLocalEntries();
   }
 
-  void _changeTimeWindow(String window) {
-    setState(() {
-      _selectedTimeWindow = window;
-    });
-  }
-
-  List<MoodEntry> _getFilteredEntries(List<MoodEntry> allEntries) {
-    final now = DateTime.now();
-    switch (_selectedTimeWindow) {
-      case 'week':
-        return allEntries
-            .where((e) => now.difference(e.timestamp).inDays <= 7)
-            .toList();
-      case 'month':
-        return allEntries
-            .where((e) => now.difference(e.timestamp).inDays <= 30)
-            .toList();
-      default:
-        return allEntries;
+  Future<void> _refresh() async {
+    final user = appComponent.authSignal.user.value;
+    if (user != null) {
+      await appComponent.moodSignal.fetchMoodEntries(user.uid);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: SignalBuilder(
+        builder: (context) {
+          final entries = appComponent.insightsSignal.getAllEntries();
+          final points = MoodSeriesUtils.series(entries, _granularity);
+          final week = MoodSeriesUtils.weekAverages(entries, DateTime.now());
 
-    return SignalBuilder(
-      builder: (context) {
-        final allEntries = _getFilteredEntries(
-          appComponent.insightsSignal.getAllEntries(),
-        );
-
-        if (allEntries.isEmpty) {
-          return const EmptyState(message: 'Log some moods to see insights');
-        }
-
-        final analytics = AnalyticsUtils.calculateAnalytics(allEntries);
-
-        if (analytics.isEmpty) {
-          return const EmptyState(message: 'No data available');
-        }
-
-        final avgMood = analytics['avgMood'] as double;
-        final totalEntries = analytics['totalEntries'] as int;
-        final moodCounts = analytics['moodCounts'] as Map<int, int>;
-
-        return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Mood Insights',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your emotional journey at a glance',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              _buildTimeWindowFilter(isDark),
-              const SizedBox(height: 24),
-
-              _buildAverageMoodCard(avgMood, totalEntries, isDark),
-              const SizedBox(height: 20),
-
-              Expanded(
-                child: _buildMoodDistribution(moodCounts, totalEntries, isDark),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTimeWindowFilter(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildFilterButton('Week', 'week', isDark),
-          _buildFilterButton('Month', 'month', isDark),
-          _buildFilterButton('All Time', 'all', isDark),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterButton(String label, String value, bool isDark) {
-    final isSelected = _selectedTimeWindow == value;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _changeTimeWindow(value),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark ? Colors.blue.shade700 : Colors.blue.shade600)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected
-                  ? Colors.white
-                  : (isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.only(
+              top: 24,
+              bottom: 24 + MediaQuery.paddingOf(context).bottom,
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAverageMoodCard(double avgMood, int totalEntries, bool isDark) {
-    final moodIndex = avgMood.round().clamp(0, 5);
-    final moodColor = AppConstants.moodColorsDark[moodIndex];
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: moodColor.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  AppConstants.moodEmojis[moodIndex],
-                  style: const TextStyle(fontSize: 48),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Average Mood',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppConstants.moodLabels[moodIndex],
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${avgMood.toStringAsFixed(1)} / 5.0',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: moodColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$totalEntries mood entries logged',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ScreenHeader(
+                    title: InsightsStrings.title,
+                    subtitle: InsightsStrings.subtitle,
+                    actionIcon: Icons.refresh_rounded,
+                    actionTooltip: InsightsStrings.refreshTooltip,
+                    onActionPressed: _refresh,
+                    actionLoading: appComponent.moodSignal.isLoading.value,
                   ),
                 ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: MoodRangePills(
+                    selected: _granularity,
+                    onChanged: (g) => setState(() => _granularity = g),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (entries.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48),
+                    child: EmptyState(message: InsightsStrings.emptyMessage),
+                  )
+                else ...[
+                  MoodCurveChart(points: points),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: WeekMoodRow(averages: week),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: MoodBreakdownCard(entries: entries),
+                  ),
+                ],
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMoodDistribution(
-    Map<int, int> moodCounts,
-    int totalEntries,
-    bool isDark,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Mood Distribution',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'How often you feel each mood',
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                final count = moodCounts[index] ?? 0;
-                if (count == 0) return const SizedBox.shrink();
-
-                final percentage = ((count / totalEntries) * 100).round();
-                final color = AppConstants.moodColorsDark[index];
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            AppConstants.moodEmojis[index],
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              AppConstants.moodLabels[index],
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '$percentage%',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Stack(
-                        children: [
-                          Container(
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF1E1E1E)
-                                  : Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          FractionallySizedBox(
-                            widthFactor: percentage / 100,
-                            child: Container(
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

@@ -8,12 +8,16 @@ class MoodFace extends StatelessWidget {
     required this.faceColor,
     required this.featureColor,
     this.size = 160,
+    this.glow = true,
   });
 
   final int level;
   final Color faceColor;
   final Color featureColor;
   final double size;
+
+  /// Soft halo behind the happy face; turn off for small icon uses.
+  final bool glow;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,7 @@ class MoodFace extends StatelessWidget {
         level: level,
         faceColor: faceColor,
         featureColor: featureColor,
+        glow: glow,
       ),
     );
   }
@@ -33,11 +38,13 @@ class _FacePainter extends CustomPainter {
     required this.level,
     required this.faceColor,
     required this.featureColor,
+    required this.glow,
   });
 
   final int level;
   final Color faceColor;
   final Color featureColor;
+  final bool glow;
 
   static const _happyLevel = 4;
 
@@ -46,7 +53,7 @@ class _FacePainter extends CustomPainter {
     final s = size.width;
     Offset p(double x, double y) => Offset(x * s, y * s);
 
-    if (level == _happyLevel) {
+    if (glow && level == _happyLevel) {
       canvas.drawCircle(
         p(0.5, 0.5),
         s * 0.52,
@@ -109,5 +116,6 @@ class _FacePainter extends CustomPainter {
   bool shouldRepaint(_FacePainter old) =>
       old.level != level ||
       old.faceColor != faceColor ||
-      old.featureColor != featureColor;
+      old.featureColor != featureColor ||
+      old.glow != glow;
 }
