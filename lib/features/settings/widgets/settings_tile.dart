@@ -1,69 +1,80 @@
 import 'package:flutter/material.dart';
 
-class SettingsTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final VoidCallback? onTap;
-  final bool isDestructive;
+import 'package:dailypulse/core/theme/context_extensions.dart';
 
+/// One settings row: tinted icon box, title, optional subtitle and chevron.
+class SettingsTile extends StatelessWidget {
   const SettingsTile({
     super.key,
     required this.icon,
+    required this.iconBackground,
     required this.iconColor,
     required this.title,
     this.subtitle,
-    this.trailing,
     this.onTap,
     this.isDestructive = false,
   });
 
+  final IconData icon;
+  final Color iconBackground;
+  final Color iconColor;
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+  final bool isDestructive;
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return ListTile(
+    final home = context.home;
+    final danger = context.status.error;
+    final titleColor = isDestructive ? danger : home.textPrimary;
+
+    return InkWell(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isDestructive 
-              ? Colors.red.withValues(alpha: 0.1)
-              : iconColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(
-          icon,
-          color: isDestructive ? Colors.red : iconColor,
-          size: 22,
-        ),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: isDestructive 
-              ? Colors.red 
-              : (isDark ? Colors.white : Colors.black87),
-        ),
-      ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle!,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: isDestructive
+                    ? danger.withValues(alpha: 0.15)
+                    : iconBackground,
+                borderRadius: BorderRadius.circular(14),
               ),
-            )
-          : null,
-      trailing: trailing ?? Icon(
-        Icons.arrow_forward_ios,
-        size: 14,
-        color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+              child: Icon(
+                icon,
+                size: 24,
+                color: isDestructive ? danger : iconColor,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: context.textTheme.titleLarge?.copyWith(
+                      color: titleColor,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: home.textMuted,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (!isDestructive)
+              Icon(Icons.chevron_right_rounded, color: home.textMuted),
+          ],
+        ),
       ),
     );
   }

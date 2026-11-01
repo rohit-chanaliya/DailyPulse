@@ -47,7 +47,10 @@ class MoodRepository {
     return HiveService.watchAll();
   }
 
-  // Fetch mood entries from Firebase and sync to local storage
+  // Fetch mood entries from Firebase and merge into local storage.
+  //
+  // Pending entries (id == null) are never deleted, and local data is never
+  // replaced when the fetch fails — Firestore throws instead of returning [].
   Future<List<MoodEntry>> fetchAndSyncFromFirebase(String userId) async {
     try {
       appLogger.i('Starting Firebase fetch for user: $userId');
@@ -55,11 +58,36 @@ class MoodRepository {
 
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
 
-      // Replace local storage with the Firebase snapshot
-      await HiveService.clear();
-      await HiveService.putAll(firebaseEntries);
+      final localEntries = HiveService.getAll();
+      final localById = <String, MoodEntry>{
+        for (final e in localEntries)
+          if (e.id != null) e.id!: e,
+      };
+      final remoteIds = <String>{
+        for (final e in firebaseEntries)
+          if (e.id != null) e.id!,
+      };
 
-      appLogger.i('Synced ${firebaseEntries.length} entries to local Hive');
+      // Reuse the existing localId for synced entries so a re-fetch does
+      // not duplicate them (fromFirestore generates a fresh localId).
+      final merged = firebaseEntries.map((remote) {
+        final existing = remote.id == null ? null : localById[remote.id];
+        if (existing == null) return remote;
+        return remote.copyWith(localId: existing.localId);
+      }).toList();
+
+      // Propagate remote deletes, but only for this user's synced entries.
+      // Pending uploads (id == null) and other users' data are untouched.
+      for (final local in localEntries) {
+        if (local.id != null &&
+            local.userId == userId &&
+            !remoteIds.contains(local.id)) {
+          await HiveService.delete(local.localId);
+        }
+      }
+      await HiveService.putAll(merged);
+
+      appLogger.i('Merged ${merged.length} entries into local Hive');
       return HiveService.getAll();
     } catch (e, stackTrace) {
       appLogger.e(

@@ -74,3 +74,4 @@ local.properties
 opencode.json
 .agents/AGENTS.md
 AGENTS.md
+app_design/*

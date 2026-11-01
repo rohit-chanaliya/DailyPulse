@@ -14,11 +14,13 @@ abstract final class AppRoutes {
   static const String resetPassword = '/reset-password';
 
   static const String home = '/home';
+  static const String mood = '/home/mood';
   static const String history = '/history';
   static const String insights = '/insights';
   static const String settings = '/settings';
 
-  static const String addNote = '/mood-note';
+  static const String logMood = '/log-mood';
+  static const String journalEntry = '/journal-entry';
 
   /// Routes that may be visited without an authenticated user.
   static const Set<String> publicRoutes = {

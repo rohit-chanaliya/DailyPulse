@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ThemeSelector extends StatefulWidget {
-  final bool isLightMode;
-  final bool isDarkMode;
-  final bool isSystemMode;
-  final VoidCallback onLightMode;
-  final VoidCallback onDarkMode;
-  final VoidCallback onSystemMode;
+import 'package:dailypulse/core/constant/strings/settings_strings.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
 
+/// Light / Dark / System choice as a segmented pill.
+class ThemeSelector extends StatelessWidget {
   const ThemeSelector({
     super.key,
     required this.isLightMode,
@@ -18,166 +15,91 @@ class ThemeSelector extends StatefulWidget {
     required this.onSystemMode,
   });
 
-  @override
-  State<ThemeSelector> createState() => _ThemeSelectorState();
-}
-
-class _ThemeSelectorState extends State<ThemeSelector>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _onTapDown() {
-    _animationController.forward();
-  }
-
-  void _onTapUp() {
-    _animationController.reverse();
-  }
+  final bool isLightMode;
+  final bool isDarkMode;
+  final bool isSystemMode;
+  final VoidCallback onLightMode;
+  final VoidCallback onDarkMode;
+  final VoidCallback onSystemMode;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Column(
-      children: [
-        _buildThemeOption(
-          icon: Icons.light_mode_outlined,
-          title: 'Light',
-          subtitle: 'Bright and clear',
-          isSelected: widget.isLightMode,
-          onTap: widget.onLightMode,
-          isDark: isDark,
-        ),
-        const SizedBox(height: 12),
-        _buildThemeOption(
-          icon: Icons.dark_mode_outlined,
-          title: 'Dark',
-          subtitle: 'Easy on the eyes',
-          isSelected: widget.isDarkMode,
-          onTap: widget.onDarkMode,
-          isDark: isDark,
-        ),
-        const SizedBox(height: 12),
-        _buildThemeOption(
-          icon: Icons.brightness_auto,
-          title: 'System',
-          subtitle: 'Match device settings',
-          isSelected: widget.isSystemMode,
-          onTap: widget.onSystemMode,
-          isDark: isDark,
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: context.home.searchSurface.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          _ThemePill(
+            icon: Icons.light_mode_outlined,
+            label: SettingsStrings.themeLight,
+            selected: isLightMode,
+            onTap: onLightMode,
+          ),
+          _ThemePill(
+            icon: Icons.dark_mode_outlined,
+            label: SettingsStrings.themeDark,
+            selected: isDarkMode,
+            onTap: onDarkMode,
+          ),
+          _ThemePill(
+            icon: Icons.brightness_auto_outlined,
+            label: SettingsStrings.themeSystem,
+            selected: isSystemMode,
+            onTap: onSystemMode,
+          ),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildThemeOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
-    return GestureDetector(
-      onTapDown: (_) => _onTapDown(),
-      onTapUp: (_) => _onTapUp(),
-      onTapCancel: _onTapUp,
-      onTap: () {
-        _onTapUp();
-        onTap();
-      },
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark
-                    ? Colors.blue.shade700.withValues(alpha: 0.3)
-                    : Colors.blue.shade50)
-                : (isDark
-                    ? const Color(0xFF1E1E1E)
-                    : Colors.blue.shade50.withValues(alpha: 0.3)),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected
-                  ? (isDark ? Colors.blue.shade300 : Colors.blue.shade200)
-                  : Colors.transparent,
-              width: 2,
+class _ThemePill extends StatelessWidget {
+  const _ThemePill({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final home = context.home;
+    final color = selected ? home.onMedia : home.textPrimary;
+
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 48,
+            decoration: BoxDecoration(
+              color: selected ? home.accent : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? (isDark ? Colors.blue.shade700 : Colors.blue.shade200)
-                      : (isDark
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 20, color: color),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: context.textTheme.labelLarge?.copyWith(color: color),
                 ),
-                child: Icon(
-                  icon,
-                  color: isSelected
-                      ? (isDark ? Colors.white : Colors.blue.shade700)
-                      : Colors.grey.shade600,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (isSelected)
-                Icon(
-                  Icons.check_circle,
-                  color: isDark ? Colors.blue.shade300 : Colors.blue.shade200,
-                  size: 24,
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

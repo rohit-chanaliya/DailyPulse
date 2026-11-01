@@ -61,7 +61,11 @@ class HomeMoodScreen extends StatelessWidget {
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 32)),
                     const SliverToBoxAdapter(child: HomeArticlesSection()),
-                    const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 40 + MediaQuery.paddingOf(context).bottom,
+                      ),
+                    ),
                   ],
                 ),
               ],

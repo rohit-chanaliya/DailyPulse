@@ -10,9 +10,11 @@ import 'package:dailypulse/features/auth/screens/sign_up_screen.dart';
 import 'package:dailypulse/features/auth/screens/verify_email_screen.dart';
 import 'package:dailypulse/features/history/screens/history_screen.dart';
 import 'package:dailypulse/features/insights/screens/insights_screen.dart';
-import 'package:dailypulse/features/mood/presentation/models/mood_option.dart';
-import 'package:dailypulse/features/mood/presentation/screens/add_note_screen.dart';
+import 'package:dailypulse/features/mood/presentation/models/journal_entry_args.dart';
 import 'package:dailypulse/features/mood/presentation/screens/home_mood_screen.dart';
+import 'package:dailypulse/features/mood/presentation/screens/journal_entry_screen.dart';
+import 'package:dailypulse/features/mood/presentation/screens/log_mood_screen.dart';
+import 'package:dailypulse/features/mood/presentation/screens/mood_screen.dart';
 import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
 import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
@@ -78,11 +80,19 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
         },
       ),
       GoRoute(
-        path: AppRoutes.addNote,
+        path: AppRoutes.logMood,
         pageBuilder: (context, state) {
-          final mood = state.extra! as MoodOption;
-          final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-          return _fadePage(state, AddNoteScreen(mood: mood, userId: userId));
+          final level = state.extra as int? ?? LogMoodScreen.defaultLevel;
+          return _fadePage(state, LogMoodScreen(initialLevel: level));
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.journalEntry,
+        pageBuilder: (context, state) {
+          final args =
+              state.extra as JournalEntryArgs? ??
+              const JournalEntryArgs(level: LogMoodScreen.defaultLevel);
+          return _fadePage(state, JournalEntryScreen(args: args));
         },
       ),
       StatefulShellRoute.indexedStack(
@@ -95,6 +105,12 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
               GoRoute(
                 path: AppRoutes.home,
                 builder: (context, state) => const HomeMoodScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'mood',
+                    builder: (context, state) => const MoodScreen(),
+                  ),
+                ],
               ),
             ],
           ),

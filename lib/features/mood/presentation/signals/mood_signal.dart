@@ -20,14 +20,17 @@ class MoodSignal {
     required int moodLevel,
     required String userId,
     String? note,
+    DateTime? timestamp,
+    String? title,
   }) async {
     isLoading.value = true;
     try {
       final entry = MoodEntry(
-        timestamp: DateTime.now(),
+        timestamp: timestamp ?? DateTime.now(),
         moodLevel: moodLevel,
         note: note?.isEmpty ?? true ? null : note,
         userId: userId,
+        title: title?.isEmpty ?? true ? null : title,
       );
 
       await _repository.addMoodEntry(entry, userId);

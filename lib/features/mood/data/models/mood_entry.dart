@@ -14,6 +14,7 @@ class MoodEntry {
   final String? note;
   final String? id; // Firestore document ID
   final String? userId; // User who created this entry
+  final String? title; // Optional journal title
 
   MoodEntry({
     String? localId,
@@ -22,6 +23,7 @@ class MoodEntry {
     this.note,
     this.id,
     this.userId,
+    this.title,
   }) : localId = localId ?? const Uuid().v4();
 
   Map<String, dynamic> toFirestore() {
@@ -31,6 +33,7 @@ class MoodEntry {
       'note': note,
       'userId': userId,
       'createdAt': FieldValue.serverTimestamp(),
+      if (title != null) 'title': title,
     };
   }
 
@@ -41,6 +44,7 @@ class MoodEntry {
       note: data['note'] as String?,
       id: docId,
       userId: data['userId'] as String?,
+      title: data['title'] as String?,
     );
   }
 
@@ -51,6 +55,7 @@ class MoodEntry {
     String? note,
     String? id,
     String? userId,
+    String? title,
   }) {
     return MoodEntry(
       localId: localId ?? this.localId,
@@ -59,6 +64,7 @@ class MoodEntry {
       note: note ?? this.note,
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      title: title ?? this.title,
     );
   }
 }
@@ -68,21 +74,36 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
   @override
   final int typeId = 1;
 
-  static const int _fieldCount = 6;
+  static const int _fieldCount = 7;
 
   @override
   MoodEntry read(BinaryReader reader) {
     final fields = <int, dynamic>{};
-    for (var i = 0; i < reader.readByte(); i++) {
+    final count = reader.readByte();
+    for (var i = 0; i < count; i++) {
       fields[reader.readByte()] = reader.read();
     }
+    // Null-tolerant: old or partially-written frames may miss fields.
+    final rawTimestamp = fields[1];
+    final timestamp = switch (rawTimestamp) {
+      final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
+      final DateTime dt => dt,
+      _ => DateTime.now(),
+    };
+    final rawMood = fields[2];
+    final moodLevel = switch (rawMood) {
+      final int v => v.clamp(0, 5),
+      final num n => n.toInt().clamp(0, 5),
+      _ => 3,
+    };
     return MoodEntry(
-      localId: fields[0] as String,
-      timestamp: DateTime.fromMillisecondsSinceEpoch(fields[1] as int),
-      moodLevel: fields[2] as int,
+      localId: fields[0] as String? ?? const Uuid().v4(),
+      timestamp: timestamp,
+      moodLevel: moodLevel,
       note: fields[3] as String?,
       id: fields[4] as String?,
       userId: fields[5] as String?,
+      title: fields[6] as String?,
     );
   }
 
@@ -101,7 +122,9 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
       ..writeByte(4)
       ..write(obj.id)
       ..writeByte(5)
-      ..write(obj.userId);
+      ..write(obj.userId)
+      ..writeByte(6)
+      ..write(obj.title);
   }
 
   @override

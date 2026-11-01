@@ -1,146 +1,141 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import 'package:dailypulse/core/constant/strings/settings_strings.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
+
+/// Account summary: initial avatar, name, email and two info chips.
 class UserProfileCard extends StatelessWidget {
+  const UserProfileCard({
+    super.key,
+    this.displayName,
+    this.email,
+    this.memberSince,
+    this.entryCount = 0,
+  });
+
   final String? displayName;
   final String? email;
-
-  const UserProfileCard({super.key, this.displayName, this.email});
+  final DateTime? memberSince;
+  final int entryCount;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).primaryColor;
+    final home = context.home;
+    final name = (displayName?.trim().isNotEmpty ?? false)
+        ? displayName!.trim()
+        : SettingsStrings.defaultName;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF2C2C2C),
-                  const Color(0xFF1E1E1E),
-                ]
-              : [
-                  primaryColor.withValues(alpha: 0.1),
-                  Colors.white,
-                ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark 
-              ? Colors.white.withValues(alpha: 0.05) 
-              : primaryColor.withValues(alpha: 0.05),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: home.headerSurface,
+        borderRadius: BorderRadius.circular(32),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
+          Row(
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: 72,
+                height: 72,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      primaryColor,
-                      primaryColor.withValues(alpha: 0.7),
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: home.accent,
                 ),
-                child: Center(
-                  child: Text(
-                    (displayName?.isNotEmpty ?? false)
-                        ? displayName![0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                child: Text(
+                  name[0].toUpperCase(),
+                  style: context.textTheme.displaySmall?.copyWith(
+                    color: home.onMedia,
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: primaryColor,
-                      width: 2,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.headlineLarge?.copyWith(
+                        color: home.onMedia,
+                      ),
                     ),
-                  ),
-                  child: Icon(
-                    Icons.edit,
-                    size: 14,
-                    color: primaryColor,
-                  ),
+                    const SizedBox(height: 2),
+                    Text(
+                      email ?? SettingsStrings.noEmail,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: home.onMedia.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  displayName ?? 'User',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (memberSince != null)
+                _InfoChip(
+                  icon: Icons.calendar_today_outlined,
+                  label:
+                      '${SettingsStrings.memberSincePrefix}'
+                      '${DateFormat('MMM y').format(memberSince!)}',
+                  background: home.greenDark,
+                  foreground: home.green,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  email ?? 'No email',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Premium Member',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              _InfoChip(
+                icon: Icons.edit_note_rounded,
+                label: '$entryCount${SettingsStrings.entriesSuffix}',
+                background: home.yellowDark,
+                foreground: home.yellow,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.foreground,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: foreground),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: context.textTheme.labelMedium?.copyWith(color: foreground),
           ),
         ],
       ),

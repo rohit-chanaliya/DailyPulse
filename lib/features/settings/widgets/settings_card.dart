@@ -1,42 +1,24 @@
 import 'package:flutter/material.dart';
 
-class SettingsCard extends StatelessWidget {
-  final Widget child;
-  final EdgeInsets? margin;
+import 'package:dailypulse/core/theme/context_extensions.dart';
 
-  const SettingsCard({
-    super.key,
-    required this.child,
-    this.margin,
-  });
+/// Rounded surface that groups related settings rows.
+class SettingsCard extends StatelessWidget {
+  const SettingsCard({super.key, required this.child, this.padding});
+
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
-      margin: margin,
+      padding: padding,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark 
-              ? Colors.white.withValues(alpha: 0.05) 
-              : Colors.black.withValues(alpha: 0.05),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: context.home.surface,
+        borderRadius: BorderRadius.circular(28),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: child,
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: child,
     );
   }
 }
