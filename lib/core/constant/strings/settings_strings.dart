@@ -23,6 +23,9 @@ abstract final class SettingsStrings {
   static const signOut = 'Sign Out';
   static const signOutSubtitle = 'Exit your current session';
   static const signOutMessage = 'Are you sure you want to sign out?';
+  static const deleteAccount = 'Delete Account';
+  static const deleteAccountSubtitle =
+      'Permanently delete your account and data';
   static const appName = 'DailyPulse';
-  static const version = 'Version 1.0.0';
+  static const version = 'Version 1.0.1';
 }

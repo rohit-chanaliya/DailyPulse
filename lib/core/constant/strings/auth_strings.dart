@@ -30,6 +30,8 @@ abstract final class AuthStrings {
   static const String signInAction = 'Sign In';
   static const String termsPrefix = 'I agree to the ';
   static const String termsLink = 'Terms & Conditions';
+  static const String termsAndPrivacyDivider = ' and ';
+  static const String privacyPolicyLink = 'Privacy Policy';
   static const String termsRequiredError =
       'Please accept the Terms & Conditions to proceed';
   static const String accountCreatedSuccess =
@@ -90,4 +92,14 @@ abstract final class AuthStrings {
   static const String failedToSendResetLink = 'Failed to send reset link';
   static const String rememberPasswordPrefix = 'Remember your password? ';
   static const String backToSignInAction = 'Sign In';
+
+  // Delete Account
+  static const String deleteAccountNoUser =
+      'No signed-in account found. Please sign in again.';
+  static const String deleteAccountDataFailed =
+      'Your data could not be deleted. Check your connection and try again.';
+  static const String deleteAccountFailed =
+      'Could not delete your account. Please try again.';
+  static const String deleteAccountCancelled =
+      'Account deletion was cancelled.';
 }

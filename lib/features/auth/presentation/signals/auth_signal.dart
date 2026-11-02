@@ -8,6 +8,8 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
+import 'package:dailypulse/features/mood/data/repositories/mood_repository.dart';
+import 'package:dailypulse/features/mood/data/services/sync_service.dart';
 
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
@@ -15,7 +17,7 @@ enum AuthStatus { initial, authenticated, unauthenticated, loading }
 @singleton
 class AuthSignal {
   @inject
-  AuthSignal(this._auth) {
+  AuthSignal(this._auth, this._syncService, this._moodRepository) {
     if (!kIsWeb) {
       GoogleSignIn.instance.initialize();
     }
@@ -29,22 +31,25 @@ class AuthSignal {
   }
 
   final FirebaseAuth _auth;
+  final SyncService _syncService;
+  final MoodRepository _moodRepository;
   late final StreamSubscription<User?> _authSubscription;
 
   final status = signal<AuthStatus>(AuthStatus.initial);
   final user = signal<User?>(null);
   final errorMessage = signal<String?>(null);
 
+  /// Whether the signed-in user authenticated through Google.
+  bool get isGoogleUser {
+    final current = user.value;
+    if (current == null) return false;
+    return current.providerData.any((info) => info.providerId == 'google.com');
+  }
+
   /// Whether the current email/password user has a verified email.
   /// Google sign-in users are always considered verified.
   bool get isEmailVerified =>
-      user.value?.emailVerified == true ||
-      _isGoogleUser(user.value);
-
-  bool _isGoogleUser(User? u) {
-    if (u == null) return false;
-    return u.providerData.any((info) => info.providerId == 'google.com');
-  }
+      user.value?.emailVerified == true || isGoogleUser;
 
   bool get isAuthenticated => status.value == AuthStatus.authenticated;
 
@@ -52,10 +57,17 @@ class AuthSignal {
     if (value == null) {
       user.value = null;
       status.value = AuthStatus.unauthenticated;
+      _syncService.stopBackgroundSync();
       return;
     }
     user.value = value;
     status.value = AuthStatus.authenticated;
+
+    // Nothing else starts sync, so this listener is the single entry point:
+    // it covers cold starts with a restored session and every sign-in.
+    _syncService.startBackgroundSync();
+    unawaited(_syncService.syncPendingEntries());
+
     appLogger.i(
       'Auth state changed: ${status.value.name}, User UID: ${value.uid}',
     );
@@ -165,15 +177,9 @@ class AuthSignal {
         final GoogleAuthProvider authProvider = GoogleAuthProvider();
         userCredential = await _auth.signInWithPopup(authProvider);
       } else {
-        final GoogleSignInAccount googleUser =
-            await GoogleSignIn.instance.authenticate();
-        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          idToken: googleAuth.idToken,
+        userCredential = await _auth.signInWithCredential(
+          await _googleCredential(),
         );
-
-        userCredential = await _auth.signInWithCredential(credential);
       }
 
       user.value = userCredential.user;
@@ -449,6 +455,90 @@ class AuthSignal {
       default:
         return 'Authentication failed. Please try again';
     }
+  }
+
+  /// Permanently deletes the signed-in account and every data trace of it.
+  ///
+  /// [password] is only needed for email/password accounts whose session is
+  /// older than Firebase's recent-login window; Google accounts re-authenticate
+  /// through the account picker.
+  ///
+  /// Order matters: the remote/local wipe runs while the user is still signed
+  /// in, because the security rules only allow owners to delete their own
+  /// documents. Deleting the Auth user first would make that wipe impossible.
+  Future<bool> deleteAccount({String? password}) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      errorMessage.value = AuthStrings.deleteAccountNoUser;
+      return false;
+    }
+
+    try {
+      if (!await _hasRecentLogin(currentUser)) {
+        await _reauthenticate(currentUser, password);
+      }
+
+      final dataDeleted = await _moodRepository.deleteAccountData(
+        currentUser.uid,
+      );
+      if (!dataDeleted) {
+        errorMessage.value = AuthStrings.deleteAccountDataFailed;
+        return false;
+      }
+
+      try {
+        await currentUser.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code != 'requires-recent-login') rethrow;
+        await _reauthenticate(currentUser, password);
+        await currentUser.delete();
+      }
+
+      appLogger.i('Account deleted: ${currentUser.uid}');
+      return true;
+    } on FirebaseAuthException catch (e) {
+      errorMessage.value = _getErrorMessage(e.code);
+      appLogger.w('Account deletion failed: ${e.code}');
+      return false;
+    } on GoogleSignInException catch (e) {
+      errorMessage.value = e.code == GoogleSignInExceptionCode.canceled
+          ? AuthStrings.deleteAccountCancelled
+          : AuthStrings.deleteAccountFailed;
+      appLogger.w('Account deletion re-auth failed: ${e.code}');
+      return false;
+    } catch (e, stackTrace) {
+      errorMessage.value = AuthStrings.deleteAccountFailed;
+      appLogger.e(
+        'Unexpected error deleting account',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
+  }
+
+  /// Firebase only asks for a fresh login within a few minutes of sign-in.
+  Future<bool> _hasRecentLogin(User user) async {
+    final lastSignIn = user.metadata.lastSignInTime;
+    if (lastSignIn == null) return false;
+    return DateTime.now().difference(lastSignIn) <
+        const Duration(minutes: 4);
+  }
+
+  Future<void> _reauthenticate(User user, String? password) async {
+    final credential = isGoogleUser
+        ? await _googleCredential()
+        : EmailAuthProvider.credential(
+            email: user.email ?? '',
+            password: password ?? '',
+          );
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  Future<AuthCredential> _googleCredential() async {
+    final googleUser = await GoogleSignIn.instance.authenticate();
+    final googleAuth = googleUser.authentication;
+    return GoogleAuthProvider.credential(idToken: googleAuth.idToken);
   }
 
   void dispose() {

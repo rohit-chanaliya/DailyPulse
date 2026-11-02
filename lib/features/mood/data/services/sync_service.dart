@@ -110,15 +110,7 @@ class SyncService {
     _isSyncing = true;
 
     try {
-      final allEntries = HiveService.getAll();
-      final pendingEntries = allEntries
-          .where(
-            (entry) =>
-                entry.id == null &&
-                entry.userId != null &&
-                entry.userId == user.uid,
-          )
-          .toList();
+      final pendingEntries = HiveService.getPendingForUser(user.uid);
 
       if (pendingEntries.isEmpty) {
         return;
@@ -166,10 +158,7 @@ class SyncService {
       return false;
     }
 
-    return HiveService.getAll().any(
-      (entry) =>
-          entry.id == null && entry.userId != null && entry.userId == userId,
-    );
+    return HiveService.getPendingForUser(userId).isNotEmpty;
   }
 
   int getPendingSyncCount() {
@@ -178,14 +167,7 @@ class SyncService {
       return 0;
     }
 
-    return HiveService.getAll()
-        .where(
-          (entry) =>
-              entry.id == null &&
-              entry.userId != null &&
-              entry.userId == userId,
-        )
-        .length;
+    return HiveService.getPendingForUser(userId).length;
   }
 
   bool _hasConnection(dynamic event) {

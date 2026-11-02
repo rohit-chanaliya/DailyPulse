@@ -1,7 +1,7 @@
 name: dailypulse
 description: "Daily Pulse - Track your daily moods and emotions"
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.11.3
@@ -30,6 +30,7 @@ dependencies:
   inject_annotation: ^1.2.1
   google_sign_in: ^7.2.0
   app_links: ^7.2.2
+  url_launcher: ^6.3.3
   
   
 
@@ -38,7 +39,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
-  flutter_native_splash:
+  flutter_native_splash: ^2.4.8
   flutter_launcher_icons: ^0.14.2
   inject_generator: ^1.2.1
 flutter:
@@ -55,20 +56,20 @@ flutter:
 flutter_native_splash:
   color: "#FAF8F5"
   color_dark: "#161210"
-  image: assets/app_logo.png
-  image_dark: assets/app_logo.png
+  image: assets/splash_android12.png
+  image_dark: assets/splash_android12.png
   android_gravity: center
   ios_content_mode: scaleAspectFit
   android_12:
     color: "#FAF8F5"
     color_dark: "#161210"
-    image: assets/app_logo.png
-    image_dark: assets/app_logo.png
+    image: assets/splash_android12.png
+    image_dark: assets/splash_android12.png
   web: false
 
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false
   image_path: "assets/app_logo.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/app_logo.png"

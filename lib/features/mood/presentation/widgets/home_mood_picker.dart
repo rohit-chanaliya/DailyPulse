@@ -97,16 +97,21 @@ class _MoodButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            Text(mood.emoji, style: const TextStyle(fontSize: 26)),
-            const SizedBox(height: 4),
+            Text(
+              mood.emoji,
+              style: const TextStyle(fontSize: 22, height: 1.1),
+            ),
+            const SizedBox(height: 2),
             Text(
               mood.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.textTheme.labelMedium?.copyWith(
+              style: context.textTheme.labelSmall?.copyWith(
                 color: context.home.textPrimary,
                 fontWeight: FontWeight.w600,
+                height: 1.2,
               ),
             ),
           ],

@@ -2,19 +2,27 @@ import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
+import '../../../auth/presentation/signals/auth_signal.dart';
 import '../../data/models/mood_entry.dart';
 import '../../data/repositories/mood_repository.dart';
 
 /// Mood entries and loading state backed by signals.
+///
+/// Every read is scoped to the signed-in user: the Hive box is shared by every
+/// account on this device, so unscoped reads would leak another user's moods.
 @singleton
 class MoodSignal {
   @inject
-  MoodSignal(this._repository);
+  MoodSignal(this._repository, this._authSignal);
 
   final MoodRepository _repository;
+  final AuthSignal _authSignal;
 
   final isLoading = signal(false);
   final entries = signal<List<MoodEntry>>(const []);
+
+  /// The signed-in user's id, or `null` when nobody is signed in.
+  String? get _userId => _authSignal.user.value?.uid;
 
   Future<bool> saveMood({
     required int moodLevel,
@@ -34,7 +42,7 @@ class MoodSignal {
       );
 
       await _repository.addMoodEntry(entry, userId);
-      entries.value = _repository.getAllEntries();
+      entries.value = _repository.getAllEntries(userId);
       appLogger.i('Mood saved successfully: level $moodLevel');
       return true;
     } catch (e, stackTrace) {
@@ -56,15 +64,15 @@ class MoodSignal {
         error: e,
         stackTrace: stackTrace,
       );
-      entries.value = _repository.getAllEntries();
+      entries.value = _repository.getAllEntries(userId);
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Locally cached entries, refreshed on every write.
+  /// Locally cached entries of the signed-in user, refreshed on every write.
   void reloadLocalEntries() {
-    entries.value = _repository.getAllEntries();
+    entries.value = _repository.getAllEntries(_userId);
   }
 
   Stream<List<MoodEntry>> streamMoodEntries(String userId) {
@@ -72,7 +80,7 @@ class MoodSignal {
   }
 
   Stream<List<MoodEntry>> watchLocalEntries() {
-    return _repository.watchEntries();
+    return _repository.watchEntries(_userId);
   }
 
   void startBackgroundSync() {

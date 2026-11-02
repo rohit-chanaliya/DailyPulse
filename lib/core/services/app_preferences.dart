@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:hive_ce/hive.dart';
 
 /// Lightweight local preferences backed by Hive.
@@ -9,6 +10,7 @@ class AppPreferences {
 
   static const String _boxName = 'app_preferences';
   static const String _onboardingSeenKey = 'has_seen_onboarding';
+  static const String _themeModeKey = 'theme_mode';
 
   static late final Box<dynamic> _box;
 
@@ -22,5 +24,20 @@ class AppPreferences {
 
   static Future<void> setHasSeenOnboarding(bool value) {
     return _box.put(_onboardingSeenKey, value);
+  }
+
+  /// Theme the user picked in Settings; [ThemeMode.system] when never set.
+  static ThemeMode get themeMode => switch (_box.get(_themeModeKey)) {
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
+
+  static Future<void> setThemeMode(ThemeMode mode) {
+    return _box.put(_themeModeKey, switch (mode) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'system',
+    });
   }
 }

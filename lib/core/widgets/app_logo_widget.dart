@@ -11,7 +11,7 @@ class AppLogoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/mindful_yoga_logo.png',
+      'assets/app_logo.png',
       width: size,
       height: size,
       fit: BoxFit.contain,

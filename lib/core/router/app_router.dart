@@ -18,6 +18,7 @@ import 'package:dailypulse/features/mood/presentation/screens/mood_screen.dart';
 import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
 import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
+import 'package:dailypulse/features/settings/screens/delete_account_screen.dart';
 import 'package:dailypulse/features/settings/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -94,6 +95,11 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
               const JournalEntryArgs(level: LogMoodScreen.defaultLevel);
           return _fadePage(state, JournalEntryScreen(args: args));
         },
+      ),
+      GoRoute(
+        path: AppRoutes.deleteAccount,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const DeleteAccountScreen()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

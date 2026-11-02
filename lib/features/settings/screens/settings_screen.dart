@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+import 'package:dailypulse/core/constant/links.dart';
 import 'package:dailypulse/core/constant/strings/settings_strings.dart';
 import 'package:dailypulse/core/di/injection.dart';
+import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
+import 'package:dailypulse/core/utils/link_launcher.dart';
 import 'package:dailypulse/core/widgets/screen_header.dart';
 import 'package:dailypulse/features/settings/widgets/settings_section.dart';
 import 'package:dailypulse/features/settings/widgets/settings_tile.dart';
@@ -23,7 +27,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    appComponent.moodSignal.reloadLocalEntries();
+    // Defer signal mutation to after the first frame to avoid
+    // SignalEffectException during the build phase.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) appComponent.moodSignal.reloadLocalEntries();
+    });
   }
 
   Future<void> _handleSignOut() async {
@@ -120,6 +128,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           iconColor: home.green,
                           title: SettingsStrings.privacy,
                           subtitle: SettingsStrings.privacySubtitle,
+                          onTap: () => LinkLauncher.open(
+                            context,
+                            AppLinks.privacyPolicy,
+                          ),
                         ),
                       ],
                     ),
@@ -148,14 +160,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 28),
                   SettingsSection(
                     title: SettingsStrings.account,
-                    child: SettingsTile(
-                      icon: Icons.logout_rounded,
-                      iconBackground: home.orangeDark,
-                      iconColor: home.orange,
-                      title: SettingsStrings.signOut,
-                      subtitle: SettingsStrings.signOutSubtitle,
-                      isDestructive: true,
-                      onTap: _handleSignOut,
+                    child: Column(
+                      children: [
+                        SettingsTile(
+                          icon: Icons.logout_rounded,
+                          iconBackground: home.orangeDark,
+                          iconColor: home.orange,
+                          title: SettingsStrings.signOut,
+                          subtitle: SettingsStrings.signOutSubtitle,
+                          onTap: _handleSignOut,
+                        ),
+                        divider,
+                        SettingsTile(
+                          icon: Icons.delete_outline_rounded,
+                          iconBackground: home.orangeDark,
+                          iconColor: home.orange,
+                          title: SettingsStrings.deleteAccount,
+                          subtitle: SettingsStrings.deleteAccountSubtitle,
+                          isDestructive: true,
+                          onTap: () =>
+                              context.push(AppRoutes.deleteAccount),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 36),

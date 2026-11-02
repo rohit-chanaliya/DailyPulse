@@ -12,12 +12,21 @@ class FirestoreService {
 
   final FirebaseFirestore _firestore;
   static const String _moodsCollection = 'moods';
+  static const String _usersCollection = 'users';
+  static const String _preferencesCollection = 'preferences';
+
+  /// Firestore caps a single write batch at 500 operations.
+  static const int _deleteBatchSize = 400;
 
   Future<String?> addMoodEntry(MoodEntry entry) async {
     try {
-      final docRef = await _firestore
+      // The local id doubles as the document id, which makes a sync retry
+      // idempotent: if the write commits but the response is lost, the retry
+      // overwrites the same document instead of creating a duplicate.
+      final docRef = _firestore
           .collection(_moodsCollection)
-          .add(entry.toFirestore());
+          .doc(entry.localId);
+      await docRef.set(entry.toFirestore());
       appLogger.d('Added mood entry to Firestore: ${docRef.id}');
       return docRef.id;
     } catch (e, stackTrace) {
@@ -87,5 +96,43 @@ class FirestoreService {
               .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
               .toList(),
         );
+  }
+
+  /// Deletes every mood entry owned by [userId].
+  ///
+  /// Deletes are chunked because a Firestore batch is limited to 500 writes.
+  Future<void> deleteMoodEntries(String userId) async {
+    while (true) {
+      final snapshot = await _firestore
+          .collection(_moodsCollection)
+          .where('userId', isEqualTo: userId)
+          .limit(_deleteBatchSize)
+          .get();
+
+      if (snapshot.docs.isEmpty) return;
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+  }
+
+  /// Deletes a user-scoped document (profile / preferences) when it exists.
+  Future<void> deleteUserDocument(String collection, String userId) async {
+    final doc = await _firestore.collection(collection).doc(userId).get();
+    if (!doc.exists) return;
+    await doc.reference.delete();
+  }
+
+  /// Wipes every remote trace of [userId].
+  ///
+  /// Must run while the user is still signed in — the security rules only
+  /// allow owners to delete their own documents.
+  Future<void> deleteAccountData(String userId) async {
+    await deleteMoodEntries(userId);
+    await deleteUserDocument(_usersCollection, userId);
+    await deleteUserDocument(_preferencesCollection, userId);
   }
 }

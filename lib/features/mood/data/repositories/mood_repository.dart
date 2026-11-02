@@ -38,13 +38,33 @@ class MoodRepository {
     return _syncService.forceSyncNow();
   }
 
-  List<MoodEntry> getAllEntries() {
-    return HiveService.getAll();
+  List<MoodEntry> getAllEntries(String? userId) {
+    return HiveService.getAllForUser(userId);
   }
 
-  /// Emits local entries whenever they change.
-  Stream<List<MoodEntry>> watchEntries() {
-    return HiveService.watchAll();
+  /// Emits [userId]'s entries whenever they change.
+  Stream<List<MoodEntry>> watchEntries(String? userId) {
+    return HiveService.watchForUser(userId);
+  }
+
+  /// Deletes every local and remote trace of [userId].
+  ///
+  /// Returns `false` when the remote wipe failed, so the caller can keep the
+  /// account alive instead of leaving orphaned data behind.
+  Future<bool> deleteAccountData(String userId) async {
+    try {
+      await _firestoreService.deleteAccountData(userId);
+      await HiveService.deleteAllForUser(userId);
+      appLogger.i('Deleted account data for user: $userId');
+      return true;
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Error deleting account data',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
   }
 
   // Fetch mood entries from Firebase and merge into local storage.
@@ -58,7 +78,7 @@ class MoodRepository {
 
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
 
-      final localEntries = HiveService.getAll();
+      final localEntries = HiveService.getAllForUser(userId);
       final localById = <String, MoodEntry>{
         for (final e in localEntries)
           if (e.id != null) e.id!: e,
@@ -88,7 +108,7 @@ class MoodRepository {
       await HiveService.putAll(merged);
 
       appLogger.i('Merged ${merged.length} entries into local Hive');
-      return HiveService.getAll();
+      return HiveService.getAllForUser(userId);
     } catch (e, stackTrace) {
       appLogger.e(
         'Error in fetchAndSyncFromFirebase',
@@ -96,7 +116,7 @@ class MoodRepository {
         stackTrace: stackTrace,
       );
       // Return local entries if Firebase fetch fails
-      return getAllEntries();
+      return getAllEntries(userId);
     }
   }
 

@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-/// App-wide theme selection backed by a signal.
+import 'package:dailypulse/core/services/app_preferences.dart';
+
+/// App-wide theme selection backed by a signal and persisted locally.
 @singleton
 class ThemeSignal {
   @inject
-  ThemeSignal();
+  ThemeSignal() {
+    mode.value = AppPreferences.themeMode;
+  }
 
   final mode = signal<ThemeMode>(ThemeMode.system);
 
@@ -18,6 +24,8 @@ class ThemeSignal {
   void setThemeMode(ThemeMode value) {
     if (mode.value == value) return;
     mode.value = value;
+    // Fire-and-forget: the write is local and must not block the UI switch.
+    unawaited(AppPreferences.setThemeMode(value));
   }
 
   void toggleTheme(BuildContext context) {
