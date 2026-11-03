@@ -159,11 +159,9 @@ final ThemeData darkTheme = ThemeData(
       progressLoadingBg: AppColors.splashDarkBg,
       progressLoadingOverlay: AppColors.splashDarkOverlay,
       fetchingDataBg: AppColors.splashGreenBg,
-      quoteBg: AppColors.splashOrangeBg,
       brandLogoColor: AppColors.splashCreamBrand,
       progressLoadingText: AppColors.white,
       fetchingDataText: AppColors.white,
-      quoteText: AppColors.white,
     ),
     OnboardingColors(
       welcomeBg: AppColors.splashDarkBg,

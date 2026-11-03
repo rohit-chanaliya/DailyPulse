@@ -9,13 +9,11 @@ extension SplashPhaseColors on SplashColors {
     SplashPhase.brandLogo => brandLogoBg,
     SplashPhase.progressLoading => progressLoadingBg,
     SplashPhase.fetchingData => fetchingDataBg,
-    SplashPhase.quote => quoteBg,
   };
 
   Color skipButtonFor(SplashPhase phase) => switch (phase) {
     SplashPhase.brandLogo => brandLogoColor,
     SplashPhase.progressLoading => progressLoadingText,
     SplashPhase.fetchingData => fetchingDataText,
-    SplashPhase.quote => quoteText,
   }.withValues(alpha: 0.5);
 }

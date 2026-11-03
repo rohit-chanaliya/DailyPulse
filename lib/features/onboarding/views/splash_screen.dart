@@ -59,7 +59,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: SplashPhaseContent(
                     phase: currentPhase,
                     progressValue: progressValue,
-                    onContinue: _navigateNext,
                   ),
                 ),
               ),

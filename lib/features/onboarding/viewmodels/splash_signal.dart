@@ -11,7 +11,6 @@ enum SplashPhase {
   brandLogo, // Cream background with terracotta logo
   progressLoading, // Dark warm charcoal background with 0-100% counter
   fetchingData, // Sage green background with "Fetching Data"
-  quote, // Terracotta orange background with Albert Camus quote
 }
 
 /// Drives the splash sequence and decides where the app lands afterwards.
@@ -85,14 +84,7 @@ class SplashSignal {
   }
 
   void _startPhase3(void Function() onComplete) {
-    _phaseTimer = Timer(const Duration(milliseconds: 3200), () {
-      currentPhase.value = SplashPhase.quote;
-      _startPhase4(onComplete);
-    });
-  }
-
-  void _startPhase4(void Function() onComplete) {
-    _phaseTimer = Timer(const Duration(milliseconds: 4500), onComplete);
+    _phaseTimer = Timer(const Duration(milliseconds: 3200), onComplete);
   }
 
   void skipSplash(void Function() onComplete) {

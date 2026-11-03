@@ -4,9 +4,6 @@ class OnboardingStrings {
   static const String splashLoadingPercentageSign = '%';
   static const String splashFetchingData = 'Fetching Data...';
   static const String splashInteractPrompt = 'Shake your screen to interact!';
-  static const String splashQuoteText =
-      '"In the midst of winter, I found there was within me an invincible summer."';
-  static const String splashQuoteAuthor = '— ALBERT CAMUS';
   static const String splashSkip = 'Skip';
 
   // Welcome Screen
