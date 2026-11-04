@@ -1,5 +1,5 @@
-import '../../core/constant/constants.dart';
-import '../../features/mood/presentation/models/mood_option.dart';
+import '../constant/constants.dart';
+import '../../features/mood/models/mood_option.dart';
 
 class MoodUtils {
   /// Mood options in display order; `level` is the zero-based index used by

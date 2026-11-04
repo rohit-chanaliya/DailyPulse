@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
-import 'package:dailypulse/features/mood/data/local/hive_service.dart';
-import 'package:dailypulse/features/mood/data/models/mood_entry.dart';
+import 'package:dailypulse/features/mood/datasource/hive_service.dart';
+import 'package:dailypulse/features/mood/models/mood_entry.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 

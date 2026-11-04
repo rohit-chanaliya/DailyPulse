@@ -1,4 +1,4 @@
-import '../../features/mood/data/models/mood_entry.dart';
+import '../../features/mood/models/mood_entry.dart';
 
 /// How entries are grouped along the mood chart's x-axis.
 enum MoodGranularity { all, days, weeks, months, years }

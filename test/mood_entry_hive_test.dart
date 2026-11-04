@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dailypulse/features/mood/data/models/mood_entry.dart';
+import 'package:dailypulse/features/mood/models/mood_entry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 
