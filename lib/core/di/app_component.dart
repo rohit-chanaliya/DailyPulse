@@ -1,7 +1,9 @@
 import 'package:inject_annotation/inject_annotation.dart';
 
+import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
 import 'package:dailypulse/features/insights/presentation/signals/insights_signal.dart';
+import 'package:dailypulse/features/mood/data/local/hive_service.dart';
 import 'package:dailypulse/features/mood/data/repositories/mood_repository.dart';
 import 'package:dailypulse/features/mood/data/remote/firestore_service.dart';
 import 'package:dailypulse/features/mood/data/services/sync_service.dart';
@@ -20,6 +22,8 @@ import 'infrastructure_module.dart';
 abstract class AppComponent {
   static const create = g.AppComponent$Component.create;
 
+  HiveService get hiveService;
+  AppPreferences get appPreferences;
   FirestoreService get firestoreService;
   SyncService get syncService;
   MoodRepository get moodRepository;

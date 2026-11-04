@@ -10,9 +10,11 @@ import 'package:dailypulse/core/services/app_preferences.dart';
 @singleton
 class ThemeSignal {
   @inject
-  ThemeSignal() {
-    mode.value = AppPreferences.themeMode;
+  ThemeSignal(this._preferences) {
+    mode.value = _preferences.themeMode;
   }
+
+  final AppPreferences _preferences;
 
   final mode = signal<ThemeMode>(ThemeMode.system);
 
@@ -25,7 +27,7 @@ class ThemeSignal {
     if (mode.value == value) return;
     mode.value = value;
     // Fire-and-forget: the write is local and must not block the UI switch.
-    unawaited(AppPreferences.setThemeMode(value));
+    unawaited(_preferences.setThemeMode(value));
   }
 
   void toggleTheme(BuildContext context) {

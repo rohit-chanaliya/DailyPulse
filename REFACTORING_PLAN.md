@@ -67,21 +67,21 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
 - **Objective:** Eliminate static service calls (`HiveService.*`, `AppPreferences.*`) so every repository and service is constructor-injected and mockable in unit tests. Fix model and constant bugs.
 
 ### Checklist & Exact File Changes
-- [ ] **1. Fix Hive Box Constant Drift (`lib/core/constant/constants.dart`)**
+- [x] **1. Fix Hive Box Constant Drift (`lib/core/constant/constants.dart`)**
   - Currently `AppConstants.hiveBoxName` is `'mood_box'` (line 5), while `HiveService.boxName` (`lib/features/mood/data/local/hive_service.dart:11`) opens `'mood_entries'`.
   - Keep `'mood_entries'` as the single constant (to preserve existing user data on disk) and remove legacy `AppConstants.moodColors` / `moodColorsDark` (lines 10–26).
-- [ ] **2. Fix Nullable `MoodEntry.copyWith` (`lib/features/mood/data/models/mood_entry.dart:51-69`)**
+- [x] **2. Fix Nullable `MoodEntry.copyWith` (`lib/features/mood/data/models/mood_entry.dart:51-69`)**
   - Currently `note: note ?? this.note` prevents clearing a `note` or `title` back to `null`.
   - Use a sentinel value (`static const Object _unset = Object();`) for nullable fields (`note`, `id`, `userId`, `title`) so passing `note: null` explicitly clears the field.
-- [ ] **3. Provide Open Hive Boxes in `InfrastructureModule` (`lib/core/di/infrastructure_module.dart`)**
+- [x] **3. Provide Open Hive Boxes in `InfrastructureModule` (`lib/core/di/infrastructure_module.dart`)**
   - Keep `await HiveService.init()` and `await AppPreferences.init()` in `main.dart` before `initDependencies()`.
   - Add `@provides @singleton Box<MoodEntry> provideMoodBox() => Hive.box<MoodEntry>(HiveService.boxName);`
   - Add `@provides @singleton Box<dynamic> providePreferencesBox() => Hive.box<dynamic>(AppPreferences.boxName);`
-- [ ] **4. Make `HiveService` & `AppPreferences` Injectable Singletons**
+- [x] **4. Make `HiveService` & `AppPreferences` Injectable Singletons**
   - Annotate `HiveService` (`lib/features/mood/data/local/hive_service.dart`) with `@singleton` and `@inject HiveService(this._moodBox)`. Convert static methods (`put`, `putAll`, `delete`, `getAllForUser`, `getPendingForUser`, `watchForUser`, `deleteAllForUser`) to instance methods.
   - Annotate `AppPreferences` (`lib/core/services/app_preferences.dart`) with `@singleton` and `@inject AppPreferences(this._box)`. Inject it into `OnboardingRepository` (`lib/features/onboarding/repository/onboarding_repository.dart`) and `ThemeSignal` (`lib/features/settings/presentation/signals/theme_signal.dart`).
   - Inject `HiveService` into `MoodRepository` (`lib/features/mood/data/repositories/mood_repository.dart`) and `SyncService` (`lib/features/mood/data/services/sync_service.dart`).
-- [ ] **5. Regenerate DI & Verify**
+- [x] **5. Regenerate DI & Verify**
   - Run `dart run build_runner build`
   - Run `flutter analyze` and `flutter test`
 
