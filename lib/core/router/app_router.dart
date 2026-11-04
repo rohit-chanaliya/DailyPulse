@@ -20,7 +20,6 @@ import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
 import 'package:dailypulse/features/settings/screens/delete_account_screen.dart';
 import 'package:dailypulse/features/settings/screens/settings_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,7 +28,7 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
     navigatorKey: navigatorKey,
     initialLocation: AppRoutes.splash,
     refreshListenable: RouterRefreshStream(
-      FirebaseAuth.instance.authStateChanges(),
+      appComponent.authSignal.authStateChanges,
     ),
     redirect: _redirect,
     routes: [
@@ -66,10 +65,7 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return _fadePage(
             state,
-            VerifyEmailScreen(
-              email: extra['email'] as String? ?? '',
-              password: extra['password'] as String? ?? '',
-            ),
+            VerifyEmailScreen(email: extra['email'] as String? ?? ''),
           );
         },
       ),
@@ -166,7 +162,7 @@ String? _redirect(BuildContext context, GoRouterState state) {
     return null;
   }
 
-  final user = FirebaseAuth.instance.currentUser;
+  final user = appComponent.authSignal.currentUser;
 
   if (user == null) {
     if (AppRoutes.publicRoutes.contains(location)) {

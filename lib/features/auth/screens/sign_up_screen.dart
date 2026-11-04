@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
 import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
-import 'package:dailypulse/core/utils/validators.dart';
-import 'package:dailypulse/core/widgets/custom_text_field.dart';
-import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
 import '../widgets/auth_back_button.dart';
-import '../widgets/auth_card.dart';
-import '../widgets/auth_google_button.dart';
 import '../widgets/auth_header.dart';
-import '../widgets/auth_primary_button.dart';
-import '../widgets/auth_terms_checkbox.dart';
 import '../widgets/auth_trust_badge.dart';
+import '../widgets/sign_up_form_card.dart';
 
 /// Minimalist, mindful Sign Up screen with balanced full-screen layout.
 class SignUpScreen extends StatefulWidget {
@@ -44,40 +38,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _signUp() async {
     if (!_agreeToTerms) {
-      SnackBarUtils.showError(
-        context,
-        AuthStrings.termsRequiredError,
-      );
+      SnackBarUtils.showError(context, AuthStrings.termsRequiredError);
+      return;
+    }
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = _emailController.text.trim();
+    final success = await appComponent.authSignal.signUp(
+      email: email,
+      password: _passwordController.text,
+      name: _nameController.text.trim(),
+    );
+
+    if (!mounted) return;
+    if (!success) {
+      final message = appComponent.authSignal.errorMessage.value;
+      if (message != null) {
+        SnackBarUtils.showError(context, message);
+      }
       return;
     }
 
-    if (_formKey.currentState!.validate()) {
-      await appComponent.authSignal.handleSignUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        name: _nameController.text.trim(),
-        onSuccess: () {
-          if (mounted) {
-            SnackBarUtils.showSuccess(
-              context,
-              AuthStrings.verificationSentSuccess,
-            );
-            context.go(
-              AppRoutes.verifyEmail,
-              extra: {
-                'email': _emailController.text.trim(),
-                'password': _passwordController.text,
-              },
-            );
-          }
-        },
-        onError: (message) {
-          if (mounted) {
-            SnackBarUtils.showError(context, message);
-          }
-        },
-      );
+    SnackBarUtils.showSuccess(context, AuthStrings.verificationSentSuccess);
+    context.go(AppRoutes.verifyEmail, extra: {'email': email});
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    final success = await appComponent.authSignal.signInWithGoogle();
+    if (!mounted) return;
+
+    if (!success) {
+      final message = appComponent.authSignal.errorMessage.value;
+      if (message != null) {
+        SnackBarUtils.showError(context, message);
+      }
+      return;
     }
+
+    SnackBarUtils.showSuccess(context, AuthStrings.accountCreatedSuccess);
+    context.go(AppRoutes.home);
   }
 
   @override
@@ -90,7 +89,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight - 32,
@@ -123,149 +125,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             subtitle: AuthStrings.signUpSubtitle,
                           ),
                           const SizedBox(height: 24),
-
-                          // Form Card grouping inputs, terms, and primary action
-                          AuthCard(
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  CustomTextField(
-                                    controller: _nameController,
-                                    label: AuthStrings.nameLabel,
-                                    hintText: AuthStrings.nameHint,
-                                    prefixIcon: Icons.person_outline_rounded,
-                                    keyboardType: TextInputType.name,
-                                    validator: Validators.validateName,
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  CustomTextField(
-                                    controller: _emailController,
-                                    label: AuthStrings.emailLabel,
-                                    hintText: AuthStrings.emailHint,
-                                    prefixIcon: Icons.email_outlined,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: Validators.validateEmail,
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  CustomTextField(
-                                    controller: _passwordController,
-                                    label: AuthStrings.passwordLabel,
-                                    hintText: AuthStrings.passwordHint,
-                                    prefixIcon: Icons.lock_outline_rounded,
-                                    obscureText: _obscurePassword,
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscurePassword
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        size: 20,
-                                        color: onboardingColors.welcomeSubtitle,
-                                      ),
-                                      onPressed: () => setState(
-                                        () => _obscurePassword = !_obscurePassword,
-                                      ),
-                                    ),
-                                    validator: Validators.validatePasswordStrength,
-                                  ),
-                                  const SizedBox(height: 14),
-
-                                  // Terms & Conditions Checkbox
-                                  AuthTermsCheckbox(
-                                    isChecked: _agreeToTerms,
-                                    onChanged: (val) =>
-                                        setState(() => _agreeToTerms = val),
-                                  ),
-                                  const SizedBox(height: 22),
-
-                                  // Primary Sign Up Button
-                                  SignalBuilder(
-                                    builder: (context) {
-                                      final isLoading =
-                                          appComponent.authSignal.status.value ==
-                                              AuthStatus.loading;
-
-                                      return AuthPrimaryButton(
-                                        text: AuthStrings.signUpButton,
-                                        isLoading: isLoading,
-                                        onPressed: _signUp,
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Mindful OR Divider
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Divider(
-                                          color: onboardingColors.welcomeSubtitle
-                                              .withValues(alpha: 0.25),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0,
-                                        ),
-                                        child: Text(
-                                          AuthStrings.orDivider,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color:
-                                                onboardingColors.welcomeSubtitle,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Divider(
-                                          color: onboardingColors.welcomeSubtitle
-                                              .withValues(alpha: 0.25),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Google Sign-In Button
-                                  SignalBuilder(
-                                    builder: (context) {
-                                      final isLoading =
-                                          appComponent.authSignal.status.value ==
-                                              AuthStatus.loading;
-
-                                      return AuthGoogleButton(
-                                        isLoading: isLoading,
-                                        onPressed: () async {
-                                          await appComponent.authSignal
-                                              .handleGoogleSignIn(
-                                            onSuccess: () {
-                                              if (mounted) {
-                                                SnackBarUtils.showSuccess(
-                                                  context,
-                                                  AuthStrings.accountCreatedSuccess,
-                                                );
-                                                context.go(AppRoutes.home);
-                                              }
-                                            },
-                                            onError: (message) {
-                                              if (mounted) {
-                                                SnackBarUtils.showError(
-                                                  context,
-                                                  message,
-                                                );
-                                              }
-                                            },
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                          SignUpFormCard(
+                            formKey: _formKey,
+                            nameController: _nameController,
+                            emailController: _emailController,
+                            passwordController: _passwordController,
+                            obscurePassword: _obscurePassword,
+                            onToggleObscure: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
                             ),
+                            agreeToTerms: _agreeToTerms,
+                            onTermsChanged: (value) =>
+                                setState(() => _agreeToTerms = value),
+                            onSubmit: _signUp,
+                            onGoogleSignIn: _signUpWithGoogle,
                           ),
                           const SizedBox(height: 20),
 

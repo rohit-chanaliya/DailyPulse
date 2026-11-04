@@ -1,6 +1,7 @@
 import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/services/app_preferences.dart';
+import 'package:dailypulse/features/auth/data/auth_repository.dart';
 import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
 import 'package:dailypulse/features/insights/presentation/signals/insights_signal.dart';
 import 'package:dailypulse/features/mood/data/local/hive_service.dart';
@@ -28,6 +29,7 @@ abstract class AppComponent {
   SyncService get syncService;
   MoodRepository get moodRepository;
   OnboardingRepository get onboardingRepository;
+  AuthRepository get authRepository;
 
   MoodSignal get moodSignal;
   InsightsSignal get insightsSignal;
