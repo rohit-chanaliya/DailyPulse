@@ -28,7 +28,7 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
     navigatorKey: navigatorKey,
     initialLocation: AppRoutes.splash,
     refreshListenable: RouterRefreshStream(
-      appComponent.authSignal.authStateChanges,
+      appComponent.authSignal.userChanges,
     ),
     redirect: _redirect,
     routes: [
@@ -182,10 +182,9 @@ String? _redirect(BuildContext context, GoRouterState state) {
     (info) => info.providerId == 'google.com',
   );
   if (!user.emailVerified && !isGoogleUser) {
-    // Unverified user tried to go somewhere protected: sign them out and
-    // send to sign-in so they can re-authenticate after verifying.
+    // Unverified users keep their session only to resend the link.
     if (!AppRoutes.publicRoutes.contains(location)) {
-      return AppRoutes.signIn;
+      return AppRoutes.verifyEmail;
     }
     return null;
   }

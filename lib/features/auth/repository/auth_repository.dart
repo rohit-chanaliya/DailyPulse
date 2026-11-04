@@ -28,7 +28,7 @@ class AuthRepository {
 
   static const Duration _actionTimeout = Duration(seconds: 15);
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get userChanges => _auth.userChanges();
   User? get currentUser => _auth.currentUser;
 
   Future<Result<void>> signUp({
@@ -81,8 +81,9 @@ class AuthRepository {
       );
       final user = credential.user;
       if (user != null && !user.emailVerified) {
-        await _auth.signOut();
-        appLogger.w('Sign in blocked – email not verified');
+        // Keep the session: the verify screen resends the link without a
+        // password, and the router/sync gate on verification.
+        appLogger.w('Sign in allowed – email not verified');
         return const Err(AuthStrings.emailNotVerifiedError);
       }
       return const Ok(null);

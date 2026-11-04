@@ -24,30 +24,41 @@ class AppTabButton extends StatelessWidget {
         ? buttons.tabSelectedForeground
         : buttons.tabUnselectedForeground;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: buttons.surfaceBackground,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.cards.shadow,
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: text,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox(
+          height: 48,
+          child: Center(
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: buttons.surfaceBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.cards.shadow,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    )
+                  : null,
+              child: Center(
+                child: Text(
+                  text,
+                  style: AppTypography.textSmBold.copyWith(
+                    color: textColor,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                   ),
-                ],
-              )
-            : null,
-        child: Center(
-          child: Text(
-            text,
-            style: AppTypography.textSmBold.copyWith(
-              color: textColor,
-              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ),

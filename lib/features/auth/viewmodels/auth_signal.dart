@@ -19,7 +19,7 @@ enum AuthStatus { initial, authenticated, unauthenticated, loading }
 class AuthSignal {
   @inject
   AuthSignal(this._repository, this._syncService, this._moodRepository) {
-    _authSubscription = _repository.authStateChanges.listen(
+    _authSubscription = _repository.userChanges.listen(
       _onAuthStateChanged,
       onError: (Object error, StackTrace stackTrace) {
         errorMessage.value = AuthStrings.authStreamError;
@@ -37,7 +37,7 @@ class AuthSignal {
   final user = signal<User?>(null);
   final errorMessage = signal<String?>(null);
 
-  Stream<User?> get authStateChanges => _repository.authStateChanges;
+  Stream<User?> get userChanges => _repository.userChanges;
   User? get currentUser => _repository.currentUser;
 
   /// Whether the signed-in user authenticated through Google.
@@ -109,8 +109,18 @@ class AuthSignal {
     );
     return switch (result) {
       Ok() => true,
-      Err(:final message) => _fail(message),
+      Err(:final message) => _keepUnverifiedSession(message),
     };
+  }
+
+  /// A kept unverified session can resend its link, so it stays signed in.
+  bool _keepUnverifiedSession(String? message) {
+    if (_repository.currentUser != null) {
+      status.value = AuthStatus.authenticated;
+      errorMessage.value = message;
+      return false;
+    }
+    return _fail(message);
   }
 
   Future<void> signOut() async {

@@ -28,7 +28,7 @@ class AppDatePickerButton extends StatelessWidget {
         : buttons.mutedForeground;
 
     return SizedBox(
-      height: 36,
+      height: 48,
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(

@@ -46,7 +46,16 @@ class _SignInScreenState extends State<SignInScreen> {
     );
 
     if (!mounted || success) return;
+
     final message = appComponent.authSignal.errorMessage.value;
+    if (message == AuthStrings.emailNotVerifiedError) {
+      SnackBarUtils.showError(context, message!);
+      context.go(
+        AppRoutes.verifyEmail,
+        extra: {'email': _emailController.text.trim()},
+      );
+      return;
+    }
     if (message != null) {
       SnackBarUtils.showError(context, message);
     }

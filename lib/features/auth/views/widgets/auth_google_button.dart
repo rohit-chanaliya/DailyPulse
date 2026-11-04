@@ -25,24 +25,21 @@ class AuthGoogleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onboardingColors = context.onboarding;
+    final buttons = context.buttons;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return OutlinedButton(
       onPressed: isLoading ? null : onPressed,
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 52),
-        backgroundColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
-        foregroundColor: isDark ? Colors.white : const Color(0xFF333333),
-        side: BorderSide(
-          color: isDark ? Colors.white24 : const Color(0xFFE2E8F0),
-          width: 1.2,
-        ),
+        backgroundColor: buttons.surfaceBackground,
+        foregroundColor: buttons.secondaryForeground,
+        side: BorderSide(color: buttons.surfaceBorder, width: 1.2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
         elevation: isDark ? 0 : 1,
-        shadowColor: Colors.black.withValues(alpha: 0.05),
+        shadowColor: context.cards.shadow,
       ),
       child: isLoading
           ? SizedBox(
@@ -51,7 +48,7 @@ class AuthGoogleButton extends StatelessWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  onboardingColors.welcomeHighlight,
+                  buttons.secondaryForeground,
                 ),
               ),
             )
@@ -69,7 +66,7 @@ class AuthGoogleButton extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: isDark ? Colors.white : const Color(0xFF2D3748),
+                    color: buttons.secondaryForeground,
                     letterSpacing: 0.2,
                   ),
                 ),
