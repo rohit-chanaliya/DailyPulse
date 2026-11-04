@@ -2,7 +2,7 @@ import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/router/route_error_screen.dart';
 import 'package:dailypulse/core/router/router_refresh_stream.dart';
-import 'package:dailypulse/features/app/presentation/app_shell.dart';
+import 'package:dailypulse/features/app/views/app_shell.dart';
 import 'package:dailypulse/features/auth/views/forgot_password_screen.dart';
 import 'package:dailypulse/features/auth/views/reset_password_screen.dart';
 import 'package:dailypulse/features/auth/views/sign_in_screen.dart';

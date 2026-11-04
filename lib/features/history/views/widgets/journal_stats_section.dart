@@ -5,7 +5,7 @@ import 'package:dailypulse/core/constant/strings/history_strings.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/mood_stats_utils.dart';
 import 'package:dailypulse/core/utils/mood_utils.dart';
-import 'package:dailypulse/features/app/presentation/models/nav_assets.dart';
+import 'package:dailypulse/features/app/models/nav_assets.dart';
 import 'package:dailypulse/features/history/views/widgets/journal_stat_card.dart';
 import 'package:dailypulse/features/mood/models/mood_entry.dart';
 
