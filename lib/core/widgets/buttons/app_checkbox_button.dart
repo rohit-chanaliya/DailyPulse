@@ -30,50 +30,56 @@ class AppCheckboxButton extends StatelessWidget {
         ? buttons.onSelection
         : buttons.secondaryForeground;
 
-    return GestureDetector(
-      onTap: () => onChanged(!isChecked),
-      child: Container(
-        height: 54,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(27),
-          border: Border.all(color: borderColor, width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: context.cards.shadow,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              text,
-              style: AppTypography.textMdSemiBold.copyWith(color: textColor),
-            ),
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isChecked
-                    ? buttons.onSelection.withValues(alpha: 0.2)
-                    : Colors.transparent,
-                border: Border.all(
-                  color: isChecked
-                      ? buttons.onSelection
-                      : buttons.mutedForeground,
-                  width: 1.5,
-                ),
+    return Semantics(
+      button: true,
+      checked: isChecked,
+      label: text,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(!isChecked),
+        child: Container(
+          height: 54,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(27),
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: context.cards.shadow,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              child: isChecked
-                  ? Icon(Icons.check, color: buttons.onSelection, size: 14)
-                  : null,
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                text,
+                style: AppTypography.textMdSemiBold.copyWith(color: textColor),
+              ),
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isChecked
+                      ? buttons.onSelection.withValues(alpha: 0.2)
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: isChecked
+                        ? buttons.onSelection
+                        : buttons.mutedForeground,
+                    width: 1.5,
+                  ),
+                ),
+                child: isChecked
+                    ? Icon(Icons.check, color: buttons.onSelection, size: 14)
+                    : null,
+              ),
+            ],
+          ),
         ),
       ),
     );

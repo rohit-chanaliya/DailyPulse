@@ -32,26 +32,37 @@ class AppPillButton extends StatelessWidget {
         ? buttons.pillSelectedForeground
         : buttons.mutedForeground;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: 34,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: borderColor, width: 1.2),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: textColor),
-            const SizedBox(width: 6),
-            Text(
-              text,
-              style: AppTypography.textXsBold.copyWith(color: textColor),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: text,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPressed,
+        child: SizedBox(
+          height: 48,
+          child: Center(
+            child: Container(
+              height: 34,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(17),
+                border: Border.all(color: borderColor, width: 1.2),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 14, color: textColor),
+                  const SizedBox(width: 6),
+                  Text(
+                    text,
+                    style: AppTypography.textXsBold.copyWith(color: textColor),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

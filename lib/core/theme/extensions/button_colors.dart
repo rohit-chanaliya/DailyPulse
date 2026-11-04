@@ -17,6 +17,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
     required this.surfaceBorder,
     required this.selectionBackground,
     required this.onSelection,
+    required this.toggleThumb,
     required this.accentBackground,
     required this.onAccent,
     required this.pillBackground,
@@ -38,6 +39,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
   final Color surfaceBorder;
   final Color selectionBackground;
   final Color onSelection;
+  final Color toggleThumb;
   final Color accentBackground;
   final Color onAccent;
   final Color pillBackground;
@@ -59,7 +61,8 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
     surfaceBackground: Colors.white,
     surfaceBorder: Color(0xFFEAE2DA),
     selectionBackground: Color(0xFF98AF86),
-    onSelection: Colors.white,
+    onSelection: Color(0xFF1F160F),
+    toggleThumb: Colors.white,
     accentBackground: Color(0xFFFE814B),
     onAccent: Colors.white,
     pillBackground: Colors.white,
@@ -67,7 +70,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
     pillSelectedBorder: Color(0xFF9BB068),
     pillSelectedForeground: Color(0xFF5A6B38),
     tabSelectedForeground: Color(0xFF402B20),
-    tabUnselectedForeground: Color(0xFFBDBDBD),
+    tabUnselectedForeground: Color(0xFF6B6B6B),
   );
 
   static const ButtonColors dark = ButtonColors(
@@ -81,7 +84,8 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
     surfaceBackground: Color(0xFF231E1B),
     surfaceBorder: Color(0xFF38302B),
     selectionBackground: Color(0xFF98AF86),
-    onSelection: Colors.white,
+    onSelection: Color(0xFF1F160F),
+    toggleThumb: Colors.white,
     accentBackground: Color(0xFFFE814B),
     onAccent: Colors.white,
     pillBackground: Color(0xFF1E1916),
@@ -105,6 +109,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
     Color? surfaceBorder,
     Color? selectionBackground,
     Color? onSelection,
+    Color? toggleThumb,
     Color? accentBackground,
     Color? onAccent,
     Color? pillBackground,
@@ -126,6 +131,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
       surfaceBorder: surfaceBorder ?? this.surfaceBorder,
       selectionBackground: selectionBackground ?? this.selectionBackground,
       onSelection: onSelection ?? this.onSelection,
+      toggleThumb: toggleThumb ?? this.toggleThumb,
       accentBackground: accentBackground ?? this.accentBackground,
       onAccent: onAccent ?? this.onAccent,
       pillBackground: pillBackground ?? this.pillBackground,
@@ -166,6 +172,7 @@ class ButtonColors extends ThemeExtension<ButtonColors> {
         other.selectionBackground,
       ),
       onSelection: lerpColor(onSelection, other.onSelection),
+      toggleThumb: lerpColor(toggleThumb, other.toggleThumb),
       accentBackground: lerpColor(accentBackground, other.accentBackground),
       onAccent: lerpColor(onAccent, other.onAccent),
       pillBackground: lerpColor(pillBackground, other.pillBackground),

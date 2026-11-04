@@ -17,12 +17,13 @@ class AuthPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onboardingColors = context.onboarding;
+    final foreground = context.buttons.primaryForeground;
 
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: onboardingColors.welcomeHighlight,
-        foregroundColor: Colors.white,
+        foregroundColor: foreground,
         minimumSize: const Size(double.infinity, 56),
         elevation: 4,
         shadowColor: onboardingColors.welcomeHighlight.withValues(alpha: 0.4),
@@ -31,12 +32,12 @@ class AuthPrimaryButton extends StatelessWidget {
         ),
       ),
       child: isLoading
-          ? const SizedBox(
+          ? SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(foreground),
               ),
             )
           : Row(
