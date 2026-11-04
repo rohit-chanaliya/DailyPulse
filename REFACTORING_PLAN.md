@@ -169,7 +169,7 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
 - **Objective:** Enforce the **1 widget per file** and **≤ 300 lines per UI file** rules on `custom_button.dart` (522 lines) and eliminate all raw hex/Material colors in widgets and utilities.
 
 ### Checklist & Exact File Changes
-- [ ] **1. Split `lib/core/widgets/custom_button.dart` (522 lines) into 7 Dedicated Files**
+- [x] **1. Split `lib/core/widgets/custom_button.dart` (522 lines) into 7 Dedicated Files**
   - `lib/core/widgets/buttons/app_button.dart` (`AppButton`, `AppButtonVariant`, `AppButtonSize`)
   - `lib/core/widgets/buttons/app_date_picker_button.dart` (`AppDatePickerButton`)
   - `lib/core/widgets/buttons/app_checkbox_button.dart` (`AppCheckboxButton`)
@@ -177,15 +177,16 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
   - `lib/core/widgets/buttons/app_icon_button.dart` (`AppIconButton`, `AppIconButtonSize`)
   - `lib/core/widgets/buttons/app_toggle_button.dart` (`AppToggleButton`)
   - `lib/core/widgets/buttons/app_pill_button.dart` (`AppPillButton`)
-  - Keep `lib/core/widgets/custom_button.dart` as a barrel re-export (`export 'buttons/app_button.dart'; ...`) so existing imports don't break.
-- [ ] **2. Replace Hardcoded Colors in Buttons with `ThemeExtension` Tokens**
-  - Replace hardcoded `Color(0xFF402B20)`, `Color(0xFF2C221D)`, `Color(0xFFF5EFEB)`, `Color(0xFF38302B)`, `Color(0xFFEAE2DA)` across the button classes with semantic tokens from `context.home` / `context.cards` / `context.status`.
-- [ ] **3. Theme-Aware `SnackBarUtils` & `DialogUtils`**
-  - In `lib/core/utils/snackbar_utils.dart:6-18`, replace `Colors.red`, `Colors.green`, `Colors.blue` with `context.status.error`, `context.status.success`, `context.status.info`.
-  - In `lib/core/utils/dialog_utils.dart:25`, replace `Colors.red` with `context.status.error`.
-- [ ] **4. Remove Deprecated Theme Statics (`lib/core/theme/app_theme.dart:20-27`)**
-  - Remove unused `@Deprecated` static colors (`primaryBlue`, `accentPink`, `backgroundLight`, `cardBackground`).
-- [ ] **5. Verify in Both Light & Dark Themes**
+  - Kept `lib/core/widgets/custom_button.dart` as a 12-line barrel re-export.
+- [x] **2. Replace Hardcoded Colors in Buttons with `ThemeExtension` Tokens**
+  - Added `ButtonColors` (`lib/core/theme/extensions/button_colors.dart`, light + dark) and registered it in `context_extensions.dart`, `light_theme.dart` and `dark_theme.dart`.
+  - All raw hex values (`#402B20`, `#2C221D`, `#F5EFEB`, `#38302B`, `#EAE2DA`, …) moved out of the widgets into the extension.
+- [x] **3. Theme-Aware `SnackBarUtils` & `DialogUtils`**
+  - `snackbar_utils.dart` now uses `context.status.error/success/info`.
+  - `dialog_utils.dart` danger action uses `context.status.error`.
+- [x] **4. Remove Deprecated Theme Statics (`lib/core/theme/app_theme.dart:20-27`)**
+  - Removed unused `@Deprecated` statics; `nav_bar_item.dart` now reads `colorScheme`.
+- [x] **5. Verify in Both Light & Dark Themes**
   - Run `flutter analyze` and `flutter test`
 
 ---

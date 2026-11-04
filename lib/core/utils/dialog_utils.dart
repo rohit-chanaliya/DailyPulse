@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:dailypulse/core/theme/context_extensions.dart';
+
 class DialogUtils {
   static Future<bool> showConfirmDialog({
     required BuildContext context,
@@ -22,7 +24,9 @@ class DialogUtils {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: isDanger
-                ? TextButton.styleFrom(foregroundColor: Colors.red)
+                ? TextButton.styleFrom(
+                    foregroundColor: context.status.error,
+                  )
                 : null,
             child: Text(confirmText),
           ),

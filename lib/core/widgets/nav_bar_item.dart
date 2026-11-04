@@ -1,4 +1,3 @@
-import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class NavBarItem extends StatelessWidget {
@@ -21,9 +20,10 @@ class NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final color = isSelected
-        ? AppTheme.accentPink
-        : (isDark ? Colors.grey.shade500 : Colors.grey.shade600);
+        ? colors.secondary
+        : colors.onSurfaceVariant;
 
     return GestureDetector(
       onTap: onTap,
