@@ -287,25 +287,66 @@ lib/features/<feature>/
 
 ## 4. How to Run Each Phase (Execution Protocol)
 
-When starting any phase from this document, follow [`WORKFLOW.md`](WORKFLOW.md):
+> **Golden rule:** every phase branch is created from an **up-to-date `main`**. Never branch from a previous phase branch, and never commit on a branch whose PR is already merged.
 
-1. Check clean git state:
-   ```bash
-   git status
-   git checkout main && git pull origin main
-   ```
-2. Create the phase branch:
-   ```bash
-   git checkout -b <phase-branch-name>
-   ```
-3. Implement only the checklist items for that phase.
-4. Regenerate DI if any `@singleton` / `@inject` / `@module` changed:
-   ```bash
-   dart run build_runner build
-   ```
-5. Run verification gate:
-   ```bash
-   flutter analyze
-   flutter test
-   ```
-6. Run `dailypulse_pr_reviewer` before committing, then commit with Conventional Commits (`refactor(mood): ...`, `refactor(auth): ...`).
+### Step 0 — Confirm the previous PR is merged
+```bash
+gh pr view <previous-pr-number> --json state,mergeCommit
+```
+If `state` is not `MERGED`, **STOP** and wait. Do not start the next phase.
+
+### Step 1 — Sync `main`
+```bash
+git status                     # must be clean; if not, STOP and ask
+git checkout main
+git pull --ff-only origin main
+```
+Local `main` must match `origin/main` before branching.
+
+### Step 2 — Create the phase branch from `main`
+```bash
+git checkout -b <phase-branch-name>
+git log --oneline -1 main      # branch parent must equal origin/main
+```
+
+### Step 3 — Implement only that phase's checklist
+
+### Step 4 — Regenerate DI if any `@singleton` / `@inject` / `@module` changed
+```bash
+dart run build_runner build
+```
+
+### Step 5 — Verification gate (must be green)
+```bash
+flutter analyze      # 0 issues
+flutter test         # all pass
+```
+
+### Step 6 — Commit, push and open the PR
+```bash
+git add -A
+git commit -m "<type>(<scope>): <summary>"
+git push -u origin <phase-branch-name>
+gh pr create --base main --head <phase-branch-name> \
+  --title "<type>(<scope>): <summary>" --body-file <body-file>
+```
+
+### Step 7 — Stop
+Report the PR link and wait for the merge. The next phase starts again at **Step 0**.
+
+### Branch naming per phase
+
+| Phase | Branch |
+|---|---|
+| 1 | `refactor/di-and-local-storage` |
+| 2 | `refactor/unify-mood-reactivity` |
+| 3 | `refactor/auth-layer-split` |
+| 4 | `refactor/design-system-and-buttons` |
+| 5 | `refactor/feature-folder-symmetry` |
+| 6 | `chore/strict-lints-and-test-suite` |
+
+### Failure modes to avoid (already hit once)
+- ❌ Branching Phase N from Phase N-1 instead of `main` → stacked PRs and duplicate diffs.
+- ❌ Committing after the previous branch was merged → commit lands on a dead branch.
+- ❌ Parallel `git commit` + `git checkout -b` in one shell step → race can move the commit to the wrong branch.
+- ❌ Starting a phase while the previous PR is still open.
