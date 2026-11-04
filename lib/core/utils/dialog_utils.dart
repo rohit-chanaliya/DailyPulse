@@ -41,7 +41,7 @@ class DialogUtils {
     required String title,
     required String message,
   }) async {
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),

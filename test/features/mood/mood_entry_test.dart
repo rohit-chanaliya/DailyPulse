@@ -75,4 +75,21 @@ void main() {
     expect(cleared.id, 'doc-123');
     expect(cleared.userId, 'user-1');
   });
+
+  test('adapter clamps out-of-range mood levels on read', () async {
+    final box = await Hive.openBox<MoodEntry>('mood_entries_clamped');
+
+    final high = MoodEntry(timestamp: DateTime(2026, 1, 1), moodLevel: 99);
+    final low = MoodEntry(timestamp: DateTime(2026, 1, 2), moodLevel: -3);
+
+    await box.put(high.localId, high);
+    await box.put(low.localId, low);
+
+    // Hive caches values in memory; reopen to force the adapter's read path.
+    await box.close();
+    final reopened = await Hive.openBox<MoodEntry>('mood_entries_clamped');
+
+    expect(reopened.get(high.localId)!.moodLevel, 5);
+    expect(reopened.get(low.localId)!.moodLevel, 0);
+  });
 }
