@@ -5,7 +5,7 @@ import 'package:dailypulse/core/router/app_router.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/services/deep_link_service.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/features/mood/data/local/hive_service.dart';
+import 'package:dailypulse/features/mood/datasource/hive_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

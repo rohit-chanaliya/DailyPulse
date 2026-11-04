@@ -1,4 +1,4 @@
-import '../../features/mood/data/models/mood_entry.dart';
+import '../../features/mood/models/mood_entry.dart';
 
 /// Aggregations over mood entries shared by History and Insights.
 abstract final class MoodStatsUtils {

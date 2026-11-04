@@ -15,22 +15,21 @@ import 'package:firebase_auth/firebase_auth.dart' as _i22;
 import 'package:hive_ce/src/box/box.dart' as _i19;
 import 'package:inject_annotation/inject_annotation.dart' as _i17;
 
-import '../../features/auth/data/auth_error_mapper.dart' as _i18;
-import '../../features/auth/data/auth_repository.dart' as _i5;
-import '../../features/auth/presentation/signals/auth_signal.dart' as _i10;
-import '../../features/insights/presentation/signals/insights_signal.dart'
-    as _i12;
-import '../../features/mood/data/local/hive_service.dart' as _i6;
-import '../../features/mood/data/models/mood_entry.dart' as _i20;
-import '../../features/mood/data/remote/firestore_service.dart' as _i7;
-import '../../features/mood/data/repositories/mood_repository.dart' as _i9;
-import '../../features/mood/data/services/sync_service.dart' as _i8;
-import '../../features/mood/presentation/signals/mood_signal.dart' as _i11;
+import '../../features/auth/repository/auth_error_mapper.dart' as _i18;
+import '../../features/auth/repository/auth_repository.dart' as _i5;
+import '../../features/auth/viewmodels/auth_signal.dart' as _i10;
+import '../../features/insights/viewmodels/insights_signal.dart' as _i12;
+import '../../features/mood/datasource/firestore_service.dart' as _i7;
+import '../../features/mood/datasource/hive_service.dart' as _i6;
+import '../../features/mood/models/mood_entry.dart' as _i20;
+import '../../features/mood/repository/mood_repository.dart' as _i9;
+import '../../features/mood/services/sync_service.dart' as _i8;
+import '../../features/mood/viewmodels/mood_signal.dart' as _i11;
 import '../../features/onboarding/repository/onboarding_repository.dart'
     as _i13;
 import '../../features/onboarding/viewmodels/onboarding_signal.dart' as _i14;
 import '../../features/onboarding/viewmodels/splash_signal.dart' as _i15;
-import '../../features/settings/presentation/signals/theme_signal.dart' as _i16;
+import '../../features/settings/viewmodels/theme_signal.dart' as _i16;
 import '../services/app_preferences.dart' as _i4;
 import 'app_component.dart' as _i1;
 import 'firebase_module.dart' as _i2;

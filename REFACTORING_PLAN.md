@@ -208,23 +208,23 @@ lib/features/<feature>/
 ```
 
 ### Checklist & Exact File Moves (`git mv`)
-- [ ] **1. `lib/features/auth/`**
-  - `data/` → `datasource/` & `repository/`
+- [x] **1. `lib/features/auth/`**
+  - `data/` → `repository/` (repository + error mapper)
   - `presentation/signals/auth_signal.dart` → `viewmodels/auth_signal.dart`
   - `screens/` → `views/`
   - `widgets/` → `views/widgets/`
-- [ ] **2. `lib/features/history/`**
+- [x] **2. `lib/features/history/`**
   - `screens/` → `views/`
   - `widgets/` → `views/widgets/`
-- [ ] **3. `lib/features/insights/`**
+- [x] **3. `lib/features/insights/`**
   - `presentation/signals/insights_signal.dart` → `viewmodels/insights_signal.dart`
   - `screens/` → `views/`
   - `widgets/` → `views/widgets/`
-- [ ] **4. `lib/features/settings/`**
+- [x] **4. `lib/features/settings/`**
   - `presentation/signals/theme_signal.dart` → `viewmodels/theme_signal.dart`
   - `screens/` → `views/`
   - `widgets/` → `views/widgets/`
-- [ ] **5. `lib/features/mood/`**
+- [x] **5. `lib/features/mood/`**
   - `data/models/` + `presentation/models/` → `models/`
   - `data/local/` + `data/remote/` → `datasource/`
   - `data/repositories/` → `repository/`
@@ -232,9 +232,11 @@ lib/features/<feature>/
   - `presentation/signals/` → `viewmodels/`
   - `presentation/screens/` → `views/`
   - `presentation/widgets/` → `views/widgets/`
-- [ ] **6. Regenerate DI & Verify**
+- [x] **6. Regenerate DI & Verify**
   - Run `dart run build_runner build`
   - Run `flutter analyze` and `flutter test`
+
+> `lib/features/app/` (the navigation shell) and `lib/features/onboarding/` were left as-is: onboarding already matched the target layout, and the app shell is wiring rather than a data feature.
 
 ---
 

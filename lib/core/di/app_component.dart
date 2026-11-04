@@ -1,18 +1,18 @@
 import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/services/app_preferences.dart';
-import 'package:dailypulse/features/auth/data/auth_repository.dart';
-import 'package:dailypulse/features/auth/presentation/signals/auth_signal.dart';
-import 'package:dailypulse/features/insights/presentation/signals/insights_signal.dart';
-import 'package:dailypulse/features/mood/data/local/hive_service.dart';
-import 'package:dailypulse/features/mood/data/repositories/mood_repository.dart';
-import 'package:dailypulse/features/mood/data/remote/firestore_service.dart';
-import 'package:dailypulse/features/mood/data/services/sync_service.dart';
-import 'package:dailypulse/features/mood/presentation/signals/mood_signal.dart';
+import 'package:dailypulse/features/auth/repository/auth_repository.dart';
+import 'package:dailypulse/features/auth/viewmodels/auth_signal.dart';
+import 'package:dailypulse/features/insights/viewmodels/insights_signal.dart';
+import 'package:dailypulse/features/mood/datasource/hive_service.dart';
+import 'package:dailypulse/features/mood/repository/mood_repository.dart';
+import 'package:dailypulse/features/mood/datasource/firestore_service.dart';
+import 'package:dailypulse/features/mood/services/sync_service.dart';
+import 'package:dailypulse/features/mood/viewmodels/mood_signal.dart';
 import 'package:dailypulse/features/onboarding/repository/onboarding_repository.dart';
 import 'package:dailypulse/features/onboarding/viewmodels/onboarding_signal.dart';
 import 'package:dailypulse/features/onboarding/viewmodels/splash_signal.dart';
-import 'package:dailypulse/features/settings/presentation/signals/theme_signal.dart';
+import 'package:dailypulse/features/settings/viewmodels/theme_signal.dart';
 
 import 'app_component.inject.dart' as g;
 import 'firebase_module.dart';
