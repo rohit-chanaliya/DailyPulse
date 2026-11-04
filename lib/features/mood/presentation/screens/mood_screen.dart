@@ -21,12 +21,6 @@ class _MoodScreenState extends State<MoodScreen> {
   /// Position in the newest-first entry list; 0 is the latest entry.
   int _index = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    appComponent.moodSignal.reloadLocalEntries();
-  }
-
   void _step(int delta, int length) {
     final next = (_index + delta).clamp(0, length - 1);
     if (next != _index) {

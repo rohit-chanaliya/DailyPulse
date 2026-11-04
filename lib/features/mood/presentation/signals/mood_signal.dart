@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -10,19 +12,34 @@ import '../../data/repositories/mood_repository.dart';
 ///
 /// Every read is scoped to the signed-in user: the Hive box is shared by every
 /// account on this device, so unscoped reads would leak another user's moods.
+///
+/// The [entries] signal is kept in sync with Hive for the whole session, so
+/// background syncs and account switches update the UI without manual reloads.
 @singleton
 class MoodSignal {
   @inject
-  MoodSignal(this._repository, this._authSignal);
+  MoodSignal(this._repository, this._authSignal) {
+    _authEffect = effect(() {
+      _bindToUser(_authSignal.user.value?.uid);
+    });
+  }
 
   final MoodRepository _repository;
   final AuthSignal _authSignal;
 
   final isLoading = signal(false);
   final entries = signal<List<MoodEntry>>(const []);
+  final newestFirst = signal(true);
 
-  /// The signed-in user's id, or `null` when nobody is signed in.
-  String? get _userId => _authSignal.user.value?.uid;
+  /// [entries] in the order chosen by [newestFirst].
+  late final orderedEntries = computed<List<MoodEntry>>(() {
+    final list = entries.value;
+    return newestFirst.value ? list : list.reversed.toList(growable: false);
+  });
+
+  EffectCleanup? _authEffect;
+  StreamSubscription<List<MoodEntry>>? _entriesSubscription;
+  String? _boundUserId;
 
   Future<bool> saveMood({
     required int moodLevel,
@@ -42,7 +59,6 @@ class MoodSignal {
       );
 
       await _repository.addMoodEntry(entry, userId);
-      entries.value = _repository.getAllEntries(userId);
       appLogger.i('Mood saved successfully: level $moodLevel');
       return true;
     } catch (e, stackTrace) {
@@ -70,19 +86,6 @@ class MoodSignal {
     }
   }
 
-  /// Locally cached entries of the signed-in user, refreshed on every write.
-  void reloadLocalEntries() {
-    entries.value = _repository.getAllEntries(_userId);
-  }
-
-  Stream<List<MoodEntry>> streamMoodEntries(String userId) {
-    return _repository.streamMoodEntries(userId);
-  }
-
-  Stream<List<MoodEntry>> watchLocalEntries() {
-    return _repository.watchEntries(_userId);
-  }
-
   void startBackgroundSync() {
     _repository.startBackgroundSync();
   }
@@ -93,5 +96,38 @@ class MoodSignal {
 
   int getPendingSyncCount() {
     return _repository.getPendingSyncCount();
+  }
+
+  /// Subscribes [entries] to [userId]'s Hive box and drops the old subscription.
+  void _bindToUser(String? userId) {
+    if (userId == _boundUserId) return;
+    _boundUserId = userId;
+
+    _entriesSubscription?.cancel();
+    _entriesSubscription = null;
+
+    if (userId == null) {
+      entries.value = const [];
+      return;
+    }
+
+    entries.value = _repository.getAllEntries(userId);
+    _entriesSubscription = _repository.watchEntries(userId).listen(
+      (list) => entries.value = list,
+      onError: (Object error, StackTrace stackTrace) {
+        appLogger.e(
+          'Mood entries stream error',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      },
+    );
+  }
+
+  void dispose() {
+    _authEffect?.call();
+    _authEffect = null;
+    _entriesSubscription?.cancel();
+    _entriesSubscription = null;
   }
 }

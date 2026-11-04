@@ -9,24 +9,10 @@ import 'package:dailypulse/features/history/widgets/journal_empty_state.dart';
 import 'package:dailypulse/features/history/widgets/journal_entry_card.dart';
 import 'package:dailypulse/features/history/widgets/journal_sort_pill.dart';
 import 'package:dailypulse/features/history/widgets/journal_stats_section.dart';
-import 'package:dailypulse/features/mood/data/models/mood_entry.dart';
 
 /// Every logged entry as scrollable cards, plus a few journal stats.
-class HistoryScreen extends StatefulWidget {
+class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
-
-  @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
-}
-
-class _HistoryScreenState extends State<HistoryScreen> {
-  bool _newestFirst = true;
-
-  @override
-  void initState() {
-    super.initState();
-    appComponent.moodSignal.reloadLocalEntries();
-  }
 
   Future<void> _refresh() async {
     final user = appComponent.authSignal.user.value;
@@ -41,12 +27,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return RefreshIndicator(
       onRefresh: _refresh,
-      child: StreamBuilder<List<MoodEntry>>(
-        stream: appComponent.moodSignal.watchLocalEntries(),
-        initialData: appComponent.moodSignal.entries.value,
-        builder: (context, snapshot) {
-          final entries = snapshot.data ?? const <MoodEntry>[];
-          final ordered = _newestFirst ? entries : entries.reversed.toList();
+      child: SignalBuilder(
+        builder: (context) {
+          final entries = appComponent.moodSignal.entries.value;
+          final ordered = appComponent.moodSignal.orderedEntries.value;
 
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -59,15 +43,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SignalBuilder(
-                    builder: (context) => ScreenHeader(
-                      title: HistoryStrings.title,
-                      subtitle: HistoryStrings.subtitle,
-                      actionIcon: Icons.refresh_rounded,
-                      actionTooltip: HistoryStrings.refreshTooltip,
-                      onActionPressed: _refresh,
-                      actionLoading: appComponent.moodSignal.isLoading.value,
-                    ),
+                  child: ScreenHeader(
+                    title: HistoryStrings.title,
+                    subtitle: HistoryStrings.subtitle,
+                    actionIcon: Icons.refresh_rounded,
+                    actionTooltip: HistoryStrings.refreshTooltip,
+                    onActionPressed: _refresh,
+                    actionLoading: appComponent.moodSignal.isLoading.value,
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -83,8 +65,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                       ),
                       JournalSortPill(
-                        newestFirst: _newestFirst,
-                        onChanged: (v) => setState(() => _newestFirst = v),
+                        newestFirst: appComponent.moodSignal.newestFirst.value,
+                        onChanged: (v) =>
+                            appComponent.moodSignal.newestFirst.value = v,
                       ),
                     ],
                   ),

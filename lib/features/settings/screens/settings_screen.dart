@@ -24,16 +24,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Defer signal mutation to after the first frame to avoid
-    // SignalEffectException during the build phase.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) appComponent.moodSignal.reloadLocalEntries();
-    });
-  }
-
   Future<void> _handleSignOut() async {
     final confirm = await DialogUtils.showConfirmDialog(
       context: context,

@@ -84,20 +84,6 @@ class FirestoreService {
     }
   }
 
-  // Stream mood entries for real-time updates
-  Stream<List<MoodEntry>> streamMoodEntries(String userId) {
-    return _firestore
-        .collection(_moodsCollection)
-        .where('userId', isEqualTo: userId)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
-              .toList(),
-        );
-  }
-
   /// Deletes every mood entry owned by [userId].
   ///
   /// Deletes are chunked because a Firestore batch is limited to 500 writes.
