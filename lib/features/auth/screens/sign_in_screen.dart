@@ -38,16 +38,17 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _signIn() async {
-    if (_formKey.currentState!.validate()) {
-      await appComponent.authSignal.handleSignIn(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        onError: (message) {
-          if (mounted) {
-            SnackBarUtils.showError(context, message);
-          }
-        },
-      );
+    if (!_formKey.currentState!.validate()) return;
+
+    final success = await appComponent.authSignal.signIn(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (!mounted || success) return;
+    final message = appComponent.authSignal.errorMessage.value;
+    if (message != null) {
+      SnackBarUtils.showError(context, message);
     }
   }
 
@@ -215,17 +216,22 @@ class _SignInScreenState extends State<SignInScreen> {
                                       return AuthGoogleButton(
                                         isLoading: isLoading,
                                         onPressed: () async {
-                                          await appComponent.authSignal
-                                              .handleGoogleSignIn(
-                                            onError: (message) {
-                                              if (mounted) {
-                                                SnackBarUtils.showError(
-                                                  context,
-                                                  message,
-                                                );
-                                              }
-                                            },
-                                          );
+                                          final success = await appComponent
+                                              .authSignal
+                                              .signInWithGoogle();
+                                          if (!context.mounted || success) {
+                                            return;
+                                          }
+                                          final message = appComponent
+                                              .authSignal
+                                              .errorMessage
+                                              .value;
+                                          if (message != null) {
+                                            SnackBarUtils.showError(
+                                              context,
+                                              message,
+                                            );
+                                          }
                                         },
                                       );
                                     },

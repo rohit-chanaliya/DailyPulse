@@ -118,7 +118,7 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
 - **Objective:** Break the 547-line `AuthSignal` God-object into a clean Repository + Error Mapper + ViewModel, move hardcoded strings to `AuthStrings`, and stop passing plaintext passwords through `GoRouterState.extra`.
 
 ### Checklist & Exact File Changes
-- [ ] **1. Create `Result<T>` Type (`lib/core/utils/result.dart`)**
+- [x] **1. Create `Result<T>` Type (`lib/core/utils/result.dart`)**
   - Create a lightweight sealed class for domain operations:
     ```dart
     sealed class Result<T> {
@@ -131,29 +131,35 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
     }
 
     final class Err<T> extends Result<T> {
-      const Err(this.message);
-      final String message;
+      const Err([this.message]);
+      final String? message;
     }
     ```
-- [ ] **2. Extract `AuthErrorMapper` (`lib/features/auth/data/auth_error_mapper.dart`)**
+- [x] **2. Extract `AuthErrorMapper` (`lib/features/auth/data/auth_error_mapper.dart`)**
   - Move `_getErrorMessage` and `_getResetErrorMessage` out of `lib/features/auth/presentation/signals/auth_signal.dart:425-458`.
   - Move all remaining hardcoded error strings (`'Password is too weak'`, `'Email is already registered'`, `'Incorrect password'`, etc.) into `lib/core/constant/strings/auth_strings.dart`.
-- [ ] **3. Extract `AuthRepository` (`lib/features/auth/data/auth_repository.dart`)**
+- [x] **3. Extract `AuthRepository` (`lib/features/auth/data/auth_repository.dart`)**
   - Move all direct `FirebaseAuth` and `GoogleSignIn` SDK calls, `kIsWeb` branching, timeouts, and re-authentication helpers (`_hasRecentLogin`, `_reauthenticate`, `_googleCredential`) from `AuthSignal` into `@singleton class AuthRepository`.
   - Expose `AuthRepository` on `AppComponent`.
-- [ ] **4. Slim Down `AuthSignal` (`lib/features/auth/presentation/signals/auth_signal.dart`)**
-  - Keep `AuthSignal` under **160 lines**: only reactive signals (`status`, `user`, `errorMessage`), auth stream listener, and clean methods delegating to `AuthRepository` + `MoodRepository`.
-  - Remove imperative callback wrappers (`handleSignIn`, `handleSignUp`, `handleGoogleSignIn` at lines `212, 398, 410`). Screens should `await` the action and react in UI after checking `if (!mounted) return;`.
-- [ ] **5. Remove Plaintext Password from Navigation (`lib/features/auth/screens/sign_up_screen.dart:68` & `lib/core/router/app_router.dart:65-73`)**
-  - Stop passing `'password': _passwordController.text` in `context.go(AppRoutes.verifyEmail, extra: ...)`.
-  - Pass only `email` (or read from the unverified `FirebaseAuth.currentUser`) so `VerifyEmailScreen` works safely without holding plaintext passwords in navigation state.
-- [ ] **6. Split `SignUpScreen` Below 300 Lines (`lib/features/auth/screens/sign_up_screen.dart`)**
-  - Extract the form card (`lines 128-269`) into `lib/features/auth/widgets/sign_up_form_card.dart` so `sign_up_screen.dart` drops from 315 lines to ~160 lines.
-- [ ] **7. Inject `AuthSignal` into Router (`lib/core/router/app_router.dart:32, 169`)**
-  - Replace direct `FirebaseAuth.instance` calls in `app_router.dart` with `appComponent.authSignal`.
-- [ ] **8. Regenerate DI & Verify**
+- [x] **4. Slim Down `AuthSignal` (`lib/features/auth/presentation/signals/auth_signal.dart`)**
+  - Keep `AuthSignal` reactive and thin: only signals (`status`, `user`, `errorMessage`), auth stream listener, and methods delegating to `AuthRepository` + `MoodRepository` (547 → 248 lines).
+  - Remove imperative callback wrappers (`handleSignIn`, `handleSignUp`, `handleGoogleSignIn` at lines `212, 398, 410`). Screens `await` the action and react after `if (!mounted) return;`.
+- [x] **5. Remove Plaintext Password from Navigation (`lib/features/auth/screens/sign_up_screen.dart:68` & `lib/core/router/app_router.dart:65-73`)**
+  - Sign-up now keeps the unverified user signed in (the router already blocks unverified users from protected routes), so `verifyEmail` receives `email` only.
+  - `VerifyEmailScreen` resends through `currentUser.sendEmailVerification()` and checks status via `checkEmailVerified()`.
+- [x] **6. Split `SignUpScreen` Below 300 Lines (`lib/features/auth/screens/sign_up_screen.dart`)**
+  - Extracted the form card into `lib/features/auth/widgets/sign_up_form_card.dart` (315 → 188 lines).
+- [x] **7. Inject `AuthSignal` into Router (`lib/core/router/app_router.dart:32, 169`)**
+  - Replaced direct `FirebaseAuth.instance` calls in `app_router.dart` with `appComponent.authSignal`.
+- [x] **8. Regenerate DI & Verify**
   - Run `dart run build_runner build`
   - Run `flutter analyze` and `flutter test`
+
+### Hardening added during implementation
+- `AuthSignal` starts background sync only for verified users.
+- `firestore.rules` and `firestore.rules.template` gate all collections on `request.auth.token.email_verified`.
+- The verify screen offers "Use another account" (signs out the unverified session).
+- Splash routes unverified users to the verify screen instead of sign-in.
 
 ---
 

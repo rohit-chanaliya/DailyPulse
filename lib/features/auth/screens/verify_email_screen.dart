@@ -14,13 +14,8 @@ import '../widgets/auth_trust_badge.dart';
 /// Screen shown after sign-up while the user verifies their email.
 class VerifyEmailScreen extends StatefulWidget {
   final String email;
-  final String password;
 
-  const VerifyEmailScreen({
-    super.key,
-    required this.email,
-    required this.password,
-  });
+  const VerifyEmailScreen({super.key, this.email = ''});
 
   @override
   State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
@@ -30,46 +25,41 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   bool _isResending = false;
   bool _isChecking = false;
 
+  /// Falls back to the signed-in user when opened from a cold start.
+  String get _displayEmail =>
+      widget.email.isNotEmpty
+      ? widget.email
+      : appComponent.authSignal.currentUser?.email ?? '';
+
   Future<void> _resendEmail() async {
     setState(() => _isResending = true);
-    final success = await appComponent.authSignal.resendVerificationEmail(
-      email: widget.email,
-      password: widget.password,
-    );
-    if (mounted) {
-      setState(() => _isResending = false);
-      if (success) {
-        SnackBarUtils.showSuccess(context, AuthStrings.verificationResendSuccess);
-      } else {
-        SnackBarUtils.showError(
-          context,
-          appComponent.authSignal.errorMessage.value ??
-              'Failed to resend email',
-        );
-      }
+    final success = await appComponent.authSignal.resendVerificationEmail();
+    if (!mounted) return;
+    setState(() => _isResending = false);
+    if (success) {
+      SnackBarUtils.showSuccess(context, AuthStrings.verificationResendSuccess);
+    } else {
+      SnackBarUtils.showError(
+        context,
+        appComponent.authSignal.errorMessage.value ??
+            AuthStrings.failedToResendVerification,
+      );
     }
   }
 
   Future<void> _checkVerification() async {
     setState(() => _isChecking = true);
 
-    // Try signing in to check if the email has been verified.
-    final success = await appComponent.authSignal.signIn(
-      email: widget.email,
-      password: widget.password,
-    );
+    // The user stays signed in while unverified, so a reload is enough.
+    final verified = await appComponent.authSignal.checkEmailVerified();
 
-    if (mounted) {
-      setState(() => _isChecking = false);
-      if (success) {
-        SnackBarUtils.showSuccess(context, AuthStrings.emailVerifiedSuccess);
-        context.go(AppRoutes.home);
-      } else {
-        SnackBarUtils.showError(
-          context,
-          AuthStrings.emailNotVerifiedError,
-        );
-      }
+    if (!mounted) return;
+    setState(() => _isChecking = false);
+    if (verified) {
+      SnackBarUtils.showSuccess(context, AuthStrings.emailVerifiedSuccess);
+      context.go(AppRoutes.home);
+    } else {
+      SnackBarUtils.showError(context, AuthStrings.emailNotVerifiedError);
     }
   }
 
@@ -140,7 +130,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Text(
-                                    widget.email,
+                                    _displayEmail,
                                     style:
                                         context.textTheme.bodyMedium?.copyWith(
                                       color: onboardingColors.welcomeHighlight,
@@ -232,11 +222,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Go to sign in
-                          GestureDetector(
-                            onTap: () => context.go(AppRoutes.signIn),
+                          // Escape hatch: sign out of the unverified session.
+                          TextButton(
+                            onPressed: () async {
+                              await appComponent.authSignal.signOut();
+                              if (!context.mounted) return;
+                              context.go(AppRoutes.signIn);
+                            },
                             child: Text(
-                              AuthStrings.signInAfterVerify,
+                              AuthStrings.useAnotherAccount,
                               style: context.textTheme.bodyMedium?.copyWith(
                                 color: onboardingColors.welcomeHighlight,
                                 fontWeight: FontWeight.w700,

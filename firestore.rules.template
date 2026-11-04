@@ -6,9 +6,15 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
+    // Email/password accounts must verify their address before touching data.
+    // Google accounts always carry email_verified = true.
+    function isVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return isVerified() && request.auth.uid == userId;
     }
 
     // App uses zero-based mood levels 0..5 (Frustrated..Excited).
@@ -28,15 +34,15 @@ service cloud.firestore {
     
     // Mood entries - users can only access their own moods
     match /moods/{moodId} {
-      allow read: if isAuthenticated() &&
+      allow read: if isVerified() &&
                      resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() &&
+      allow create: if isVerified() &&
                        request.resource.data.userId == request.auth.uid &&
                        moodLevelInRange(request.resource.data);
-      allow update: if isAuthenticated() &&
+      allow update: if isVerified() &&
                        resource.data.userId == request.auth.uid &&
                        moodLevelInRange(request.resource.data);
-      allow delete: if isAuthenticated() &&
+      allow delete: if isVerified() &&
                        resource.data.userId == request.auth.uid;
     }
     

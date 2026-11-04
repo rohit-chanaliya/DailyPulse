@@ -30,7 +30,7 @@ class SplashSignal {
   /// Where a cold start should land once the splash is done.
   ///
   /// Authenticated users skip the onboarding/auth funnel; unverified
-  /// email/password users are sent to sign-in.
+  /// email/password users land on the verify screen so they can resend.
   String get nextLocation {
     final user = _auth.currentUser;
     if (user != null) {
@@ -39,7 +39,7 @@ class SplashSignal {
       );
       return user.emailVerified || isGoogleUser
           ? AppRoutes.home
-          : AppRoutes.signIn;
+          : AppRoutes.verifyEmail;
     }
     return _onboardingRepository.hasSeenOnboarding
         ? AppRoutes.signIn

@@ -43,9 +43,15 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Email/password accounts must verify their address before touching data.
+    // Google accounts always carry email_verified = true.
+    function isVerified() {
+      return isAuthenticated() && request.auth.token.email_verified == true;
+    }
+
     // Check if current user is the owner of the document identified by userId
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return isVerified() && request.auth.uid == userId;
     }
 
     // Validate email address format
@@ -107,13 +113,13 @@ service cloud.firestore {
     // Mood Entries Collection
     // Supports query: where('userId', '==', request.auth.uid)
     match /moods/{moodId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow create: if isAuthenticated() && isValidMood(request.resource.data);
-      allow update: if isAuthenticated() &&
+      allow read: if isVerified() && resource.data.userId == request.auth.uid;
+      allow create: if isVerified() && isValidMood(request.resource.data);
+      allow update: if isVerified() &&
                        resource.data.userId == request.auth.uid &&
                        isValidMood(request.resource.data) &&
                        areImmutableFieldsUnchanged(['userId', 'createdAt']);
-      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isVerified() && resource.data.userId == request.auth.uid;
     }
 
     // User Profile Collection

@@ -59,7 +59,7 @@ abstract final class AuthStrings {
       'This verification link is invalid or has already been used.';
   static const String verificationTimeout =
       'Verification is taking too long. Check your connection and try again.';
-  static const String signInAfterVerify = 'Go to Sign In';
+  static const String useAnotherAccount = 'Use another account';
   static const String checkSpamNote =
       'Didn\'t receive the email? Check your spam folder or resend.';
 
@@ -102,4 +102,24 @@ abstract final class AuthStrings {
       'Could not delete your account. Please try again.';
   static const String deleteAccountCancelled =
       'Account deletion was cancelled.';
+
+  // Error Messages
+  static const String unexpectedError = 'An unexpected error occurred';
+  static const String authStreamError = 'Failed to listen for auth changes';
+  static const String authFailedFallback =
+      'Authentication failed. Please try again';
+  static const String weakPassword = 'Password is too weak';
+  static const String emailAlreadyInUse = 'Email is already registered';
+  static const String invalidEmail = 'Invalid email address';
+  static const String userNotFound = 'No user found with this email';
+  static const String wrongPassword = 'Incorrect password';
+  static const String invalidCredential = 'Invalid email or password';
+  static const String userDisabled = 'This account has been disabled';
+  static const String googleSignInFailed = 'Failed to sign in with Google';
+  static const String noSignedInUser =
+      'No signed-in account found. Please sign in again.';
+  static const String failedToResendVerification =
+      'Failed to resend verification email';
+  static const String failedToVerifyEmail = 'Failed to verify email';
+  static const String failedToRestoreEmail = 'Could not restore your email';
 }
