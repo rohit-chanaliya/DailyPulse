@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
 import '../models/mood_option.dart';
 
 class MoodCard extends StatelessWidget {
@@ -14,22 +15,23 @@ class MoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final moodColor = context.mood.values[mood.level.clamp(0, 5)];
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: isDark
-              ? mood.color.withValues(alpha: 0.2)
-              : mood.color.withValues(alpha: 0.3),
+              ? moodColor.withValues(alpha: 0.2)
+              : moodColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: mood.color.withValues(alpha: isDark ? 0.5 : 0.4),
+            color: moodColor.withValues(alpha: isDark ? 0.5 : 0.4),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: mood.color.withValues(alpha: isDark ? 0.15 : 0.2),
+              color: moodColor.withValues(alpha: isDark ? 0.15 : 0.2),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -42,7 +44,7 @@ class MoodCard extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: mood.color.withValues(alpha: isDark ? 0.4 : 0.5),
+                color: moodColor.withValues(alpha: isDark ? 0.4 : 0.5),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -71,7 +73,7 @@ class MoodCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: mood.color.withValues(alpha: isDark ? 0.3 : 0.4),
+                color: moodColor.withValues(alpha: isDark ? 0.3 : 0.4),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

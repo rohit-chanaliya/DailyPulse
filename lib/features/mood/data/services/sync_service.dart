@@ -12,8 +12,14 @@ import '../remote/firestore_service.dart';
 @singleton
 class SyncService {
   @inject
-  SyncService(this._firestoreService, this._connectivity, this._auth);
+  SyncService(
+    this._hiveService,
+    this._firestoreService,
+    this._connectivity,
+    this._auth,
+  );
 
+  final HiveService _hiveService;
   final FirestoreService _firestoreService;
   final Connectivity _connectivity;
   final FirebaseAuth _auth;
@@ -110,7 +116,7 @@ class SyncService {
     _isSyncing = true;
 
     try {
-      final pendingEntries = HiveService.getPendingForUser(user.uid);
+      final pendingEntries = _hiveService.getPendingForUser(user.uid);
 
       if (pendingEntries.isEmpty) {
         return;
@@ -123,7 +129,7 @@ class SyncService {
 
         if (docId != null) {
           final updatedEntry = entry.copyWith(id: docId);
-          await HiveService.put(updatedEntry);
+          await _hiveService.put(updatedEntry);
           appLogger.d('Synced entry with localId ${entry.localId}');
         }
       }
@@ -158,7 +164,7 @@ class SyncService {
       return false;
     }
 
-    return HiveService.getPendingForUser(userId).isNotEmpty;
+    return _hiveService.getPendingForUser(userId).isNotEmpty;
   }
 
   int getPendingSyncCount() {
@@ -167,7 +173,7 @@ class SyncService {
       return 0;
     }
 
-    return HiveService.getPendingForUser(userId).length;
+    return _hiveService.getPendingForUser(userId).length;
   }
 
   bool _hasConnection(dynamic event) {

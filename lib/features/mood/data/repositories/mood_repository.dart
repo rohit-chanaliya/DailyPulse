@@ -10,14 +10,15 @@ import '../services/sync_service.dart';
 @singleton
 class MoodRepository {
   @inject
-  MoodRepository(this._syncService, this._firestoreService);
+  MoodRepository(this._hiveService, this._syncService, this._firestoreService);
 
+  final HiveService _hiveService;
   final SyncService _syncService;
   final FirestoreService _firestoreService;
 
   Future<void> addMoodEntry(MoodEntry entry, String userId) async {
     final entryWithUser = entry.copyWith(userId: userId);
-    await HiveService.put(entryWithUser);
+    await _hiveService.put(entryWithUser);
     appLogger.d('Added mood entry locally for user: $userId');
     _syncService.syncPendingEntries();
   }
@@ -39,12 +40,12 @@ class MoodRepository {
   }
 
   List<MoodEntry> getAllEntries(String? userId) {
-    return HiveService.getAllForUser(userId);
+    return _hiveService.getAllForUser(userId);
   }
 
   /// Emits [userId]'s entries whenever they change.
   Stream<List<MoodEntry>> watchEntries(String? userId) {
-    return HiveService.watchForUser(userId);
+    return _hiveService.watchForUser(userId);
   }
 
   /// Deletes every local and remote trace of [userId].
@@ -54,7 +55,7 @@ class MoodRepository {
   Future<bool> deleteAccountData(String userId) async {
     try {
       await _firestoreService.deleteAccountData(userId);
-      await HiveService.deleteAllForUser(userId);
+      await _hiveService.deleteAllForUser(userId);
       appLogger.i('Deleted account data for user: $userId');
       return true;
     } catch (e, stackTrace) {
@@ -78,7 +79,7 @@ class MoodRepository {
 
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
 
-      final localEntries = HiveService.getAllForUser(userId);
+      final localEntries = _hiveService.getAllForUser(userId);
       final localById = <String, MoodEntry>{
         for (final e in localEntries)
           if (e.id != null) e.id!: e,
@@ -102,13 +103,13 @@ class MoodRepository {
         if (local.id != null &&
             local.userId == userId &&
             !remoteIds.contains(local.id)) {
-          await HiveService.delete(local.localId);
+          await _hiveService.delete(local.localId);
         }
       }
-      await HiveService.putAll(merged);
+      await _hiveService.putAll(merged);
 
       appLogger.i('Merged ${merged.length} entries into local Hive');
-      return HiveService.getAllForUser(userId);
+      return _hiveService.getAllForUser(userId);
     } catch (e, stackTrace) {
       appLogger.e(
         'Error in fetchAndSyncFromFirebase',

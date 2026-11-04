@@ -1,4 +1,6 @@
+import 'package:dailypulse/core/constant/constants.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:inject_annotation/inject_annotation.dart';
 
 import '../models/mood_entry.dart';
 
@@ -7,13 +9,15 @@ import '../models/mood_entry.dart';
 /// The box is shared by every account that signs in on this device, so every
 /// read must be scoped by `userId`. Unscoped reads are only for the
 /// merge/delete paths that already know which user they are acting on.
+@singleton
 class HiveService {
-  static const String boxName = 'mood_entries';
+  @inject
+  HiveService(this._moodBox);
+
+  static const String boxName = AppConstants.hiveBoxName;
   static const String _directory = 'dailypulse';
 
-  static late final Box<MoodEntry> moodBox;
-
-  HiveService._();
+  final Box<MoodEntry> _moodBox;
 
   static Future<void> init() async {
     await Hive.initFlutter(_directory);
@@ -22,50 +26,50 @@ class HiveService {
       Hive.registerAdapter(MoodEntryAdapter());
     }
 
-    moodBox = await Hive.openBox<MoodEntry>(boxName);
+    await Hive.openBox<MoodEntry>(boxName);
   }
 
   /// Emits [userId]'s entries whenever the box changes.
-  static Stream<List<MoodEntry>> watchForUser(String? userId) {
+  Stream<List<MoodEntry>> watchForUser(String? userId) {
     if (userId == null) return Stream.value(const <MoodEntry>[]);
-    return moodBox.watch().map((_) => getAllForUser(userId));
+    return _moodBox.watch().map((_) => getAllForUser(userId));
   }
 
   /// [userId]'s entries, newest first.
-  static List<MoodEntry> getAllForUser(String? userId) {
+  List<MoodEntry> getAllForUser(String? userId) {
     if (userId == null) return const [];
     return _sorted(
-      moodBox.values.where((entry) => entry.userId == userId).toList(),
+      _moodBox.values.where((entry) => entry.userId == userId).toList(),
     );
   }
 
   /// [userId]'s entries that have not been pushed to Firestore yet.
   ///
   /// Oldest first so retries upload in the order the user created them.
-  static List<MoodEntry> getPendingForUser(String? userId) {
+  List<MoodEntry> getPendingForUser(String? userId) {
     if (userId == null) return const [];
-    return moodBox.values
+    return _moodBox.values
         .where((entry) => entry.id == null && entry.userId == userId)
         .toList()
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
   }
 
   /// Removes every local entry of [userId] (used when an account is deleted).
-  static Future<void> deleteAllForUser(String userId) async {
-    final keys = moodBox.values
+  Future<void> deleteAllForUser(String userId) async {
+    final keys = _moodBox.values
         .where((entry) => entry.userId == userId)
         .map((entry) => entry.localId)
         .toList();
-    await moodBox.deleteAll(keys);
+    await _moodBox.deleteAll(keys);
   }
 
-  static Future<void> put(MoodEntry entry) => moodBox.put(entry.localId, entry);
+  Future<void> put(MoodEntry entry) => _moodBox.put(entry.localId, entry);
 
-  static Future<void> putAll(Iterable<MoodEntry> entries) {
-    return moodBox.putAll({for (final e in entries) e.localId: e});
+  Future<void> putAll(Iterable<MoodEntry> entries) {
+    return _moodBox.putAll({for (final e in entries) e.localId: e});
   }
 
-  static Future<void> delete(String localId) => moodBox.delete(localId);
+  Future<void> delete(String localId) => _moodBox.delete(localId);
 
   static List<MoodEntry> _sorted(List<MoodEntry> entries) {
     return entries..sort((a, b) => b.timestamp.compareTo(a.timestamp));

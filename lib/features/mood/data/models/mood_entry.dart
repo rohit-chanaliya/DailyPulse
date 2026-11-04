@@ -48,23 +48,25 @@ class MoodEntry {
     );
   }
 
+  static const Object _unset = Object();
+
   MoodEntry copyWith({
     String? localId,
     DateTime? timestamp,
     int? moodLevel,
-    String? note,
-    String? id,
-    String? userId,
-    String? title,
+    Object? note = _unset,
+    Object? id = _unset,
+    Object? userId = _unset,
+    Object? title = _unset,
   }) {
     return MoodEntry(
       localId: localId ?? this.localId,
       timestamp: timestamp ?? this.timestamp,
       moodLevel: moodLevel ?? this.moodLevel,
-      note: note ?? this.note,
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      title: title ?? this.title,
+      note: identical(note, _unset) ? this.note : note as String?,
+      id: identical(id, _unset) ? this.id : id as String?,
+      userId: identical(userId, _unset) ? this.userId : userId as String?,
+      title: identical(title, _unset) ? this.title : title as String?,
     );
   }
 }

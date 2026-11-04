@@ -54,4 +54,25 @@ void main() {
     expect(restored.userId, isNull);
     expect(restored.localId, isNotEmpty);
   });
+
+  test('copyWith can explicitly clear nullable fields back to null', () {
+    final entry = MoodEntry(
+      timestamp: DateTime(2026, 1, 1),
+      moodLevel: 4,
+      note: 'Initial note',
+      title: 'Initial title',
+      id: 'doc-123',
+      userId: 'user-1',
+    );
+
+    final preserved = entry.copyWith(moodLevel: 5);
+    expect(preserved.note, 'Initial note');
+    expect(preserved.title, 'Initial title');
+
+    final cleared = entry.copyWith(note: null, title: null);
+    expect(cleared.note, isNull);
+    expect(cleared.title, isNull);
+    expect(cleared.id, 'doc-123');
+    expect(cleared.userId, 'user-1');
+  });
 }

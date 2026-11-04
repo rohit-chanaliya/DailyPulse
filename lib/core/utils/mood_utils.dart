@@ -10,7 +10,6 @@ class MoodUtils {
       (index) => MoodOption(
         label: AppConstants.moodLabels[index],
         emoji: AppConstants.moodEmojis[index],
-        color: AppConstants.moodColorsDark[index],
         level: index,
       ),
     );

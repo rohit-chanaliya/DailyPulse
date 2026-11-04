@@ -6,9 +6,11 @@ import 'package:dailypulse/core/services/app_preferences.dart';
 @singleton
 class OnboardingRepository {
   @inject
-  OnboardingRepository();
+  OnboardingRepository(this._preferences);
 
-  bool get hasSeenOnboarding => AppPreferences.hasSeenOnboarding;
+  final AppPreferences _preferences;
 
-  Future<void> markSeen() => AppPreferences.setHasSeenOnboarding(true);
+  bool get hasSeenOnboarding => _preferences.hasSeenOnboarding;
+
+  Future<void> markSeen() => _preferences.setHasSeenOnboarding(true);
 }
