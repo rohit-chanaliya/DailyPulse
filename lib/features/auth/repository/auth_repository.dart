@@ -198,7 +198,7 @@ class AuthRepository {
   }) async {
     try {
       await _auth.applyActionCode(oobCode).timeout(_actionTimeout);
-      await _auth.currentUser?.reload();
+      await _refreshUserClaims();
       return const Ok(null);
     } on TimeoutException {
       appLogger.w('Apply action code timed out');
@@ -214,6 +214,17 @@ class AuthRepository {
       );
       return Err(failureMessage);
     }
+  }
+
+  /// Reloads the user and forces a fresh ID token.
+  ///
+  /// The Firestore rules read `request.auth.token.email_verified`, and the
+  /// cached token keeps the old claim until it is refreshed.
+  Future<void> _refreshUserClaims() async {
+    final current = _auth.currentUser;
+    if (current == null) return;
+    await current.reload();
+    await current.getIdToken(true);
   }
 
   /// Validates a password reset code and returns the account email.
@@ -272,7 +283,12 @@ class AuthRepository {
     }
     try {
       await current.reload();
-      return Ok(_auth.currentUser?.emailVerified ?? false);
+      final verified = _auth.currentUser?.emailVerified ?? false;
+      if (verified) {
+        // Rules gate on the token claim, not the user profile field.
+        await _auth.currentUser?.getIdToken(true);
+      }
+      return Ok(verified);
     } on FirebaseAuthException catch (e) {
       appLogger.w('Refresh verification failed: ${e.code}');
       return Err(_errorMapper.messageFor(e.code));

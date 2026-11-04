@@ -160,6 +160,7 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
 - `firestore.rules` and `firestore.rules.template` gate all collections on `request.auth.token.email_verified`.
 - The verify screen offers "Use another account" (signs out the unverified session).
 - Splash routes unverified users to the verify screen instead of sign-in.
+- After verification the repository forces an ID token refresh (`getIdToken(true)`) so the Firestore rules see the updated `email_verified` claim immediately.
 
 ---
 
