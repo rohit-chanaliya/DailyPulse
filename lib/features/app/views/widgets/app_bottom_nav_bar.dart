@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:dailypulse/core/constant/strings/nav_strings.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
-import 'package:dailypulse/features/app/presentation/models/nav_assets.dart';
-import 'package:dailypulse/features/app/presentation/widgets/notched_bar_clipper.dart';
+import 'package:dailypulse/features/app/models/nav_assets.dart';
+import 'package:dailypulse/features/app/views/widgets/notched_bar_clipper.dart';
 
 /// Floating bottom bar: two tabs, a raised "+" action in a notch, two tabs.
 class AppBottomNavBar extends StatelessWidget {

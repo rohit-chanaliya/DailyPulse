@@ -14,10 +14,15 @@ class MoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final home = context.home;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final moodColor = context.mood.values[mood.level.clamp(0, 5)];
 
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: mood.label,
+      hint: 'Tap to log',
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
@@ -66,7 +71,7 @@ class MoodCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
+                color: home.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
@@ -80,13 +85,14 @@ class MoodCard extends StatelessWidget {
                 'Tap to log',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white70 : Colors.grey.shade800,
+                  color: home.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

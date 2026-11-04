@@ -3,20 +3,23 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
-import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
+import 'package:dailypulse/features/auth/viewmodels/auth_signal.dart';
 
 /// Handles incoming Firebase email verification links.
 ///
 /// Supported links:
 /// - `https://dailyplus-mobile-app.web.app/app-verify?mode=verifyEmail&oobCode=...`
 /// - `dailypulse://verify?mode=verifyEmail&oobCode=...` (custom-scheme fallback)
+@singleton
 class DeepLinkService {
-  DeepLinkService._();
+  @inject
+  DeepLinkService(this._authSignal);
 
   static const _authHost = 'dailyplus-mobile-app.firebaseapp.com';
   static const _authPath = '/__/auth/action';
@@ -25,18 +28,19 @@ class DeepLinkService {
   static const _scheme = 'dailypulse';
   static const _schemeHost = 'verify';
 
-  static final _appLinks = AppLinks();
-  static StreamSubscription<Uri>? _subscription;
-  static GlobalKey<NavigatorState>? _navigatorKey;
-  static Uri? _pendingUri;
-  static Uri? _lastHandledUri;
-  static bool _isFlushing = false;
+  final AuthSignal _authSignal;
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _subscription;
+  GlobalKey<NavigatorState>? _navigatorKey;
+  Uri? _pendingUri;
+  Uri? _lastHandledUri;
+  bool _isFlushing = false;
 
   /// Initialise the listener.
   ///
   /// Call once from `main` after the router and navigator key exist. Links
   /// received before the first frame are queued until a route is available.
-  static Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
+  Future<void> init(GlobalKey<NavigatorState> navigatorKey) async {
     _navigatorKey = navigatorKey;
 
     try {
@@ -49,6 +53,7 @@ class DeepLinkService {
       appLogger.w('No initial deep link: $e');
     }
 
+    await _subscription?.cancel();
     _subscription = _appLinks.uriLinkStream.listen(
       (uri) => unawaited(_handleLink(uri)),
       onError: (Object error) {
@@ -57,13 +62,13 @@ class DeepLinkService {
     );
   }
 
-  static void _scheduleFlush() {
+  void _scheduleFlush() {
     if (_isFlushing) return;
     _isFlushing = true;
     unawaited(_flushPending());
   }
 
-  static Future<void> _flushPending() async {
+  Future<void> _flushPending() async {
     await WidgetsBinding.instance.endOfFrame;
     _isFlushing = false;
     final uri = _pendingUri;
@@ -73,7 +78,7 @@ class DeepLinkService {
     }
   }
 
-  static Future<void> _handleLink(Uri uri) async {
+  Future<void> _handleLink(Uri uri) async {
     final isAuthActionLink =
         uri.scheme == 'https' &&
         uri.host == _authHost &&
@@ -120,9 +125,7 @@ class DeepLinkService {
         return;
       }
 
-      final recovered = await appComponent.authSignal.applyRecoveryCode(
-        oobCode,
-      );
+      final recovered = await _authSignal.applyRecoveryCode(oobCode);
 
       if (!context.mounted) return;
 
@@ -132,8 +135,7 @@ class DeepLinkService {
       } else {
         SnackBarUtils.showError(
           context,
-          appComponent.authSignal.errorMessage.value ??
-              AuthStrings.emailRecoveryFailed,
+          _authSignal.errorMessage.value ?? AuthStrings.emailRecoveryFailed,
         );
       }
       return;
@@ -148,9 +150,7 @@ class DeepLinkService {
       return;
     }
 
-    final verified = await appComponent.authSignal.applyVerificationCode(
-      oobCode,
-    );
+    final verified = await _authSignal.applyVerificationCode(oobCode);
 
     if (!context.mounted) return;
 
@@ -160,15 +160,14 @@ class DeepLinkService {
     } else {
       SnackBarUtils.showError(
         context,
-        appComponent.authSignal.errorMessage.value ??
-            AuthStrings.emailVerificationFailed,
+        _authSignal.errorMessage.value ?? AuthStrings.emailVerificationFailed,
       );
     }
   }
 
   /// Tear down the listener (useful in tests).
-  static void dispose() {
-    _subscription?.cancel();
+  Future<void> dispose() async {
+    await _subscription?.cancel();
     _subscription = null;
     _pendingUri = null;
     _lastHandledUri = null;

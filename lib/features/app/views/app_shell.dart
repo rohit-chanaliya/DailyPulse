@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
-import 'package:dailypulse/features/app/presentation/widgets/app_bottom_nav_bar.dart';
+import 'package:dailypulse/features/app/views/widgets/app_bottom_nav_bar.dart';
 
 /// Persistent bottom-navigation shell for the authenticated app.
 class AppShell extends StatelessWidget {

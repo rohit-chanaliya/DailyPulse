@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_router.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
-import 'package:dailypulse/core/services/deep_link_service.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/features/mood/datasource/hive_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,7 +30,7 @@ void main() async {
   final router = createAppRouter(navigatorKey: _navigatorKey);
 
   // Initialise deep-link handling for email verification.
-  unawaited(DeepLinkService.init(_navigatorKey));
+  unawaited(appComponent.deepLinkService.init(_navigatorKey));
 
   runApp(DailyPulseApp(router: router));
 }

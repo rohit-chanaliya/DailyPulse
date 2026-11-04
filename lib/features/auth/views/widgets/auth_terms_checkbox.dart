@@ -70,10 +70,10 @@ class _AuthTermsCheckboxState extends State<AuthTermsCheckbox> {
               ),
             ),
             child: widget.isChecked
-                ? const Icon(
+                ? Icon(
                     Icons.check_rounded,
                     size: 16,
-                    color: Colors.white,
+                    color: onboardingColors.welcomeButtonText,
                   )
                 : null,
           ),

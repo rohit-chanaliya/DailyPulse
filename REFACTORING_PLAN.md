@@ -237,7 +237,7 @@ lib/features/<feature>/
   - Run `dart run build_runner build`
   - Run `flutter analyze` and `flutter test`
 
-> `lib/features/app/` (the navigation shell) and `lib/features/onboarding/` were left as-is: onboarding already matched the target layout, and the app shell is wiring rather than a data feature.
+> `lib/features/app/` now follows the same layout (`models/`, `views/`, `views/widgets/`).
 
 ---
 
@@ -285,6 +285,25 @@ lib/features/<feature>/
 - [x] **4. Final Verification Gate**
   - Run `flutter analyze` (0 issues)
   - Run `flutter test` (13 tests green)
+
+---
+
+## 5. Residual Hardening (Post-Blueprint Follow-Ups)
+
+- **Branch:** `chore/residual-hardening`
+- **Objective:** Close the three non-blocking residuals left after the 6 phases.
+
+### Checklist
+- [x] **1. Theme tokens for the last raw colors**
+  - `lib/features/mood/views/widgets/mood_card.dart`: label uses `home.textPrimary`, hint uses `home.textSecondary`; card wrapped in `Semantics(button: true)`.
+  - `lib/features/auth/views/widgets/auth_terms_checkbox.dart`: check icon uses `onboardingColors.welcomeButtonText`.
+- [x] **2. `DeepLinkService` is injectable**
+  - Converted from static globals to `@singleton` + `@inject DeepLinkService(this._authSignal)`, exposed as `AppComponent.deepLinkService`.
+  - `main.dart` calls `appComponent.deepLinkService.init(...)`; `dispose()` is now an instance method.
+- [x] **3. `lib/features/app/` follows the standard layout**
+  - `presentation/app_shell.dart` → `views/app_shell.dart`, `presentation/widgets/` → `views/widgets/`, `presentation/models/nav_assets.dart` → `models/nav_assets.dart`.
+- [x] **4. Verify**
+  - `dart run build_runner build`, `flutter analyze` (0 issues), `flutter test` (13 green).
 
 ---
 
