@@ -246,7 +246,7 @@ lib/features/<feature>/
 - **Objective:** Lock in architectural quality with compile-time strictness and automated tests covering critical offline-first invariants.
 
 ### Checklist & Exact File Changes
-- [ ] **1. Harden `analysis_options.yaml`**
+- [x] **1. Harden `analysis_options.yaml`**
   ```yaml
   include: package:flutter_lints/flutter.yaml
 
@@ -269,21 +269,21 @@ lib/features/<feature>/
       - avoid_print
       - use_build_context_synchronously
   ```
-- [ ] **2. Sync `firestore.rules.template` with `firestore.rules`**
-  - `firestore.rules` (142 lines) has strict schema validation (`hasOnly`, `isValidMood`, note length `<= 1000`, immutable `userId`/`createdAt`), whereas `firestore.rules.template` (58 lines) is outdated. Copy the hardened rules into `firestore.rules.template`.
-- [ ] **3. Add High-ROI Unit Tests (`test/`)**
+- [x] **2. Sync `firestore.rules.template` with `firestore.rules`**
+  - Copied the hardened rules (`isVerified`, `hasOnly`, `isValidMood`, note length limits, immutable fields) into the template.
+- [x] **3. Add High-ROI Unit Tests (`test/`)**
   - `test/features/mood/mood_entry_test.dart`:
     - Verify `copyWith(note: null)` clears nullable fields.
-    - Verify `MoodEntryAdapter` clamps out-of-range mood levels (`-1 -> 0`, `99 -> 5`) and handles missing binary fields gracefully.
+    - Verify `MoodEntryAdapter` clamps out-of-range mood levels (`-3 -> 0`, `99 -> 5`) after a box reopen.
   - `test/features/mood/mood_repository_sync_test.dart`:
     - Verify `fetchAndSyncFromFirebase` keeps unsynced local entries (`id == null`).
     - Verify remote deletions remove only synced entries of that `userId` and never touch another user's entries.
     - Verify network failure falls back to local Hive data without wiping the box.
   - `test/features/insights/mood_series_utils_test.dart`:
-    - Verify `MoodSeriesUtils.series()` and `weekAverages()` across empty lists, single entries, and multiple entries on the same day.
-- [ ] **4. Final Verification Gate**
+    - Verify `series()`, `weekAverages()` and `lastDaysAverages()` across empty lists, same-day buckets and gaps.
+- [x] **4. Final Verification Gate**
   - Run `flutter analyze` (0 issues)
-  - Run `flutter test` (all tests green)
+  - Run `flutter test` (13 tests green)
 
 ---
 

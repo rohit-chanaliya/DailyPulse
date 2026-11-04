@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 
@@ -20,7 +22,7 @@ class MoodRepository {
     final entryWithUser = entry.copyWith(userId: userId);
     await _hiveService.put(entryWithUser);
     appLogger.d('Added mood entry locally for user: $userId');
-    _syncService.syncPendingEntries();
+    unawaited(_syncService.syncPendingEntries());
   }
 
   void startBackgroundSync() {

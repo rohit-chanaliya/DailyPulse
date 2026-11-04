@@ -1,8 +1,44 @@
 rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: moods
+// Document ID: auto-generated document ID (UUID or Firestore push ID)
+// Fields:
+//   - userId: string (required, immutable, must equal request.auth.uid) - owner's auth UID
+//   - moodLevel: int (required, integer in range [0, 5]) - recorded mood level
+//   - timestamp: timestamp (required) - client event timestamp for the mood entry
+//   - note: string (optional, string with max length 1000) - optional mood reflection/journal
+//   - title: string (optional, string with max length 100) - optional journal title
+//   - createdAt: timestamp (optional/serverTimestamp) - record creation timestamp
+//
+// Collection: users
+// Document ID: userId (must match request.auth.uid)
+// Fields:
+//   - email: string (required, valid email pattern)
+//   - name: string (optional, max 100 characters)
+//   - createdAt: timestamp (optional)
+//   - updatedAt: timestamp (optional)
+//
+// Collection: preferences
+// Document ID: userId (must match request.auth.uid)
+// Fields:
+//   - themeMode: string (optional, e.g. system, light, dark)
+//   - hasSeenOnboarding: bool (optional)
+//   - updatedAt: timestamp (optional)
+//
+// ===============================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper functions
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the request is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -13,50 +49,98 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.token.email_verified == true;
     }
 
+    // Check if current user is the owner of the document identified by userId
     function isOwner(userId) {
       return isVerified() && request.auth.uid == userId;
     }
 
-    // App uses zero-based mood levels 0..5 (Frustrated..Excited).
-    function moodLevelInRange(data) {
-      return !('moodLevel' in data) ||
-        (data.moodLevel is int &&
-         data.moodLevel >= 0 && data.moodLevel <= 5);
+    // Validate email address format
+    function isValidEmail(email) {
+      return email is string &&
+        email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
-    
-    // Users collection - users can only read/write their own data
-    match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId);
+
+    // Check if an optional string field adheres to length constraints
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] == null) ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen);
     }
-    
-    // Mood entries - users can only access their own moods
+
+    // Check if specified immutable fields remain unchanged during update
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Domain validator for Mood entries
+    function isValidMood(data) {
+      return data.keys().hasAll(['userId', 'moodLevel', 'timestamp']) &&
+             data.keys().hasOnly(['userId', 'moodLevel', 'timestamp', 'note', 'title', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.moodLevel is int &&
+             data.moodLevel >= 0 &&
+             data.moodLevel <= 5 &&
+             data.timestamp is timestamp &&
+             isValidOptionalString('note', 0, 1000) &&
+             isValidOptionalString('title', 0, 100) &&
+             (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    // Domain validator for User documents
+    function isValidUser(data) {
+      return data.keys().hasOnly(['email', 'name', 'createdAt', 'updatedAt']) &&
+             (!('email' in data) || isValidEmail(data.email)) &&
+             isValidOptionalString('name', 0, 100) &&
+             (!('createdAt' in data) || data.createdAt is timestamp) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    // Domain validator for User Preferences
+    function isValidPreference(data) {
+      return data.keys().hasOnly(['themeMode', 'hasSeenOnboarding', 'updatedAt', 'userId']) &&
+             (!('userId' in data) || data.userId == request.auth.uid) &&
+             (!('themeMode' in data) || data.themeMode in ['system', 'light', 'dark']) &&
+             (!('hasSeenOnboarding' in data) || data.hasSeenOnboarding is bool) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // Mood Entries Collection
+    // Supports query: where('userId', '==', request.auth.uid)
     match /moods/{moodId} {
-      allow read: if isVerified() &&
-                     resource.data.userId == request.auth.uid;
-      allow create: if isVerified() &&
-                       request.resource.data.userId == request.auth.uid &&
-                       moodLevelInRange(request.resource.data);
+      allow read: if isVerified() && resource.data.userId == request.auth.uid;
+      allow create: if isVerified() && isValidMood(request.resource.data);
       allow update: if isVerified() &&
                        resource.data.userId == request.auth.uid &&
-                       moodLevelInRange(request.resource.data);
-      allow delete: if isVerified() &&
-                       resource.data.userId == request.auth.uid;
+                       isValidMood(request.resource.data) &&
+                       areImmutableFieldsUnchanged(['userId', 'createdAt']);
+      allow delete: if isVerified() && resource.data.userId == request.auth.uid;
     }
-    
-    // Mood history - users can only access their own history
-    match /moodHistory/{userId}/entries/{entryId} {
-      allow read, write: if isOwner(userId);
+
+    // User Profile Collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) &&
+                       isValidUser(request.resource.data) &&
+                       areImmutableFieldsUnchanged(['createdAt']);
+      allow delete: if isOwner(userId);
     }
-    
-    // User preferences - users can only access their own preferences
+
+    // User Preferences Collection
     match /preferences/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidPreference(request.resource.data);
+      allow update: if isOwner(userId) && isValidPreference(request.resource.data);
+      allow delete: if isOwner(userId);
     }
-    
-    // Deny all other access by default
+
+    // Default deny for all other collections and subcollections
     match /{document=**} {
       allow read, write: if false;
     }
