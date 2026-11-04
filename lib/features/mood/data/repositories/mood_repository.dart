@@ -120,9 +120,4 @@ class MoodRepository {
       return getAllEntries(userId);
     }
   }
-
-  // Stream mood entries from Firebase
-  Stream<List<MoodEntry>> streamMoodEntries(String userId) {
-    return _firestoreService.streamMoodEntries(userId);
-  }
 }

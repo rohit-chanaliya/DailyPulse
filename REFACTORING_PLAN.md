@@ -93,20 +93,20 @@ Static Globals (`HiveService.put`) ❌         └── Zero static calls (100%
 - **Objective:** Replace mixed `StreamBuilder` + manual `reloadLocalEntries()` + `SignalBuilder` patterns with a single reactive signal pipeline driven automatically by Hive box changes.
 
 ### Checklist & Exact File Changes
-- [ ] **1. Auto-Sync `MoodSignal.entries` with Hive (`lib/features/mood/presentation/signals/mood_signal.dart`)**
+- [x] **1. Auto-Sync `MoodSignal.entries` with Hive (`lib/features/mood/presentation/signals/mood_signal.dart`)**
   - Subscribe to `_repository.watchEntries(_userId)` inside `MoodSignal` whenever `_authSignal.user` changes (or on local Hive box writes) so `entries.value` updates automatically — even when `SyncService` merges or updates entries in the background.
   - Add a `newestFirst = signal<bool>(true)` and `late final orderedEntries = computed(...)` inside `MoodSignal`.
   - Remove dead/unsafe `streamMoodEntries(String userId)` (`line 78`), which bypassed Hive and read Firestore directly.
-- [ ] **2. Simplify `HistoryScreen` (`lib/features/history/screens/history_screen.dart`)**
+- [x] **2. Simplify `HistoryScreen` (`lib/features/history/screens/history_screen.dart`)**
   - Remove `StreamBuilder<List<MoodEntry>>` (`line 44`) and `initState -> reloadLocalEntries()` (`line 28`).
   - Convert `HistoryScreen` to read `appComponent.moodSignal.orderedEntries` via `SignalBuilder` / `Watch`.
-- [ ] **3. Move Heavy Chart Calculations into `InsightsSignal` (`lib/features/insights/presentation/signals/insights_signal.dart`)**
+- [x] **3. Move Heavy Chart Calculations into `InsightsSignal` (`lib/features/insights/presentation/signals/insights_signal.dart`)**
   - Currently `InsightsScreen.build()` (`lib/features/insights/screens/insights_screen.dart:45-46`) recalculates `MoodSeriesUtils.series()` and `MoodSeriesUtils.weekAverages()` on every widget rebuild.
   - Add `final granularity = signal<MoodGranularity>(MoodGranularity.all);` to `InsightsSignal`.
   - Add `late final seriesPoints = computed(() => MoodSeriesUtils.series(_moodSignal.entries.value, granularity.value));`
   - Add `late final weekAverages = computed(() => MoodSeriesUtils.weekAverages(_moodSignal.entries.value, DateTime.now()));`
   - Convert `InsightsScreen` from `StatefulWidget` to a clean `StatelessWidget`.
-- [ ] **4. Regenerate DI & Verify**
+- [x] **4. Regenerate DI & Verify**
   - Run `dart run build_runner build`
   - Run `flutter analyze` and `flutter test`
 
