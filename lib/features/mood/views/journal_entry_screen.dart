@@ -8,6 +8,7 @@ import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/features/mood/models/journal_entry_args.dart';
 import 'package:dailypulse/features/mood/views/widgets/journal_emotion_picker.dart';
 import 'package:dailypulse/features/mood/views/widgets/journal_entry_box.dart';
+import 'package:dailypulse/features/mood/views/widgets/journal_tag_picker.dart';
 import 'package:dailypulse/features/mood/views/widgets/journal_title_field.dart';
 
 /// Journal entry form. Pops with `true` once the entry has been saved.
@@ -23,6 +24,7 @@ class JournalEntryScreen extends StatefulWidget {
 class _JournalEntryScreenState extends State<JournalEntryScreen> {
   final _titleController = TextEditingController();
   final _entryController = TextEditingController();
+  final _selectedTags = <String>{};
   late int _level = widget.args.level;
   bool _saving = false;
 
@@ -47,6 +49,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       note: _entryController.text.trim(),
       title: _titleController.text.trim(),
       timestamp: widget.args.timestamp,
+      tags: _selectedTags.toList(),
     );
     if (!mounted) return;
 
@@ -87,6 +90,19 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                       onChanged: (v) => setState(() => _level = v),
                     ),
                     const SizedBox(height: 20),
+                    const _SectionLabel(JournalStrings.tagsLabel),
+                    const SizedBox(height: 8),
+                    JournalTagPicker(
+                      selectedTags: _selectedTags,
+                      onTagToggled: (tag) => setState(() {
+                        if (_selectedTags.contains(tag)) {
+                          _selectedTags.remove(tag);
+                        } else {
+                          _selectedTags.add(tag);
+                        }
+                      }),
+                    ),
+                    const SizedBox(height: 20),
                     const _SectionLabel(JournalStrings.entryLabel),
                     const SizedBox(height: 8),
                     SizedBox(
@@ -103,7 +119,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                       builder: (context, _) {
                         final hasContent =
                             _titleController.text.trim().isNotEmpty ||
-                            _entryController.text.trim().isNotEmpty;
+                            _entryController.text.trim().isNotEmpty ||
+                            _selectedTags.isNotEmpty;
                         return SizedBox(
                           height: 56,
                           child: FilledButton(

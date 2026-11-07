@@ -15,6 +15,7 @@ class MoodEntry {
   final String? id; // Firestore document ID
   final String? userId; // User who created this entry
   final String? title; // Optional journal title
+  final List<String> tags;
 
   MoodEntry({
     String? localId,
@@ -24,6 +25,7 @@ class MoodEntry {
     this.id,
     this.userId,
     this.title,
+    this.tags = const <String>[],
   }) : localId = localId ?? const Uuid().v4();
 
   Map<String, dynamic> toFirestore() {
@@ -34,6 +36,7 @@ class MoodEntry {
       'userId': userId,
       'createdAt': FieldValue.serverTimestamp(),
       if (title != null) 'title': title,
+      if (tags.isNotEmpty) 'tags': tags,
     };
   }
 
@@ -45,6 +48,10 @@ class MoodEntry {
       id: docId,
       userId: data['userId'] as String?,
       title: data['title'] as String?,
+      tags: (data['tags'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const <String>[],
     );
   }
 
@@ -58,6 +65,7 @@ class MoodEntry {
     Object? id = _unset,
     Object? userId = _unset,
     Object? title = _unset,
+    Object? tags = _unset,
   }) {
     return MoodEntry(
       localId: localId ?? this.localId,
@@ -67,6 +75,7 @@ class MoodEntry {
       id: identical(id, _unset) ? this.id : id as String?,
       userId: identical(userId, _unset) ? this.userId : userId as String?,
       title: identical(title, _unset) ? this.title : title as String?,
+      tags: identical(tags, _unset) ? this.tags : tags as List<String>,
     );
   }
 }
@@ -76,7 +85,7 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
   @override
   final int typeId = 1;
 
-  static const int _fieldCount = 7;
+  static const int _fieldCount = 8;
 
   @override
   MoodEntry read(BinaryReader reader) {
@@ -98,6 +107,11 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
       final num n => n.toInt().clamp(0, 5),
       _ => 3,
     };
+    final rawTags = fields[7];
+    final tags = switch (rawTags) {
+      final List<dynamic> list => list.map((e) => e.toString()).toList(),
+      _ => const <String>[],
+    };
     return MoodEntry(
       localId: fields[0] as String? ?? const Uuid().v4(),
       timestamp: timestamp,
@@ -106,6 +120,7 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
       id: fields[4] as String?,
       userId: fields[5] as String?,
       title: fields[6] as String?,
+      tags: tags,
     );
   }
 
@@ -126,7 +141,9 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
       ..writeByte(5)
       ..write(obj.userId)
       ..writeByte(6)
-      ..write(obj.title);
+      ..write(obj.title)
+      ..writeByte(7)
+      ..write(obj.tags);
   }
 
   @override

@@ -12,6 +12,7 @@ rules_version = '2';
 //   - timestamp: timestamp (required) - client event timestamp for the mood entry
 //   - note: string (optional, string with max length 1000) - optional mood reflection/journal
 //   - title: string (optional, string with max length 100) - optional journal title
+//   - tags: list of strings (optional, max 10 items, each 1-50 chars) - optional emotion/activity tags
 //   - createdAt: timestamp (optional/serverTimestamp) - record creation timestamp
 //
 // Collection: users
@@ -74,10 +75,33 @@ service cloud.firestore {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
     }
 
+    // Check if an individual tag string is valid (non-empty string with maximum 50 characters)
+    function isValidTag(tag) {
+      return tag is string && tag.size() > 0 && tag.size() <= 50;
+    }
+
+    // Check if optional tags field is a valid list of strings (at most 10 items)
+    function isValidOptionalTags(data) {
+      return !('tags' in data) ||
+        (data.tags is list &&
+         data.tags.size() <= 10 &&
+         (data.tags.size() == 0 ||
+          (isValidTag(data.tags[0]) &&
+           (data.tags.size() < 2 || isValidTag(data.tags[1])) &&
+           (data.tags.size() < 3 || isValidTag(data.tags[2])) &&
+           (data.tags.size() < 4 || isValidTag(data.tags[3])) &&
+           (data.tags.size() < 5 || isValidTag(data.tags[4])) &&
+           (data.tags.size() < 6 || isValidTag(data.tags[5])) &&
+           (data.tags.size() < 7 || isValidTag(data.tags[6])) &&
+           (data.tags.size() < 8 || isValidTag(data.tags[7])) &&
+           (data.tags.size() < 9 || isValidTag(data.tags[8])) &&
+           (data.tags.size() < 10 || isValidTag(data.tags[9])))));
+    }
+
     // Domain validator for Mood entries
     function isValidMood(data) {
       return data.keys().hasAll(['userId', 'moodLevel', 'timestamp']) &&
-             data.keys().hasOnly(['userId', 'moodLevel', 'timestamp', 'note', 'title', 'createdAt']) &&
+             data.keys().hasOnly(['userId', 'moodLevel', 'timestamp', 'note', 'title', 'createdAt', 'tags']) &&
              data.userId == request.auth.uid &&
              data.moodLevel is int &&
              data.moodLevel >= 0 &&
@@ -85,6 +109,7 @@ service cloud.firestore {
              data.timestamp is timestamp &&
              isValidOptionalString('note', 0, 1000) &&
              isValidOptionalString('title', 0, 100) &&
+             isValidOptionalTags(data) &&
              (!('createdAt' in data) || data.createdAt is timestamp);
     }
 
