@@ -9,7 +9,6 @@ import './widgets/home_articles_section.dart';
 import './widgets/home_chatbot_section.dart';
 import './widgets/home_header.dart';
 import './widgets/home_metrics_section.dart';
-import './widgets/home_mood_picker.dart';
 import './widgets/home_tracker_section.dart';
 
 class HomeMoodScreen extends StatelessWidget {
@@ -23,50 +22,40 @@ class HomeMoodScreen extends StatelessWidget {
             appComponent.authSignal.user.value?.displayName?.split(' ').first ??
             HomeStrings.defaultUserName;
         return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarColor: context.home.headerSurface,
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
             statusBarIconBrightness: Brightness.light,
             statusBarBrightness: Brightness.dark,
           ),
           child: Scaffold(
             backgroundColor: context.home.background,
-            body: Stack(
+            body: Column(
               children: [
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  right: 0,
-                  height: MediaQuery.paddingOf(context).top,
-                  child: ColoredBox(color: context.home.headerSurface),
-                ),
-                CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(child: HomeHeader(userName: userName)),
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                    const SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverToBoxAdapter(child: HomeMoodPicker()),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                    const SliverToBoxAdapter(child: HomeMetricsSection()),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                    const SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverToBoxAdapter(child: HomeTrackerSection()),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                    const SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverToBoxAdapter(child: HomeChatbotSection()),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                    const SliverToBoxAdapter(child: HomeArticlesSection()),
-                    SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 40 + MediaQuery.paddingOf(context).bottom,
+                HomeHeader(userName: userName),
+                Expanded(
+                  child: CustomScrollView(
+                    slivers: [
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                      const SliverToBoxAdapter(child: HomeMetricsSection()),
+                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                      const SliverPadding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverToBoxAdapter(child: HomeTrackerSection()),
                       ),
-                    ),
-                  ],
+                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                      const SliverPadding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverToBoxAdapter(child: HomeChatbotSection()),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                      const SliverToBoxAdapter(child: HomeArticlesSection()),
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 40 + MediaQuery.paddingOf(context).bottom,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
