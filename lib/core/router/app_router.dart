@@ -79,8 +79,19 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
       GoRoute(
         path: AppRoutes.logMood,
         pageBuilder: (context, state) {
-          final level = state.extra as int? ?? LogMoodScreen.defaultLevel;
-          return _fadePage(state, LogMoodScreen(initialLevel: level));
+          final (level, timestamp) = switch (state.extra) {
+            final int l => (l, null),
+            final DateTime dt => (LogMoodScreen.defaultLevel, dt),
+            final Map<String, dynamic> map => (
+              map['level'] as int? ?? LogMoodScreen.defaultLevel,
+              map['timestamp'] as DateTime?,
+            ),
+            _ => (LogMoodScreen.defaultLevel, null),
+          };
+          return _fadePage(
+            state,
+            LogMoodScreen(initialLevel: level, initialTimestamp: timestamp),
+          );
         },
       ),
       GoRoute(
