@@ -20,33 +20,46 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _obscurePassword = true;
+  String? _selectedGender;
   bool _agreeToTerms = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedGender == null) {
+      SnackBarUtils.showError(context, AuthStrings.genderRequiredError);
+      return;
+    }
     if (!_agreeToTerms) {
       SnackBarUtils.showError(context, AuthStrings.termsRequiredError);
       return;
     }
-    if (!_formKey.currentState!.validate()) return;
 
     final email = _emailController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final fullName = '$firstName $lastName'.trim();
+
     final success = await appComponent.authSignal.signUp(
       email: email,
       password: _passwordController.text,
-      name: _nameController.text.trim(),
+      name: fullName,
+      firstName: firstName,
+      lastName: lastName,
+      gender: _selectedGender,
     );
 
     if (!mounted) return;
@@ -126,13 +139,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           const SizedBox(height: 28),
                           SignUpFormCard(
                             formKey: _formKey,
-                            nameController: _nameController,
+                            firstNameController: _firstNameController,
+                            lastNameController: _lastNameController,
                             emailController: _emailController,
                             passwordController: _passwordController,
-                            obscurePassword: _obscurePassword,
-                            onToggleObscure: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
+                            selectedGender: _selectedGender,
+                            onGenderChanged: (gender) =>
+                                setState(() => _selectedGender = gender),
                             agreeToTerms: _agreeToTerms,
                             onTermsChanged: (value) =>
                                 setState(() => _agreeToTerms = value),

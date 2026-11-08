@@ -83,6 +83,9 @@ class AuthSignal {
     required String email,
     required String password,
     required String name,
+    String? firstName,
+    String? lastName,
+    String? gender,
   }) async {
     status.value = AuthStatus.loading;
     errorMessage.value = null;
@@ -90,6 +93,9 @@ class AuthSignal {
       email: email,
       password: password,
       name: name,
+      firstName: firstName,
+      lastName: lastName,
+      gender: gender,
     );
     return switch (result) {
       Ok() => true,

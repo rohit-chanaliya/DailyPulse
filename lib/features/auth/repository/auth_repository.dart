@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -17,7 +18,7 @@ import 'auth_error_mapper.dart';
 @singleton
 class AuthRepository {
   @inject
-  AuthRepository(this._auth, this._errorMapper) {
+  AuthRepository(this._auth, this._errorMapper, this._firestore) {
     if (!kIsWeb) {
       unawaited(GoogleSignIn.instance.initialize());
     }
@@ -25,6 +26,7 @@ class AuthRepository {
 
   final FirebaseAuth _auth;
   final AuthErrorMapper _errorMapper;
+  final FirebaseFirestore _firestore;
 
   static const Duration _actionTimeout = Duration(seconds: 15);
 
@@ -35,6 +37,9 @@ class AuthRepository {
     required String email,
     required String password,
     required String name,
+    String? firstName,
+    String? lastName,
+    String? gender,
   }) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
@@ -42,6 +47,30 @@ class AuthRepository {
         password: password,
       );
       await credential.user?.updateDisplayName(name);
+
+      final user = credential.user;
+      if (user != null) {
+        try {
+          await _firestore.collection('users').doc(user.uid).set({
+            'userId': user.uid,
+            'email': email,
+            'name': name,
+            if (firstName != null && firstName.isNotEmpty)
+              'firstName': firstName,
+            if (lastName != null && lastName.isNotEmpty) 'lastName': lastName,
+            if (gender != null && gender.isNotEmpty) 'gender': gender,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+          appLogger.i('Initial user profile saved to Firestore for ${user.uid}');
+        } catch (e, stackTrace) {
+          appLogger.w(
+            'Initial profile write in Firestore skipped or deferred',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }
 
       // The account exists at this point; a failed verification email must not
       // fail the sign-up. The user can resend it from the verify screen.

@@ -18,8 +18,12 @@ rules_version = '2';
 // Collection: users
 // Document ID: userId (must match request.auth.uid)
 // Fields:
-//   - email: string (required, valid email pattern)
-//   - name: string (optional, max 100 characters)
+//   - email: string (optional, valid email pattern)
+//   - name: string (optional, 1-100 characters, e.g. fullName)
+//   - firstName: string (optional, 1-50 characters)
+//   - lastName: string (optional, 1-50 characters)
+//   - gender: string (optional, allowed values: 'Male', 'Female', 'Other')
+//   - userId: string (optional, must match request.auth.uid)
 //   - createdAt: timestamp (optional)
 //   - updatedAt: timestamp (optional)
 //
@@ -115,9 +119,13 @@ service cloud.firestore {
 
     // Domain validator for User documents
     function isValidUser(data) {
-      return data.keys().hasOnly(['email', 'name', 'createdAt', 'updatedAt']) &&
+      return data.keys().hasOnly(['email', 'name', 'firstName', 'lastName', 'gender', 'createdAt', 'updatedAt', 'userId']) &&
+             (!('userId' in data) || data.userId == request.auth.uid) &&
              (!('email' in data) || isValidEmail(data.email)) &&
-             isValidOptionalString('name', 0, 100) &&
+             isValidOptionalString('name', 1, 100) &&
+             isValidOptionalString('firstName', 1, 50) &&
+             isValidOptionalString('lastName', 1, 50) &&
+             (!('gender' in data) || data.gender == null || (data.gender is string && data.gender in ['Male', 'Female', 'Other'])) &&
              (!('createdAt' in data) || data.createdAt is timestamp) &&
              (!('updatedAt' in data) || data.updatedAt is timestamp);
     }
@@ -150,7 +158,9 @@ service cloud.firestore {
     // User Profile Collection
     match /users/{userId} {
       allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == userId &&
+                       isValidUser(request.resource.data);
       allow update: if isOwner(userId) &&
                        isValidUser(request.resource.data) &&
                        areImmutableFieldsUnchanged(['createdAt']);

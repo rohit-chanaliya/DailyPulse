@@ -25,6 +25,17 @@ abstract final class AuthStrings {
       'Begin your daily emotional wellness journey';
   static const String nameLabel = 'Full Name';
   static const String nameHint = 'Enter your name...';
+  static const String firstNameLabel = 'First Name';
+  static const String firstNameHint = 'Enter first name...';
+  static const String firstNameRequiredError = 'Please enter your first name';
+  static const String lastNameLabel = 'Last Name';
+  static const String lastNameHint = 'Enter last name...';
+  static const String lastNameRequiredError = 'Please enter your last name';
+  static const String genderLabel = 'Gender';
+  static const String genderMale = 'Male';
+  static const String genderFemale = 'Female';
+  static const String genderOther = 'Other';
+  static const String genderRequiredError = 'Please select your gender';
   static const String signUpButton = 'Create Account';
   static const String alreadyHaveAccount = 'Already have an account? ';
   static const String signInAction = 'Sign In';

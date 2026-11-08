@@ -54,17 +54,18 @@ class AppComponent$Component implements _i1.AppComponent {
     _appPreferences$Provider = _AppPreferences$Provider(boxOfDynamic$Provider);
     final authErrorMapper$Provider = _AuthErrorMapper$Provider();
     final firebaseAuth$Provider = _FirebaseAuth$Provider(firebaseModule);
+    final firebaseFirestore$Provider = _FirebaseFirestore$Provider(
+      firebaseModule,
+    );
     _authRepository$Provider = _AuthRepository$Provider(
       firebaseAuth$Provider,
       authErrorMapper$Provider,
+      firebaseFirestore$Provider,
     );
     final boxOfMoodEntry$Provider = _BoxOfMoodEntry$Provider(
       infrastructureModule,
     );
     _hiveService$Provider = _HiveService$Provider(boxOfMoodEntry$Provider);
-    final firebaseFirestore$Provider = _FirebaseFirestore$Provider(
-      firebaseModule,
-    );
     _firestoreService$Provider = _FirestoreService$Provider(
       firebaseFirestore$Provider,
     );
@@ -215,17 +216,21 @@ class _AuthRepository$Provider implements _i19.Provider<_i5.AuthRepository> {
   _AuthRepository$Provider(
     this._firebaseAuth$Provider,
     this._authErrorMapper$Provider,
+    this._firebaseFirestore$Provider,
   );
 
   final _FirebaseAuth$Provider _firebaseAuth$Provider;
 
   final _AuthErrorMapper$Provider _authErrorMapper$Provider;
 
+  final _FirebaseFirestore$Provider _firebaseFirestore$Provider;
+
   late final _i5.AuthRepository _singleton = _create();
 
   _i5.AuthRepository _create() => _i5.AuthRepository(
     _firebaseAuth$Provider.get(),
     _authErrorMapper$Provider.get(),
+    _firebaseFirestore$Provider.get(),
   );
 
   @override
