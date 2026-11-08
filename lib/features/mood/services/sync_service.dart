@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/utils/app_logger.dart';
+import 'package:dailypulse/features/settings/repository/feedback_repository.dart';
 import '../datasource/hive_service.dart';
 import '../datasource/firestore_service.dart';
 
@@ -17,12 +18,14 @@ class SyncService {
     this._firestoreService,
     this._connectivity,
     this._auth,
+    this._feedbackRepository,
   );
 
   final HiveService _hiveService;
   final FirestoreService _firestoreService;
   final Connectivity _connectivity;
   final FirebaseAuth _auth;
+  final FeedbackRepository _feedbackRepository;
 
   Timer? _syncTimer;
   bool _isSyncing = false;
@@ -108,6 +111,8 @@ class SyncService {
       _startTimerIfNeeded();
       return;
     }
+
+    unawaited(_feedbackRepository.flushPending(user.uid));
 
     if (_isSyncing) {
       appLogger.d('Sync already in progress, skip new run.');

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dailypulse/features/settings/models/feedback_entry.dart';
 import 'package:dailypulse/features/mood/datasource/firestore_service.dart';
 import 'package:dailypulse/features/mood/datasource/hive_service.dart';
 import 'package:dailypulse/features/mood/models/mood_entry.dart';
@@ -44,6 +45,9 @@ class _FakeFirestoreService implements FirestoreService {
 
   @override
   Future<String?> addMoodEntry(MoodEntry entry) async => 'doc-${entry.localId}';
+
+  @override
+  Future<bool> addFeedback(FeedbackEntry entry) async => true;
 
   @override
   Future<void> deleteMoodEntries(String userId) async {}

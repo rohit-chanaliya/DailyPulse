@@ -6,10 +6,13 @@ import 'package:dailypulse/features/mood/models/home_assets.dart';
 import 'home_asset_icon.dart';
 
 class HomeSectionTitle extends StatelessWidget {
-  const HomeSectionTitle(this.title, {super.key, this.actionIcon});
+  const HomeSectionTitle(this.title, {super.key, this.actionIcon, this.onSeeAll});
 
   final String title;
   final String? actionIcon;
+
+  /// Shows a tappable "See All" when there is no [actionIcon].
+  final VoidCallback? onSeeAll;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +29,19 @@ class HomeSectionTitle extends StatelessWidget {
         ),
         if (actionIcon case final icon?)
           HomeAssetIcon(icon)
-        else
-          Text(
-            HomeStrings.seeAll,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.home.accent,
-              fontWeight: FontWeight.w600,
+        else if (onSeeAll != null)
+          GestureDetector(
+            onTap: onSeeAll,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                HomeStrings.seeAll,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.home.accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
       ],
@@ -39,5 +49,4 @@ class HomeSectionTitle extends StatelessWidget {
   }
 
   static const metricsMenu = HomeAssets.moreVertical;
-  static const chatbotSettings = HomeAssets.gear;
 }

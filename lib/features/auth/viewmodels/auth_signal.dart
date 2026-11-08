@@ -5,8 +5,10 @@ import 'package:inject_annotation/inject_annotation.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
+import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:dailypulse/core/utils/result.dart';
+import 'package:dailypulse/features/auth/models/user_profile.dart';
 import 'package:dailypulse/features/auth/repository/auth_repository.dart';
 import 'package:dailypulse/features/mood/repository/mood_repository.dart';
 import 'package:dailypulse/features/mood/services/sync_service.dart';
@@ -18,7 +20,12 @@ enum AuthStatus { initial, authenticated, unauthenticated, loading }
 @singleton
 class AuthSignal {
   @inject
-  AuthSignal(this._repository, this._syncService, this._moodRepository) {
+  AuthSignal(
+    this._repository,
+    this._syncService,
+    this._moodRepository,
+    this._preferences,
+  ) {
     _authSubscription = _repository.userChanges.listen(
       _onAuthStateChanged,
       onError: (Object error, StackTrace stackTrace) {
@@ -31,10 +38,14 @@ class AuthSignal {
   final AuthRepository _repository;
   final SyncService _syncService;
   final MoodRepository _moodRepository;
+  final AppPreferences _preferences;
   late final StreamSubscription<User?> _authSubscription;
 
   final status = signal<AuthStatus>(AuthStatus.initial);
   final user = signal<User?>(null);
+  final profile = signal<UserProfile?>(null);
+  final profileImagePath = signal<String?>(null);
+  final isUpdatingProfile = signal<bool>(false);
   final errorMessage = signal<String?>(null);
 
   Stream<User?> get userChanges => _repository.userChanges;
@@ -56,12 +67,16 @@ class AuthSignal {
   void _onAuthStateChanged(User? value) {
     if (value == null) {
       user.value = null;
+      profile.value = null;
+      profileImagePath.value = null;
       status.value = AuthStatus.unauthenticated;
       _syncService.stopBackgroundSync();
       return;
     }
     user.value = value;
+    profileImagePath.value = _preferences.getProfileImagePath(value.uid);
     status.value = AuthStatus.authenticated;
+    unawaited(loadProfile());
 
     // Unverified email/password accounts keep a session so they can resend the
     // link, but must not sync or touch Firestore until verified.
@@ -130,7 +145,7 @@ class AuthSignal {
   }
 
   Future<void> signOut() async {
-    appLogger.i('User signed out: ${user.value?.uid}');
+    appLogger.i('User signed out');
     await _repository.signOut();
   }
 
@@ -153,6 +168,13 @@ class AuthSignal {
       Ok() => _succeed(AuthStatus.unauthenticated),
       Err(:final message) => _fail(message),
     };
+  }
+
+  /// Emails a reset link to the signed-in user without touching [status].
+  Future<Result<void>> sendPasswordResetToCurrentUser() async {
+    final email = user.value?.email;
+    if (email == null) return const Err(AuthStrings.noSignedInUser);
+    return _repository.sendPasswordReset(email);
   }
 
   void clearError() {
@@ -266,6 +288,66 @@ class AuthSignal {
   String? _failureValue(String? message) {
     errorMessage.value = message;
     return null;
+  }
+
+  /// Loads the profile for the currently signed-in user.
+  Future<UserProfile?> loadProfile() async {
+    final current = user.value;
+    if (current == null) {
+      profile.value = null;
+      return null;
+    }
+    final result = await _repository.getUserProfile(current.uid);
+    if (result case Ok(:final value)) {
+      profile.value = value;
+      return value;
+    }
+    return null;
+  }
+
+  /// Updates profile details in Firestore and syncs the display name in Auth.
+  Future<Result<UserProfile>> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String gender,
+    DateTime? dateOfBirth,
+    String location = '',
+    String avatarId = '',
+  }) async {
+    final current = user.value;
+    if (current == null) {
+      return const Err(AuthStrings.noSignedInUser);
+    }
+    isUpdatingProfile.value = true;
+    errorMessage.value = null;
+    try {
+      final result = await _repository.updateUserProfile(
+        userId: current.uid,
+        firstName: firstName,
+        lastName: lastName,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        location: location,
+        avatarId: avatarId,
+      );
+      if (result case Ok(:final value)) {
+        profile.value = value;
+        user.value = _repository.currentUser;
+      } else if (result case Err(:final message)) {
+        errorMessage.value = message;
+      }
+      return result;
+    } finally {
+      isUpdatingProfile.value = false;
+    }
+  }
+
+  /// Sets or updates the local profile avatar image path for the user.
+  Future<void> updateProfileImage(String? path) async {
+    final current = user.value;
+    if (current == null) return;
+    profileImagePath.value = path;
+    await _preferences.setProfileImagePath(current.uid, path);
   }
 
   void dispose() {

@@ -18,6 +18,10 @@ abstract final class AppRoutes {
   static const String history = '/history';
   static const String insights = '/insights';
   static const String settings = '/settings';
+  static const String profile = '/profile';
+  static const String profileEdit = '/profile/edit';
+  static const String notificationSettings = '/settings/notifications';
+  static const String feedback = '/feedback';
 
   /// Destructive account deletion flow (authenticated users only).
   static const String deleteAccount = '/delete-account';

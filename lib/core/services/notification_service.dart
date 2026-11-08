@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -27,6 +28,7 @@ class NotificationService {
   Future<void> init() async {
     try {
       tz.initializeTimeZones();
+      await _setLocalTimezone();
 
       const androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -42,6 +44,21 @@ class NotificationService {
       }
     } catch (e, st) {
       appLogger.w('NotificationService init error', error: e, stackTrace: st);
+    }
+  }
+
+  /// `tz.local` defaults to UTC; point it at the device zone so the daily
+  /// reminder fires at the user's local time.
+  Future<void> _setLocalTimezone() async {
+    try {
+      final info = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(info.identifier));
+    } catch (e, st) {
+      appLogger.w(
+        'Could not read device timezone, reminders use UTC',
+        error: e,
+        stackTrace: st,
+      );
     }
   }
 
@@ -74,15 +91,21 @@ class NotificationService {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
 
-      const androidDetails = AndroidNotificationDetails(
-        channelId,
+      final playSound = _preferences.isReminderSoundEnabled;
+      final vibrate = _preferences.isReminderVibrationEnabled;
+
+      // Android fixes sound/vibration per channel, so each combo gets its own.
+      final androidDetails = AndroidNotificationDetails(
+        '${channelId}_s${playSound ? 1 : 0}_v${vibrate ? 1 : 0}',
         channelName,
         channelDescription: channelDesc,
         importance: Importance.high,
         priority: Priority.high,
+        playSound: playSound,
+        enableVibration: vibrate,
       );
 
-      const details = NotificationDetails(android: androidDetails);
+      final details = NotificationDetails(android: androidDetails);
 
       await _plugin.zonedSchedule(
         id: dailyReminderId,

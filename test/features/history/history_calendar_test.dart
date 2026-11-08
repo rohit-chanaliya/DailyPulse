@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dailypulse/core/theme/light_theme.dart';
+import 'package:dailypulse/core/theme/dark_theme.dart';
 import 'package:dailypulse/features/history/views/widgets/history_calendar_strip.dart';
 import 'package:dailypulse/features/mood/models/mood_entry.dart';
 
@@ -19,7 +19,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: lightTheme,
+        theme: darkTheme,
         home: Scaffold(
           body: HistoryCalendarStrip(
             selectedDate: selected,

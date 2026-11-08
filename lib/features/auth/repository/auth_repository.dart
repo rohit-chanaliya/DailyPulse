@@ -7,8 +7,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
+import 'package:dailypulse/core/constant/strings/profile_strings.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:dailypulse/core/utils/result.dart';
+import 'package:dailypulse/features/auth/models/user_profile.dart';
 import 'auth_error_mapper.dart';
 
 /// All Firebase Auth and Google Sign-In access for the auth feature.
@@ -62,7 +64,7 @@ class AuthRepository {
             'createdAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
           }, SetOptions(merge: true));
-          appLogger.i('Initial user profile saved to Firestore for ${user.uid}');
+          appLogger.i('Initial user profile saved to Firestore');
         } catch (e, stackTrace) {
           appLogger.w(
             'Initial profile write in Firestore skipped or deferred',
@@ -355,7 +357,7 @@ class AuthRepository {
         await current.delete();
       }
 
-      appLogger.i('Account deleted: ${current.uid}');
+      appLogger.i('Account deleted');
       return const Ok(null);
     } on FirebaseAuthException catch (e) {
       appLogger.w('Account deletion failed: ${e.code}');
@@ -402,5 +404,96 @@ class AuthRepository {
     final googleUser = await GoogleSignIn.instance.authenticate();
     final googleAuth = googleUser.authentication;
     return GoogleAuthProvider.credential(idToken: googleAuth.idToken);
+  }
+
+  /// Fetches the user's profile from Cloud Firestore, falling back to basic auth info.
+  Future<Result<UserProfile>> getUserProfile(String userId) async {
+    try {
+      final doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists && doc.data() != null) {
+        return Ok(UserProfile.fromFirestore(doc.data()!, doc.id));
+      }
+
+      final user = _auth.currentUser;
+      final displayName = user?.displayName ?? '';
+      final parts = displayName.trim().split(RegExp(r'\s+'));
+      final firstName = parts.isNotEmpty ? parts.first : '';
+      final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+
+      return Ok(UserProfile(
+        userId: userId,
+        email: user?.email ?? '',
+        firstName: firstName,
+        lastName: lastName,
+        gender: '',
+      ));
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Failed to fetch user profile from Firestore',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return const Err(ProfileStrings.saveError);
+    }
+  }
+
+  /// Updates the user's profile in Firestore and syncs displayName in Firebase Auth.
+  Future<Result<UserProfile>> updateUserProfile({
+    required String userId,
+    required String firstName,
+    required String lastName,
+    required String gender,
+    DateTime? dateOfBirth,
+    String location = '',
+    String avatarId = '',
+  }) async {
+    try {
+      final fullName = '$firstName $lastName'.trim();
+      final data = <String, dynamic>{
+        'userId': userId,
+        'email': _auth.currentUser?.email ?? '',
+        'firstName': firstName.trim(),
+        'lastName': lastName.trim(),
+        'name': fullName,
+        'gender': gender.trim(),
+        'location': location.trim(),
+        'avatarId': avatarId,
+        'dateOfBirth': dateOfBirth != null
+            ? Timestamp.fromDate(dateOfBirth)
+            : FieldValue.delete(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .set(data, SetOptions(merge: true));
+
+      try {
+        await _auth.currentUser?.updateDisplayName(fullName);
+      } catch (e) {
+        appLogger.w('Failed to sync displayName in Firebase Auth: $e');
+      }
+
+      appLogger.i('User profile updated successfully in Firestore');
+      return Ok(UserProfile(
+        userId: userId,
+        email: _auth.currentUser?.email ?? '',
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        gender: gender.trim(),
+        dateOfBirth: dateOfBirth,
+        location: location.trim(),
+        avatarId: avatarId,
+        updatedAt: DateTime.now(),
+      ));
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Failed to update user profile in Firestore',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return const Err(ProfileStrings.saveError);
+    }
   }
 }

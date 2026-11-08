@@ -1,86 +1,85 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
+import 'package:dailypulse/core/constant/constants.dart';
 import 'package:dailypulse/core/constant/strings/home_strings.dart';
-import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
-import 'package:dailypulse/features/mood/models/home_assets.dart';
-import 'home_asset_icon.dart';
 import 'home_metric_card.dart';
 
+/// Latest mood plus a bar per recent entry (taller = better mood).
 class MoodMetricCard extends StatelessWidget {
-  const MoodMetricCard({super.key});
+  const MoodMetricCard({super.key, required this.recentLevels, this.onTap});
 
-  static const _barHeights = [
-    8.0,
-    16.0,
-    36.0,
-    29.0,
-    52.0,
-    91.0,
-    64.0,
-    41.0,
-    31.0,
-    8.0,
-    8.0,
-    8.0,
-  ];
+  /// Mood levels (0-5) of the most recent entries, oldest first.
+  final List<int> recentLevels;
+  final VoidCallback? onTap;
+
+  static const _barCount = 12;
+  static const _minBar = 8.0;
+  static const _maxBar = 91.0;
 
   @override
   Widget build(BuildContext context) {
     final home = context.home;
+    final latest = recentLevels.isEmpty ? null : recentLevels.last;
+    final padded = [
+      ...List<int?>.filled(_barCount - recentLevels.length, null),
+      ...recentLevels,
+    ];
+
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.mood),
+      onTap: onTap,
       child: HomeMetricCard(
         color: home.orange,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              spacing: 8,
               children: [
-                const HomeAssetIcon(HomeAssets.moodSad),
-                const SizedBox(width: 8),
+                Text(
+                  latest == null ? '' : AppConstants.moodEmojis[latest],
+                  style: const TextStyle(fontSize: 22),
+                ),
                 Text(
                   HomeStrings.mood,
-                  style: context.textTheme.titleMedium?.copyWith(
+                  style: context.textTheme.titleLarge?.copyWith(
                     color: home.onMedia,
-                    fontSize: 16,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              HomeStrings.moodValue,
+              latest == null
+                  ? HomeStrings.moodNotLogged
+                  : AppConstants.moodLabels[latest],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: context.textTheme.headlineLarge?.copyWith(
                 color: home.orangePale,
-                fontWeight: FontWeight.w800,
               ),
             ),
             const Spacer(),
-            SizedBox(
-              height: 101,
-              width: 131,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  for (final (index, height) in _barHeights.indexed)
-                    Container(
-                      width: 8,
-                      height: height,
-                      margin: EdgeInsets.only(
-                        right: index == _barHeights.length - 1 ? 0 : 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: index >= 3 && index <= 7
-                            ? home.orangePale
-                            : home.orangeLight,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: 3,
+              children: [
+                for (var i = 0; i < padded.length; i++)
+                  Container(
+                    width: 8,
+                    height: switch (padded[i]) {
+                      final int level =>
+                        _minBar + level / 5 * (_maxBar - _minBar),
+                      null => _minBar,
+                    },
+                    decoration: BoxDecoration(
+                      color: padded[i] != null && i >= padded.length - 6
+                          ? home.orangePale
+                          : home.orangeLight,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ],
         ),

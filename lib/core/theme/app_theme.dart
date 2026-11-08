@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'light_theme.dart';
 import 'dark_theme.dart';
 
 export 'colors/app_colors.dart';
@@ -14,10 +13,8 @@ export 'extensions/button_colors.dart';
 export 'context_extensions.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme => lightThemeData;
   static ThemeData get darkTheme => darkThemeData;
 }
 
 // Map the variables to avoid renaming them across the main entry
-ThemeData get lightThemeData => lightTheme;
 ThemeData get darkThemeData => darkTheme;

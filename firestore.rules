@@ -22,7 +22,10 @@ rules_version = '2';
 //   - name: string (optional, 1-100 characters, e.g. fullName)
 //   - firstName: string (optional, 1-50 characters)
 //   - lastName: string (optional, 1-50 characters)
-//   - gender: string (optional, allowed values: 'Male', 'Female', 'Other')
+//   - gender: string (optional, allowed values: 'Male', 'Female', 'Transgender', 'Other')
+//   - dateOfBirth: timestamp (optional)
+//   - location: string (optional, max 60 characters)
+//   - avatarId: string (optional, max 30 characters)
 //   - userId: string (optional, must match request.auth.uid)
 //   - createdAt: timestamp (optional)
 //   - updatedAt: timestamp (optional)
@@ -33,6 +36,13 @@ rules_version = '2';
 //   - themeMode: string (optional, e.g. system, light, dark)
 //   - hasSeenOnboarding: bool (optional)
 //   - updatedAt: timestamp (optional)
+//
+// Collection: feedback (write-only inbox, clients can never read it back)
+// Document ID: client-generated UUID (makes retries idempotent)
+// Fields:
+//   - userId: string (required, must equal request.auth.uid)
+//   - tags: list of strings (required, 1-7 items, each one of the known areas)
+//   - createdAt: timestamp (required)
 //
 // ===============================================================
 
@@ -119,13 +129,16 @@ service cloud.firestore {
 
     // Domain validator for User documents
     function isValidUser(data) {
-      return data.keys().hasOnly(['email', 'name', 'firstName', 'lastName', 'gender', 'createdAt', 'updatedAt', 'userId']) &&
+      return data.keys().hasOnly(['email', 'name', 'firstName', 'lastName', 'gender', 'dateOfBirth', 'location', 'avatarId', 'createdAt', 'updatedAt', 'userId']) &&
              (!('userId' in data) || data.userId == request.auth.uid) &&
              (!('email' in data) || isValidEmail(data.email)) &&
              isValidOptionalString('name', 1, 100) &&
              isValidOptionalString('firstName', 1, 50) &&
              isValidOptionalString('lastName', 1, 50) &&
-             (!('gender' in data) || data.gender == null || (data.gender is string && data.gender in ['Male', 'Female', 'Other'])) &&
+             (!('gender' in data) || data.gender == null || (data.gender is string && data.gender in ['Male', 'Female', 'Transgender', 'Other'])) &&
+             (!('dateOfBirth' in data) || data.dateOfBirth == null || data.dateOfBirth is timestamp) &&
+             isValidOptionalString('location', 0, 60) &&
+             isValidOptionalString('avatarId', 0, 30) &&
              (!('createdAt' in data) || data.createdAt is timestamp) &&
              (!('updatedAt' in data) || data.updatedAt is timestamp);
     }
@@ -137,6 +150,18 @@ service cloud.firestore {
              (!('themeMode' in data) || data.themeMode in ['system', 'light', 'dark']) &&
              (!('hasSeenOnboarding' in data) || data.hasSeenOnboarding is bool) &&
              (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    // Domain validator for Feedback documents
+    function isValidFeedback(data) {
+      return data.keys().hasOnly(['userId', 'tags', 'createdAt']) &&
+             data.keys().hasAll(['userId', 'tags', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.tags is list &&
+             data.tags.size() >= 1 &&
+             data.tags.size() <= 7 &&
+             data.tags.hasOnly(['performance', 'bug', 'user_experience', 'crashes', 'loading', 'support', 'navigation']) &&
+             data.createdAt is timestamp;
     }
 
     // ===============================================================
@@ -173,6 +198,11 @@ service cloud.firestore {
       allow create: if isOwner(userId) && isValidPreference(request.resource.data);
       allow update: if isOwner(userId) && isValidPreference(request.resource.data);
       allow delete: if isOwner(userId);
+    }
+
+    // Feedback Collection: create-only, no client reads, updates or deletes
+    match /feedback/{feedbackId} {
+      allow create: if isVerified() && isValidFeedback(request.resource.data);
     }
 
     // Default deny for all other collections and subcollections
