@@ -26,7 +26,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -111,7 +110,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                   controller: _emailController,
                                   label: AuthStrings.emailLabel,
                                   hintText: AuthStrings.emailHint,
-                                  prefixIcon: Icons.email_outlined,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: Validators.validateEmail,
                                 ),
@@ -120,20 +118,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   controller: _passwordController,
                                   label: AuthStrings.passwordLabel,
                                   hintText: AuthStrings.passwordHint,
-                                  prefixIcon: Icons.lock_outline_rounded,
-                                  obscureText: _obscurePassword,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      size: 20,
-                                      color: onboardingColors.welcomeSubtitle,
-                                    ),
-                                    onPressed: () => setState(
-                                      () => _obscurePassword = !_obscurePassword,
-                                    ),
-                                  ),
+                                  isPassword: true,
                                   validator: Validators.validatePassword,
                                 ),
                                 const SizedBox(height: 10),

@@ -40,8 +40,6 @@ class SignUpFormCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onboardingColors = context.onboarding;
-
     return Form(
       key: formKey,
       child: Column(
@@ -50,7 +48,6 @@ class SignUpFormCard extends StatelessWidget {
             controller: nameController,
             label: AuthStrings.nameLabel,
             hintText: AuthStrings.nameHint,
-            prefixIcon: Icons.person_outline_rounded,
             keyboardType: TextInputType.name,
             validator: Validators.validateName,
           ),
@@ -59,7 +56,6 @@ class SignUpFormCard extends StatelessWidget {
             controller: emailController,
             label: AuthStrings.emailLabel,
             hintText: AuthStrings.emailHint,
-            prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: Validators.validateEmail,
           ),
@@ -68,18 +64,7 @@ class SignUpFormCard extends StatelessWidget {
             controller: passwordController,
             label: AuthStrings.passwordLabel,
             hintText: AuthStrings.passwordHint,
-            prefixIcon: Icons.lock_outline_rounded,
-            obscureText: obscurePassword,
-            suffixIcon: IconButton(
-              icon: Icon(
-                obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 20,
-                color: onboardingColors.welcomeSubtitle,
-              ),
-              onPressed: onToggleObscure,
-            ),
+            isPassword: true,
             validator: Validators.validatePasswordStrength,
           ),
           const SizedBox(height: 14),

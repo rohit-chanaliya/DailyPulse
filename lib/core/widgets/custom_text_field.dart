@@ -3,13 +3,14 @@ import 'package:dailypulse/core/theme/context_extensions.dart';
 
 /// A shared, highly customizable Text Form Field with high readability,
 /// comfortable touch target, clean borders, and mindful theme colors.
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String? label;
   final String? hintText;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
+  final bool isPassword;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
 
@@ -21,9 +22,23 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
+    this.isPassword = false,
     this.keyboardType,
     this.validator,
   });
+
+  @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  late bool _obscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscured = widget.isPassword || widget.obscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,91 +51,122 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (label != null) ...[
+        if (widget.label != null) ...[
           Text(
-            label!,
+            widget.label!,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w600,
               color: home.textSecondary,
               letterSpacing: 0.1,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
         ],
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: home.textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color: home.textMuted,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            filled: true,
-            fillColor: buttons.surfaceBackground,
-            prefixIcon: prefixIcon != null
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 14, right: 10),
-                    child: Icon(
-                      prefixIcon,
-                      size: 20,
-                      color: home.textSecondary,
-                    ),
-                  )
-                : null,
-            prefixIconConstraints: prefixIcon != null
-                ? const BoxConstraints(minWidth: 44, minHeight: 24)
-                : null,
-            suffixIcon: suffixIcon,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: buttons.surfaceBorder,
-                width: 1.2,
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: widget.controller,
+          builder: (context, value, _) {
+            final Widget? effectiveSuffix;
+            if (widget.isPassword) {
+              if (value.text.isNotEmpty) {
+                effectiveSuffix = IconButton(
+                  icon: Icon(
+                    _obscured
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    size: 22,
+                    color: home.textMuted,
+                  ),
+                  onPressed: () => setState(() => _obscured = !_obscured),
+                );
+              } else {
+                effectiveSuffix = null;
+              }
+            } else {
+              effectiveSuffix = widget.suffixIcon;
+            }
+
+            final isObscuredNow =
+                widget.isPassword ? _obscured : widget.obscureText;
+
+            return TextFormField(
+              controller: widget.controller,
+              obscureText: isObscuredNow,
+              obscuringCharacter: '●',
+              keyboardType: widget.keyboardType,
+              validator: widget.validator,
+              style: TextStyle(
+                fontSize: isObscuredNow ? 18 : 16,
+                fontWeight: isObscuredNow ? FontWeight.w600 : FontWeight.w500,
+                letterSpacing: isObscuredNow ? 3.0 : 0.2,
+                color: home.textPrimary,
               ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: buttons.surfaceBorder,
-                width: 1.2,
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                hintStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.1,
+                  color: home.textMuted,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+                filled: true,
+                fillColor: buttons.surfaceBackground,
+                prefixIcon: widget.prefixIcon != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 14, right: 10),
+                        child: Icon(
+                          widget.prefixIcon,
+                          size: 20,
+                          color: home.textSecondary,
+                        ),
+                      )
+                    : null,
+                prefixIconConstraints: widget.prefixIcon != null
+                    ? const BoxConstraints(minWidth: 44, minHeight: 24)
+                    : null,
+                suffixIcon: effectiveSuffix,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: buttons.surfaceBorder,
+                    width: 1.2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: buttons.surfaceBorder,
+                    width: 1.2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: onboarding.welcomeHighlight,
+                    width: 1.8,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: status.error,
+                    width: 1.2,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: status.error,
+                    width: 1.8,
+                  ),
+                ),
               ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: onboarding.welcomeHighlight,
-                width: 1.8,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: status.error,
-                width: 1.2,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: status.error,
-                width: 1.8,
-              ),
-            ),
-          ),
+            );
+          },
         ),
       ],
     );

@@ -70,18 +70,7 @@ class ResetPasswordForm extends StatelessWidget {
             controller: passwordController,
             label: AuthStrings.newPasswordLabel,
             hintText: AuthStrings.passwordHint,
-            prefixIcon: Icons.lock_outline_rounded,
-            obscureText: obscurePassword,
-            suffixIcon: IconButton(
-              icon: Icon(
-                obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 20,
-                color: onboardingColors.welcomeSubtitle,
-              ),
-              onPressed: onToggleObscure,
-            ),
+            isPassword: true,
             validator: Validators.validatePasswordStrength,
           ),
           const SizedBox(height: 16),
@@ -89,8 +78,7 @@ class ResetPasswordForm extends StatelessWidget {
             controller: confirmController,
             label: AuthStrings.confirmPasswordLabel,
             hintText: AuthStrings.confirmPasswordHint,
-            prefixIcon: Icons.lock_reset_rounded,
-            obscureText: obscurePassword,
+            isPassword: true,
             validator: (value) {
               if (value != passwordController.text) {
                 return AuthStrings.passwordMismatchError;
