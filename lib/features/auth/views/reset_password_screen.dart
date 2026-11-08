@@ -8,7 +8,6 @@ import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import './widgets/auth_back_button.dart';
 import './widgets/auth_header.dart';
-import './widgets/auth_trust_badge.dart';
 import './widgets/reset_link_error.dart';
 import './widgets/reset_password_form.dart';
 
@@ -122,7 +121,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -130,7 +129,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             title: AuthStrings.resetPasswordTitle,
                             subtitle: AuthStrings.resetPasswordSubtitle,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 28),
                           if (_isLoadingEmail)
                             const Padding(
                               padding: EdgeInsets.all(24),
@@ -154,7 +153,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         ],
                       ),
                     ),
-                    const AuthTrustBadge(),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

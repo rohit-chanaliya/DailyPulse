@@ -8,7 +8,6 @@ import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import './widgets/auth_back_button.dart';
 import './widgets/auth_header.dart';
-import './widgets/auth_trust_badge.dart';
 import './widgets/sign_up_form_card.dart';
 
 /// Minimalist, mindful Sign Up screen with balanced full-screen layout.
@@ -114,9 +113,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
 
-                    // Centered Core: Hero Header + Form Card + Switch Link
+                    // Centered Core: Hero Header + Form + Switch Link
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -124,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             title: AuthStrings.signUpTitle,
                             subtitle: AuthStrings.signUpSubtitle,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 28),
                           SignUpFormCard(
                             formKey: _formKey,
                             nameController: _nameController,
@@ -140,7 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             onSubmit: _signUp,
                             onGoogleSignIn: _signUpWithGoogle,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 28),
 
                           // Switch to Sign In row
                           Row(
@@ -152,6 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   color: onboardingColors.welcomeSubtitle,
                                 ),
                               ),
+                              const SizedBox(width: 4),
                               GestureDetector(
                                 onTap: () {
                                   if (context.canPop()) {
@@ -174,8 +174,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
 
-                    // Bottom Mindful Trust Badge
-                    const AuthTrustBadge(),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

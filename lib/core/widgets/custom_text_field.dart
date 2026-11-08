@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import '../theme/colors.dart';
-import '../theme/typography.dart';
+import 'package:dailypulse/core/theme/context_extensions.dart';
 
-/// A shared, highly customizable Text Form Field that represents the
-/// Figma "Input Field Master" component. It supports optional labels,
-/// prefix icons (with custom circular borders), and suffix icons.
+/// A shared, highly customizable Text Form Field with high readability,
+/// comfortable touch target, clean borders, and mindful theme colors.
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String? label;
@@ -29,98 +27,98 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final home = context.home;
+    final buttons = context.buttons;
+    final onboarding = context.onboarding;
+    final status = context.status;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Render label if provided (Figma option)
         if (label != null) ...[
           Text(
             label!,
-            style: AppTypography.labelXs.copyWith(
-              color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: home.textSecondary,
+              letterSpacing: 0.1,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
         ],
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
-          style: AppTypography.paragraphSm.copyWith(
-            color: isDark ? Colors.white : const Color(0xFF402B20),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: home.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppTypography.paragraphSm.copyWith(
-              color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+            hintStyle: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              color: home.textMuted,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
             filled: true,
-            fillColor: isDark ? const Color(0xFF231E1B) : Colors.white,
-            
-            // Render circular-bordered Prefix Icon only if provided (Figma option)
+            fillColor: buttons.surfaceBackground,
             prefixIcon: prefixIcon != null
                 ? Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 8),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF38302B) : const Color(0xFFEAE2DA),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        prefixIcon,
-                        size: 16,
-                        color: isDark ? Colors.grey.shade400 : const Color(0xFF5A4535),
-                      ),
+                    padding: const EdgeInsets.only(left: 14, right: 10),
+                    child: Icon(
+                      prefixIcon,
+                      size: 20,
+                      color: home.textSecondary,
                     ),
                   )
                 : null,
             prefixIconConstraints: prefixIcon != null
-                ? const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 40,
-                  )
+                ? const BoxConstraints(minWidth: 44, minHeight: 24)
                 : null,
-            
-            // Render Suffix Icon only if provided (Figma option)
             suffixIcon: suffixIcon,
-            
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDark ? const Color(0xFF38302B) : const Color(0xFFDCD2C9),
+                color: buttons.surfaceBorder,
                 width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDark ? const Color(0xFF38302B) : const Color(0xFFDCD2C9),
+                color: buttons.surfaceBorder,
                 width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: AppColors.splashGreenBg,
-                width: 1.5,
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: onboarding.welcomeHighlight,
+                width: 1.8,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Colors.red, width: 1.2),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: status.error,
+                width: 1.2,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: status.error,
+                width: 1.8,
+              ),
             ),
           ),
         ),
@@ -128,3 +126,4 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+

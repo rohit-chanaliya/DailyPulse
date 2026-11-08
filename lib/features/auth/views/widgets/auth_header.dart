@@ -21,8 +21,8 @@ class AuthHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const AppLogoWidget(size: 120),
-        const SizedBox(height: 14),
+        const AppLogoWidget(size: 96),
+        const SizedBox(height: 16),
         Text(
           title,
           textAlign: TextAlign.center,
@@ -32,13 +32,13 @@ class AuthHeader extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           subtitle,
           textAlign: TextAlign.center,
           style: context.textTheme.bodyMedium?.copyWith(
             color: onboardingColors.welcomeSubtitle,
-            height: 1.4,
+            height: 1.35,
           ),
         ),
       ],

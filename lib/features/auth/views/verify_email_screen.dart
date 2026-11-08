@@ -6,10 +6,8 @@ import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import './widgets/auth_back_button.dart';
-import './widgets/auth_card.dart';
 import './widgets/auth_header.dart';
 import './widgets/auth_primary_button.dart';
-import './widgets/auth_trust_badge.dart';
 
 /// Screen shown after sign-up while the user verifies their email.
 class VerifyEmailScreen extends StatefulWidget {
@@ -94,7 +92,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
                     // Centered content
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -144,83 +142,75 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Action Card
-                          AuthCard(
-                            child: Column(
-                              children: [
-                                // Mail illustration
-                                Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: onboardingColors.welcomeHighlight
-                                        .withValues(alpha: 0.1),
-                                  ),
-                                  child: Icon(
-                                    Icons.mark_email_unread_outlined,
-                                    size: 40,
-                                    color: onboardingColors.welcomeHighlight,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-
-                                // Spam note
-                                Text(
-                                  AuthStrings.checkSpamNote,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      context.textTheme.bodySmall?.copyWith(
-                                    color: onboardingColors.welcomeSubtitle,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                // Primary: I've Verified, Continue
-                                AuthPrimaryButton(
-                                  text: AuthStrings.alreadyVerifiedButton,
-                                  isLoading: _isChecking,
-                                  onPressed: _checkVerification,
-                                ),
-                                const SizedBox(height: 12),
-
-                                // Secondary: Resend
-                                OutlinedButton.icon(
-                                  onPressed:
-                                      _isResending ? null : _resendEmail,
-                                  icon: _isResending
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Icon(Icons.refresh_rounded,
-                                          size: 18),
-                                  label: Text(
-                                    AuthStrings.resendVerificationButton,
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize:
-                                        const Size(double.infinity, 50),
-                                    foregroundColor:
-                                        onboardingColors.welcomeHighlight,
-                                    side: BorderSide(
-                                      color: onboardingColors.welcomeHighlight
-                                          .withValues(alpha: 0.4),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          // Mail illustration
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: onboardingColors.welcomeHighlight
+                                  .withValues(alpha: 0.1),
+                            ),
+                            child: Icon(
+                              Icons.mark_email_unread_outlined,
+                              size: 40,
+                              color: onboardingColors.welcomeHighlight,
                             ),
                           ),
                           const SizedBox(height: 20),
+
+                          // Spam note
+                          Text(
+                            AuthStrings.checkSpamNote,
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: onboardingColors.welcomeSubtitle,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Primary: I've Verified, Continue
+                          AuthPrimaryButton(
+                            text: AuthStrings.alreadyVerifiedButton,
+                            isLoading: _isChecking,
+                            onPressed: _checkVerification,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Secondary: Resend
+                          OutlinedButton.icon(
+                            onPressed:
+                                _isResending ? null : _resendEmail,
+                            icon: _isResending
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.refresh_rounded,
+                                    size: 18),
+                            label: Text(
+                              AuthStrings.resendVerificationButton,
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize:
+                                  const Size(double.infinity, 50),
+                              foregroundColor:
+                                  onboardingColors.welcomeHighlight,
+                              side: BorderSide(
+                                color: onboardingColors.welcomeHighlight
+                                    .withValues(alpha: 0.4),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
 
                           // Escape hatch: sign out of the unverified session.
                           TextButton(
@@ -241,8 +231,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       ),
                     ),
 
-                    // Bottom Trust Badge
-                    const AuthTrustBadge(),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

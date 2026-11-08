@@ -4,7 +4,6 @@ import 'package:dailypulse/core/constant/strings/auth_strings.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
-import 'auth_card.dart';
 import 'auth_primary_button.dart';
 
 /// Form for choosing a new password after opening a reset link.
@@ -34,80 +33,78 @@ class ResetPasswordForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final onboardingColors = context.onboarding;
 
-    return AuthCard(
-      child: Form(
-        key: formKey,
-        child: Column(
-          children: [
-            if (email != null && email!.isNotEmpty) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
+    return Form(
+      key: formKey,
+      child: Column(
+        children: [
+          if (email != null && email!.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: onboardingColors.welcomeHighlight.withValues(
+                  alpha: 0.08,
                 ),
-                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
                   color: onboardingColors.welcomeHighlight.withValues(
-                    alpha: 0.08,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: onboardingColors.welcomeHighlight.withValues(
-                      alpha: 0.2,
-                    ),
-                  ),
-                ),
-                child: Text(
-                  email!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: onboardingColors.welcomeHighlight,
-                    fontWeight: FontWeight.w600,
+                    alpha: 0.2,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-            ],
-            CustomTextField(
-              controller: passwordController,
-              label: AuthStrings.newPasswordLabel,
-              hintText: AuthStrings.passwordHint,
-              prefixIcon: Icons.lock_outline_rounded,
-              obscureText: obscurePassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  obscurePassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  size: 20,
-                  color: onboardingColors.welcomeSubtitle,
+              child: Text(
+                email!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: onboardingColors.welcomeHighlight,
+                  fontWeight: FontWeight.w600,
                 ),
-                onPressed: onToggleObscure,
               ),
-              validator: Validators.validatePasswordStrength,
             ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: confirmController,
-              label: AuthStrings.confirmPasswordLabel,
-              hintText: AuthStrings.confirmPasswordHint,
-              prefixIcon: Icons.lock_reset_rounded,
-              obscureText: obscurePassword,
-              validator: (value) {
-                if (value != passwordController.text) {
-                  return AuthStrings.passwordMismatchError;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 24),
-            AuthPrimaryButton(
-              text: AuthStrings.resetPasswordButton,
-              isLoading: isSubmitting,
-              onPressed: onSubmit,
-            ),
+            const SizedBox(height: 20),
           ],
-        ),
+          CustomTextField(
+            controller: passwordController,
+            label: AuthStrings.newPasswordLabel,
+            hintText: AuthStrings.passwordHint,
+            prefixIcon: Icons.lock_outline_rounded,
+            obscureText: obscurePassword,
+            suffixIcon: IconButton(
+              icon: Icon(
+                obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                size: 20,
+                color: onboardingColors.welcomeSubtitle,
+              ),
+              onPressed: onToggleObscure,
+            ),
+            validator: Validators.validatePasswordStrength,
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            controller: confirmController,
+            label: AuthStrings.confirmPasswordLabel,
+            hintText: AuthStrings.confirmPasswordHint,
+            prefixIcon: Icons.lock_reset_rounded,
+            obscureText: obscurePassword,
+            validator: (value) {
+              if (value != passwordController.text) {
+                return AuthStrings.passwordMismatchError;
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 24),
+          AuthPrimaryButton(
+            text: AuthStrings.resetPasswordButton,
+            isLoading: isSubmitting,
+            onPressed: onSubmit,
+          ),
+        ],
       ),
     );
   }
