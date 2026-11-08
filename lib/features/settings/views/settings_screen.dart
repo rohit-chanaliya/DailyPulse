@@ -10,6 +10,7 @@ import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
 import 'package:dailypulse/core/utils/link_launcher.dart';
 import 'package:dailypulse/core/widgets/screen_header.dart';
+import 'package:dailypulse/features/settings/views/widgets/reminder_settings_tile.dart';
 import 'package:dailypulse/features/settings/views/widgets/settings_section.dart';
 import 'package:dailypulse/features/settings/views/widgets/settings_tile.dart';
 import 'package:dailypulse/features/settings/views/widgets/theme_selector.dart';
@@ -96,13 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: SettingsStrings.preferences,
                     child: Column(
                       children: [
-                        SettingsTile(
-                          icon: Icons.notifications_none_rounded,
-                          iconBackground: home.orangeDark,
-                          iconColor: home.orange,
-                          title: SettingsStrings.notifications,
-                          subtitle: SettingsStrings.notificationsSubtitle,
-                        ),
+                        const ReminderSettingsTile(),
                         divider,
                         SettingsTile(
                           icon: Icons.language_rounded,

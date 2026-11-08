@@ -2,6 +2,7 @@ import 'package:inject_annotation/inject_annotation.dart';
 
 import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/services/deep_link_service.dart';
+import 'package:dailypulse/core/services/notification_service.dart';
 import 'package:dailypulse/features/auth/repository/auth_repository.dart';
 import 'package:dailypulse/features/auth/viewmodels/auth_signal.dart';
 import 'package:dailypulse/features/insights/viewmodels/insights_signal.dart';
@@ -39,4 +40,5 @@ abstract class AppComponent {
   SplashSignal get splashSignal;
   OnboardingSignal get onboardingSignal;
   DeepLinkService get deepLinkService;
+  NotificationService get notificationService;
 }
