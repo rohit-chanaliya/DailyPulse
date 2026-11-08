@@ -96,8 +96,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
               keyboardType: widget.keyboardType,
               validator: widget.validator,
               style: TextStyle(
-                fontSize: isObscuredNow ? 18 : 16,
-                fontWeight: isObscuredNow ? FontWeight.w600 : FontWeight.w500,
+                fontSize: isObscuredNow ? 18 : 17,
+                fontWeight: FontWeight.w600,
                 letterSpacing: isObscuredNow ? 3.0 : 0.2,
                 color: home.textPrimary,
               ),
