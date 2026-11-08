@@ -12,6 +12,10 @@ abstract final class SettingsStrings {
   static const preferences = 'Preferences';
   static const notifications = 'Notifications';
   static const notificationsSubtitle = 'Manage app alerts';
+  static const dailyReminder = 'Daily Reminder';
+  static const dailyReminderOff = 'Off';
+  static const dailyReminderAt = 'Daily at ';
+  static const pickReminderTime = 'Set reminder time';
   static const language = 'Language';
   static const languageSubtitle = 'English (US)';
   static const privacy = 'Privacy & Security';

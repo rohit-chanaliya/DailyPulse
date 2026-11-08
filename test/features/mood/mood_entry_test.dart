@@ -42,6 +42,43 @@ void main() {
     expect(restored.userId, 'user-1');
   });
 
+  test('MoodEntry survives a Hive write/read round-trip with tags', () async {
+    final box = await Hive.openBox<MoodEntry>('mood_entries_tags');
+    final entry = MoodEntry(
+      timestamp: DateTime(2026, 10, 22, 10, 30, 15),
+      moodLevel: 4,
+      note: 'Exercised today',
+      tags: const ['Exercise', 'Health'],
+    );
+
+    await box.put(entry.localId, entry);
+
+    // Reopen to test binary deserialization
+    await box.close();
+    final reopened = await Hive.openBox<MoodEntry>('mood_entries_tags');
+    final restored = reopened.get(entry.localId);
+
+    expect(restored, isNotNull);
+    expect(restored!.tags, const ['Exercise', 'Health']);
+  });
+
+  test('toFirestore and fromFirestore round-trip tags correctly', () {
+    final entry = MoodEntry(
+      timestamp: DateTime(2026, 5, 1, 12, 0),
+      moodLevel: 5,
+      title: 'Great day',
+      tags: const ['Family', 'Friends'],
+    );
+
+    final map = entry.toFirestore();
+    expect(map['tags'], const ['Family', 'Friends']);
+
+    final fromFs = MoodEntry.fromFirestore(map, 'doc-456');
+    expect(fromFs.tags, const ['Family', 'Friends']);
+    expect(fromFs.id, 'doc-456');
+    expect(fromFs.moodLevel, 5);
+  });
+
   test('nullable fields round-trip as null', () async {
     final box = await Hive.openBox<MoodEntry>('mood_entries_nullable');
     final entry = MoodEntry(timestamp: DateTime(2026, 1, 1), moodLevel: 2);

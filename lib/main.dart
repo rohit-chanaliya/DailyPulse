@@ -31,6 +31,7 @@ void main() async {
 
   // Initialise deep-link handling for email verification.
   unawaited(appComponent.deepLinkService.init(_navigatorKey));
+  unawaited(appComponent.notificationService.init());
 
   runApp(DailyPulseApp(router: router));
 }

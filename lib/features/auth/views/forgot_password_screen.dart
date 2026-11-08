@@ -10,10 +10,8 @@ import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/features/auth/viewmodels/auth_signal.dart';
 import './widgets/auth_back_button.dart';
-import './widgets/auth_card.dart';
 import './widgets/auth_header.dart';
 import './widgets/auth_primary_button.dart';
-import './widgets/auth_trust_badge.dart';
 
 /// Minimalist, mindful Forgot Password screen with balanced full-screen layout.
 class ForgotPasswordScreen extends StatefulWidget {
@@ -90,9 +88,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
 
-                    // Centered Core: Hero Header + Form Card + Switch Link
+                    // Centered Core: Hero Header + Form + Return Link
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -100,80 +98,76 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             title: AuthStrings.forgotPasswordTitle,
                             subtitle: AuthStrings.forgotPasswordSubtitle,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 28),
 
-                          // Form Card grouping inputs and primary action
-                          AuthCard(
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  if (_isSuccessSent) ...[
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                if (_isSuccessSent) ...[
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: onboardingColors.welcomeHighlight
+                                          .withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
                                         color: onboardingColors.welcomeHighlight
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: onboardingColors.welcomeHighlight
-                                              .withValues(alpha: 0.3),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.check_circle_outline_rounded,
-                                            color: onboardingColors.welcomeHighlight,
-                                            size: 20,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Text(
-                                              AuthStrings.resetLinkSentSuccess,
-                                              style: context.textTheme.bodySmall?.copyWith(
-                                                color: onboardingColors.welcomeText,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                            .withValues(alpha: 0.3),
+                                        width: 1,
                                       ),
                                     ),
-                                    const SizedBox(height: 18),
-                                  ],
-                                  CustomTextField(
-                                    controller: _emailController,
-                                    label: AuthStrings.emailLabel,
-                                    hintText: AuthStrings.emailHint,
-                                    prefixIcon: Icons.email_outlined,
-                                    keyboardType: TextInputType.emailAddress,
-                                    validator: Validators.validateEmail,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: onboardingColors.welcomeHighlight,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            AuthStrings.resetLinkSentSuccess,
+                                            style: context.textTheme.bodySmall?.copyWith(
+                                              color: onboardingColors.welcomeText,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 24),
-
-                                  // Primary Reset Button
-                                  SignalBuilder(
-                                    builder: (context) {
-                                      final isLoading =
-                                          appComponent.authSignal.status.value ==
-                                              AuthStatus.loading;
-
-                                      return AuthPrimaryButton(
-                                        text: _isSuccessSent
-                                            ? AuthStrings.resendResetLinkButton
-                                            : AuthStrings.sendResetLinkButton,
-                                        isLoading: isLoading,
-                                        onPressed: _handleSendResetLink,
-                                      );
-                                    },
-                                  ),
+                                  const SizedBox(height: 18),
                                 ],
-                              ),
+                                CustomTextField(
+                                  controller: _emailController,
+                                  label: AuthStrings.emailLabel,
+                                  hintText: AuthStrings.emailHint,
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: Validators.validateEmail,
+                                ),
+                                const SizedBox(height: 24),
+
+                                // Primary Reset Button
+                                SignalBuilder(
+                                  builder: (context) {
+                                    final isLoading =
+                                        appComponent.authSignal.status.value ==
+                                            AuthStatus.loading;
+
+                                    return AuthPrimaryButton(
+                                      text: _isSuccessSent
+                                          ? AuthStrings.resendResetLinkButton
+                                          : AuthStrings.sendResetLinkButton,
+                                      isLoading: isLoading,
+                                      onPressed: _handleSendResetLink,
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 28),
 
                           // Return to Sign In row
                           Row(
@@ -185,6 +179,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   color: onboardingColors.welcomeSubtitle,
                                 ),
                               ),
+                              const SizedBox(width: 4),
                               GestureDetector(
                                 onTap: () {
                                   if (context.canPop()) {
@@ -207,8 +202,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
 
-                    // Bottom Mindful Trust Badge
-                    const AuthTrustBadge(),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

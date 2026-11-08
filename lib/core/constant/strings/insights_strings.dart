@@ -12,4 +12,16 @@ abstract final class InsightsStrings {
   static const emptyMessage = 'Log some moods to see your stats';
   static const noData = 'No data in this range';
   static const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  static const tagCorrelationTitle = 'Activities & Habits';
+  static const tagCorrelationSubtitle = 'How your tags correlate with how you feel';
+  static const noTagsPrompt = 'Tag your mood entries to unlock activity insights';
+  static const weeklyPatternsTitle = 'Daily Patterns';
+  static const bestDay = 'Best Day';
+  static const toughestDay = 'Toughest Day';
+  static const timeOfDayTitle = 'Time of Day';
+  static const morning = 'Morning (5AM - 12PM)';
+  static const afternoon = 'Afternoon (12PM - 5PM)';
+  static const evening = 'Evening (5PM - 9PM)';
+  static const night = 'Night (9PM - 5AM)';
 }

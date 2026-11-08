@@ -47,6 +47,7 @@ class MoodSignal {
     String? note,
     DateTime? timestamp,
     String? title,
+    List<String> tags = const [],
   }) async {
     isLoading.value = true;
     try {
@@ -56,6 +57,7 @@ class MoodSignal {
         note: note?.isEmpty ?? true ? null : note,
         userId: userId,
         title: title?.isEmpty ?? true ? null : title,
+        tags: tags,
       );
 
       await _repository.addMoodEntry(entry, userId);

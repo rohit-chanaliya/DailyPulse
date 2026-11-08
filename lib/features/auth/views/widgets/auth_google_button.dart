@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:dailypulse/core/constant/strings/auth_strings.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 
-/// Mindful Google Sign-In button aligned with DailyPulse design principles.
+/// Modern circular Google Sign-In button aligned with DailyPulse design principles.
 class AuthGoogleButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -26,52 +25,44 @@ class AuthGoogleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final buttons = context.buttons;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return OutlinedButton(
-      onPressed: isLoading ? null : onPressed,
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 52),
-        backgroundColor: buttons.surfaceBackground,
-        foregroundColor: buttons.secondaryForeground,
-        side: BorderSide(color: buttons.surfaceBorder, width: 1.2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        elevation: isDark ? 0 : 1,
-        shadowColor: context.cards.shadow,
-      ),
-      child: isLoading
-          ? SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  buttons.secondaryForeground,
-                ),
+    return Center(
+      child: Tooltip(
+        message: 'Sign in with Google',
+        child: InkWell(
+          onTap: isLoading ? null : onPressed,
+          borderRadius: BorderRadius.circular(26),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: buttons.surfaceBackground,
+              border: Border.all(
+                color: buttons.surfaceBorder,
+                width: 1.2,
               ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.string(
-                  _googleSvg,
-                  width: 20,
-                  height: 20,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  AuthStrings.googleSignInButton,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: buttons.secondaryForeground,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ],
             ),
+            alignment: Alignment.center,
+            child: isLoading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        buttons.secondaryForeground,
+                      ),
+                    ),
+                  )
+                : SvgPicture.string(
+                    _googleSvg,
+                    width: 22,
+                    height: 22,
+                  ),
+          ),
+        ),
+      ),
     );
   }
 }

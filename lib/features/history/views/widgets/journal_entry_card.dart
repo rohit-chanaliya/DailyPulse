@@ -90,6 +90,43 @@ class JournalEntryCard extends StatelessWidget {
               color: home.textPrimary,
             ),
           ),
+          if (entry.tags.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                for (final tag in entry.tags.take(3))
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: home.searchSurface,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      tag,
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        color: home.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                if (entry.tags.length > 3)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Text(
+                      '+${entry.tags.length - 3}',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        color: home.textMuted,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 4),
           Text(
             note == null || note.isEmpty

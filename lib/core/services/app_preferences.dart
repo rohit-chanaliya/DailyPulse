@@ -14,6 +14,9 @@ class AppPreferences {
   static const String boxName = 'app_preferences';
   static const String _onboardingSeenKey = 'has_seen_onboarding';
   static const String _themeModeKey = 'theme_mode';
+  static const String _reminderEnabledKey = 'reminder_enabled';
+  static const String _reminderHourKey = 'reminder_hour';
+  static const String _reminderMinuteKey = 'reminder_minute';
 
   final Box<dynamic> _box;
 
@@ -43,4 +46,22 @@ class AppPreferences {
       ThemeMode.system => 'system',
     });
   }
+
+  bool get isReminderEnabled =>
+      _box.get(_reminderEnabledKey, defaultValue: false) as bool;
+
+  Future<void> setReminderEnabled(bool value) =>
+      _box.put(_reminderEnabledKey, value);
+
+  int get reminderHour =>
+      _box.get(_reminderHourKey, defaultValue: 20) as int;
+
+  Future<void> setReminderHour(int value) =>
+      _box.put(_reminderHourKey, value);
+
+  int get reminderMinute =>
+      _box.get(_reminderMinuteKey, defaultValue: 0) as int;
+
+  Future<void> setReminderMinute(int value) =>
+      _box.put(_reminderMinuteKey, value);
 }

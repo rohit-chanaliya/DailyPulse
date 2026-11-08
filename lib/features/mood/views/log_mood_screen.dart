@@ -16,9 +16,14 @@ import 'package:dailypulse/features/mood/views/widgets/mood_face.dart';
 /// Immersive mood logging: pick a level on the arc, tap "Set Mood" to save.
 /// The top-bar journal action opens the full journal entry form instead.
 class LogMoodScreen extends StatefulWidget {
-  const LogMoodScreen({super.key, this.initialLevel = defaultLevel});
+  const LogMoodScreen({
+    super.key,
+    this.initialLevel = defaultLevel,
+    this.initialTimestamp,
+  });
 
   final int initialLevel;
+  final DateTime? initialTimestamp;
 
   /// Neutral, the middle of the scale.
   static const int defaultLevel = 3;
@@ -29,7 +34,7 @@ class LogMoodScreen extends StatefulWidget {
 
 class _LogMoodScreenState extends State<LogMoodScreen> {
   late int _level = widget.initialLevel;
-  DateTime? _timestamp;
+  late DateTime? _timestamp = widget.initialTimestamp;
   bool _saving = false;
 
   Future<void> _save() async {

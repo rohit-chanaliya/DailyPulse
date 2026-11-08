@@ -24,19 +24,18 @@ class AuthPrimaryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: onboardingColors.welcomeHighlight,
         foregroundColor: foreground,
-        minimumSize: const Size(double.infinity, 56),
-        elevation: 4,
-        shadowColor: onboardingColors.welcomeHighlight.withValues(alpha: 0.4),
+        minimumSize: const Size(double.infinity, 52),
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
       child: isLoading
           ? SizedBox(
-              width: 24,
-              height: 24,
+              width: 22,
+              height: 22,
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
+                strokeWidth: 2.2,
                 valueColor: AlwaysStoppedAnimation<Color>(foreground),
               ),
             )
@@ -48,11 +47,11 @@ class AuthPrimaryButton extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_rounded, size: 20),
+                const Icon(Icons.arrow_forward_rounded, size: 18),
               ],
             ),
     );

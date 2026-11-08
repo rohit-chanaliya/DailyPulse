@@ -8,6 +8,8 @@ import 'package:dailypulse/core/widgets/screen_header.dart';
 import 'package:dailypulse/features/insights/views/widgets/mood_breakdown_card.dart';
 import 'package:dailypulse/features/insights/views/widgets/mood_curve_chart.dart';
 import 'package:dailypulse/features/insights/views/widgets/mood_range_pills.dart';
+import 'package:dailypulse/features/insights/views/widgets/pattern_highlights_card.dart';
+import 'package:dailypulse/features/insights/views/widgets/tag_mood_correlation_card.dart';
 import 'package:dailypulse/features/insights/views/widgets/week_mood_row.dart';
 
 /// Mood over time: a grouped curve, this week's faces and the mood breakdown.
@@ -31,6 +33,9 @@ class InsightsScreen extends StatelessWidget {
           final entries = insights.entries.value;
           final points = insights.seriesPoints.value;
           final week = insights.weekAverages.value;
+          final tagStats = insights.tagStats.value;
+          final dayPattern = insights.dayPattern.value;
+          final timeSlots = insights.timeSlots.value;
 
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -77,6 +82,19 @@ class InsightsScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: MoodBreakdownCard(entries: entries),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: PatternHighlightsCard(
+                      dayPattern: dayPattern,
+                      timeSlots: timeSlots,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TagMoodCorrelationCard(stats: tagStats),
                   ),
                 ],
               ],
