@@ -11,6 +11,10 @@ class CustomTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final bool isPassword;
+  final bool readOnly;
+  final bool enabled;
+  final double borderRadius;
+  final VoidCallback? onTap;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
 
@@ -23,6 +27,10 @@ class CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.isPassword = false,
+    this.readOnly = false,
+    this.enabled = true,
+    this.borderRadius = 16,
+    this.onTap,
     this.keyboardType,
     this.validator,
   });
@@ -95,11 +103,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
               obscuringCharacter: '●',
               keyboardType: widget.keyboardType,
               validator: widget.validator,
+              readOnly: widget.readOnly,
+              enabled: widget.enabled,
+              onTap: widget.onTap,
               style: TextStyle(
                 fontSize: isObscuredNow ? 18 : 17,
                 fontWeight: FontWeight.w600,
                 letterSpacing: isObscuredNow ? 3.0 : 0.2,
-                color: home.textPrimary,
+                color: widget.readOnly ? home.textSecondary : home.textPrimary,
               ),
               decoration: InputDecoration(
                 hintText: widget.hintText,
@@ -114,7 +125,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   vertical: 18,
                 ),
                 filled: true,
-                fillColor: buttons.surfaceBackground,
+                fillColor: widget.enabled
+                    ? buttons.surfaceBackground
+                    : buttons.surfaceBackground.withValues(alpha: 0.6),
                 prefixIcon: widget.prefixIcon != null
                     ? Padding(
                         padding: const EdgeInsets.only(left: 14, right: 10),
@@ -130,38 +143,45 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     : null,
                 suffixIcon: effectiveSuffix,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   borderSide: BorderSide(
                     color: buttons.surfaceBorder,
                     width: 1.2,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   borderSide: BorderSide(
                     color: buttons.surfaceBorder,
                     width: 1.2,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   borderSide: BorderSide(
                     color: onboarding.welcomeHighlight,
                     width: 1.8,
                   ),
                 ),
                 errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   borderSide: BorderSide(
                     color: status.error,
                     width: 1.2,
                   ),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   borderSide: BorderSide(
                     color: status.error,
                     width: 1.8,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                  borderSide: BorderSide(
+                    color: buttons.surfaceBorder.withValues(alpha: 0.5),
+                    width: 1.2,
                   ),
                 ),
               ),

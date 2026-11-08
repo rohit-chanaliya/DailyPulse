@@ -14,7 +14,9 @@ import 'package:dailypulse/features/mood/viewmodels/mood_signal.dart';
 import 'package:dailypulse/features/onboarding/repository/onboarding_repository.dart';
 import 'package:dailypulse/features/onboarding/viewmodels/onboarding_signal.dart';
 import 'package:dailypulse/features/onboarding/viewmodels/splash_signal.dart';
-import 'package:dailypulse/features/settings/viewmodels/theme_signal.dart';
+import 'package:dailypulse/features/settings/viewmodels/feedback_signal.dart';
+import 'package:dailypulse/features/settings/viewmodels/notification_settings_signal.dart';
+import 'package:dailypulse/features/settings/repository/feedback_repository.dart';
 
 import 'app_component.inject.dart' as g;
 import 'firebase_module.dart';
@@ -32,10 +34,12 @@ abstract class AppComponent {
   MoodRepository get moodRepository;
   OnboardingRepository get onboardingRepository;
   AuthRepository get authRepository;
+  FeedbackRepository get feedbackRepository;
 
   MoodSignal get moodSignal;
   InsightsSignal get insightsSignal;
-  ThemeSignal get themeSignal;
+  NotificationSettingsSignal get notificationSettingsSignal;
+  FeedbackSignal get feedbackSignal;
   AuthSignal get authSignal;
   SplashSignal get splashSignal;
   OnboardingSignal get onboardingSignal;

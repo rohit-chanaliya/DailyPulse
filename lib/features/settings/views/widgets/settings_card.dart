@@ -15,7 +15,7 @@ class SettingsCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: context.home.surface,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
       ),
       clipBehavior: Clip.antiAlias,
       child: child,

@@ -1,34 +1,52 @@
 import 'package:flutter/material.dart';
 
 import 'package:dailypulse/core/theme/context_extensions.dart';
-import 'package:dailypulse/features/settings/views/widgets/settings_card.dart';
 
-/// Section title above a [SettingsCard] holding [child].
+/// Section title (with optional trailing icon) above a stack of [children].
 class SettingsSection extends StatelessWidget {
   const SettingsSection({
     super.key,
     required this.title,
-    required this.child,
-    this.cardPadding,
+    required this.children,
+    this.trailingIcon,
+    this.trailingIconColor,
   });
 
   final String title;
-  final Widget child;
-  final EdgeInsetsGeometry? cardPadding;
+  final List<Widget> children;
+  final IconData? trailingIcon;
+  final Color? trailingIconColor;
 
   @override
   Widget build(BuildContext context) {
+    final home = context.home;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
       children: [
-        Text(
-          title,
-          style: context.textTheme.headlineSmall?.copyWith(
-            color: context.home.textPrimary,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    color: home.textPrimary,
+                  ),
+                ),
+              ),
+              if (trailingIcon != null)
+                Icon(
+                  trailingIcon,
+                  size: 24,
+                  color: trailingIconColor ?? home.textMuted,
+                ),
+            ],
           ),
         ),
-        const SizedBox(height: 12),
-        SettingsCard(padding: cardPadding, child: child),
+        ...children,
       ],
     );
   }

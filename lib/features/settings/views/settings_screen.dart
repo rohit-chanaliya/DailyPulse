@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/constant/links.dart';
+import 'package:dailypulse/core/constant/strings/notification_settings_strings.dart';
+import 'package:dailypulse/core/constant/strings/profile_strings.dart';
 import 'package:dailypulse/core/constant/strings/settings_strings.dart';
 import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_routes.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
 import 'package:dailypulse/core/utils/link_launcher.dart';
-import 'package:dailypulse/core/widgets/screen_header.dart';
-import 'package:dailypulse/features/settings/views/widgets/reminder_settings_tile.dart';
+import 'package:dailypulse/features/settings/views/widgets/settings_header.dart';
 import 'package:dailypulse/features/settings/views/widgets/settings_section.dart';
 import 'package:dailypulse/features/settings/views/widgets/settings_tile.dart';
-import 'package:dailypulse/features/settings/views/widgets/theme_selector.dart';
-import 'package:dailypulse/features/settings/views/widgets/user_profile_card.dart';
 
-/// Account summary, appearance, preferences, support and sign out.
+/// Account header, general settings, security, danger zone and sign out.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -42,135 +42,138 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final home = context.home;
-    final divider = Divider(
-      height: 1,
-      indent: 78,
-      endIndent: 16,
-      color: home.textMuted.withValues(alpha: 0.2),
-    );
 
-    return Scaffold(
-      backgroundColor: home.background,
-      body: SafeArea(
-        bottom: false,
-        child: SignalBuilder(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: home.background,
+        body: SignalBuilder(
           builder: (context) {
             final user = appComponent.authSignal.user.value;
-            final theme = appComponent.themeSignal;
+            final profile = appComponent.authSignal.profile.value;
+            final name = profile?.fullName.isNotEmpty == true
+                ? profile!.fullName
+                : user?.displayName;
 
             return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                24,
-                16,
-                24 + MediaQuery.paddingOf(context).bottom,
+              padding: EdgeInsets.only(
+                bottom: 24 + MediaQuery.paddingOf(context).bottom,
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const ScreenHeader(
-                    title: SettingsStrings.title,
-                    subtitle: SettingsStrings.subtitle,
-                  ),
-                  const SizedBox(height: 24),
-                  UserProfileCard(
-                    displayName: user?.displayName,
+                  SettingsHeader(
+                    displayName: name,
                     email: user?.email,
                     memberSince: user?.metadata.creationTime,
-                    entryCount: appComponent.moodSignal.entries.value.length,
+                    imagePath: appComponent.authSignal.profileImagePath.value,
+                    avatarId: profile?.avatarId,
+                    photoUrl: user?.photoURL,
+                    onAvatarTap: () => context.push(AppRoutes.profile),
+                    onEditProfile: () => context.push(AppRoutes.profileEdit),
+                    onMoodInsights: () => context.go(AppRoutes.insights),
                   ),
-                  const SizedBox(height: 28),
-                  SettingsSection(
-                    title: SettingsStrings.appearance,
-                    cardPadding: const EdgeInsets.all(12),
-                    child: ThemeSelector(
-                      isLightMode: theme.isLightMode,
-                      isDarkMode: theme.isDarkMode,
-                      isSystemMode: theme.isSystemMode,
-                      onLightMode: theme.setLightTheme,
-                      onDarkMode: theme.setDarkTheme,
-                      onSystemMode: theme.setSystemTheme,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  SettingsSection(
-                    title: SettingsStrings.preferences,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: 32,
                       children: [
-                        const ReminderSettingsTile(),
-                        divider,
-                        SettingsTile(
-                          icon: Icons.language_rounded,
-                          iconBackground: home.yellowDark,
-                          iconColor: home.yellow,
-                          title: SettingsStrings.language,
-                          subtitle: SettingsStrings.languageSubtitle,
+                        SettingsSection(
+                          title: SettingsStrings.generalSettings,
+                          children: [
+                            SettingsTile(
+                              icon: Icons.notifications_none_rounded,
+                              title: SettingsStrings.notifications,
+                              value: appComponent
+                                      .notificationSettingsSignal
+                                      .reminderEnabled
+                                      .value
+                                  ? NotificationSettingsStrings.on
+                                  : NotificationSettingsStrings.off,
+                              onTap: () => context.push(
+                                AppRoutes.notificationSettings,
+                              ),
+                            ),
+                            SettingsTile(
+                              icon: Icons.person_outline_rounded,
+                              title: ProfileStrings.personalInfo,
+                              subtitle: ProfileStrings.editProfileSubtitle,
+                              onTap: () => context.push(AppRoutes.profileEdit),
+                            ),
+                            SettingsTile(
+                              icon: Icons.chat_bubble_outline_rounded,
+                              title: SettingsStrings.submitFeedback,
+                              subtitle: SettingsStrings.submitFeedbackSubtitle,
+                              onTap: () => context.push(AppRoutes.feedback),
+                            ),
+                          ],
                         ),
-                        divider,
-                        SettingsTile(
-                          icon: Icons.lock_outline_rounded,
-                          iconBackground: home.greenDark,
-                          iconColor: home.green,
-                          title: SettingsStrings.privacy,
-                          subtitle: SettingsStrings.privacySubtitle,
-                          onTap: () => LinkLauncher.open(
-                            context,
-                            AppLinks.privacyPolicy,
-                          ),
+                        SettingsSection(
+                          title: SettingsStrings.securityPrivacy,
+                          children: [
+                            SettingsTile(
+                              icon: Icons.lock_outline_rounded,
+                              title: SettingsStrings.privacy,
+                              subtitle: SettingsStrings.privacySubtitle,
+                              onTap: () => LinkLauncher.open(
+                                context,
+                                AppLinks.privacyPolicy,
+                              ),
+                            ),
+                            SettingsTile(
+                              icon: Icons.help_outline_rounded,
+                              title: SettingsStrings.helpCenter,
+                              subtitle: SettingsStrings.helpCenterSubtitle,
+                              onTap: () => LinkLauncher.open(
+                                context,
+                                AppLinks.supportMailto(
+                                  SettingsStrings.helpEmailSubject,
+                                ),
+                              ),
+                            ),
+                            SettingsTile(
+                              icon: Icons.info_outline_rounded,
+                              title: SettingsStrings.about,
+                              onTap: () => DialogUtils.showInfoDialog(
+                                context: context,
+                                title: SettingsStrings.appName,
+                                message: SettingsStrings.aboutMessage,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  SettingsSection(
-                    title: SettingsStrings.support,
-                    child: Column(
-                      children: [
-                        SettingsTile(
-                          icon: Icons.help_outline_rounded,
-                          iconBackground: home.greenDark,
-                          iconColor: home.green,
-                          title: SettingsStrings.helpCenter,
+                        SettingsSection(
+                          title: SettingsStrings.dangerZone,
+                          trailingIcon: Icons.warning_amber_rounded,
+                          trailingIconColor: home.orange,
+                          children: [
+                            SettingsTile(
+                              icon: Icons.delete_outline_rounded,
+                              title: SettingsStrings.deleteAccount,
+                              subtitle: SettingsStrings.deleteAccountSubtitle,
+                              isDestructive: true,
+                              onTap: () => context.push(AppRoutes.deleteAccount),
+                            ),
+                          ],
                         ),
-                        divider,
-                        SettingsTile(
-                          icon: Icons.info_outline_rounded,
-                          iconBackground: home.purpleDark,
-                          iconColor: home.purple,
-                          title: SettingsStrings.about,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  SettingsSection(
-                    title: SettingsStrings.account,
-                    child: Column(
-                      children: [
-                        SettingsTile(
-                          icon: Icons.logout_rounded,
-                          iconBackground: home.orangeDark,
-                          iconColor: home.orange,
+                        SettingsSection(
                           title: SettingsStrings.signOut,
-                          subtitle: SettingsStrings.signOutSubtitle,
-                          onTap: _handleSignOut,
+                          children: [
+                            SettingsTile(
+                              icon: Icons.logout_rounded,
+                              title: SettingsStrings.signOut,
+                              subtitle: SettingsStrings.signOutSubtitle,
+                              onTap: _handleSignOut,
+                            ),
+                          ],
                         ),
-                        divider,
-                        SettingsTile(
-                          icon: Icons.delete_outline_rounded,
-                          iconBackground: home.orangeDark,
-                          iconColor: home.orange,
-                          title: SettingsStrings.deleteAccount,
-                          subtitle: SettingsStrings.deleteAccountSubtitle,
-                          isDestructive: true,
-                          onTap: () =>
-                              context.push(AppRoutes.deleteAccount),
-                        ),
+                        const _AppFooter(),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 36),
-                  const Center(child: _AppFooter()),
                 ],
               ),
             );
@@ -197,7 +200,7 @@ class _AppFooter extends StatelessWidget {
             color: home.headerSurface,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.bolt_rounded, color: home.accent, size: 26),
+          child: Icon(Icons.bolt_rounded, color: home.onMedia, size: 26),
         ),
         const SizedBox(height: 12),
         Text(

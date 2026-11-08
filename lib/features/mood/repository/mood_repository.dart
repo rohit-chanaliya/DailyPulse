@@ -21,7 +21,7 @@ class MoodRepository {
   Future<void> addMoodEntry(MoodEntry entry, String userId) async {
     final entryWithUser = entry.copyWith(userId: userId);
     await _hiveService.put(entryWithUser);
-    appLogger.d('Added mood entry locally for user: $userId');
+    appLogger.d('Added mood entry locally');
     unawaited(_syncService.syncPendingEntries());
   }
 
@@ -58,7 +58,7 @@ class MoodRepository {
     try {
       await _firestoreService.deleteAccountData(userId);
       await _hiveService.deleteAllForUser(userId);
-      appLogger.i('Deleted account data for user: $userId');
+      appLogger.i('Deleted account data');
       return true;
     } catch (e, stackTrace) {
       appLogger.e(
@@ -76,7 +76,7 @@ class MoodRepository {
   // replaced when the fetch fails — Firestore throws instead of returning [].
   Future<List<MoodEntry>> fetchAndSyncFromFirebase(String userId) async {
     try {
-      appLogger.i('Starting Firebase fetch for user: $userId');
+      appLogger.i('Starting Firebase fetch');
       final firebaseEntries = await _firestoreService.fetchMoodEntries(userId);
 
       appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');

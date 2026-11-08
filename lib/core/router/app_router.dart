@@ -19,6 +19,10 @@ import 'package:dailypulse/features/onboarding/views/onboarding_screen.dart';
 import 'package:dailypulse/features/onboarding/views/splash_screen.dart';
 import 'package:dailypulse/features/onboarding/views/welcome_screen.dart';
 import 'package:dailypulse/features/settings/views/delete_account_screen.dart';
+import 'package:dailypulse/features/settings/views/feedback_screen.dart';
+import 'package:dailypulse/features/settings/views/notification_settings_screen.dart';
+import 'package:dailypulse/features/settings/views/personal_info_screen.dart';
+import 'package:dailypulse/features/settings/views/profile_screen.dart';
 import 'package:dailypulse/features/settings/views/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -107,6 +111,26 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) {
         path: AppRoutes.deleteAccount,
         pageBuilder: (context, state) =>
             _fadePage(state, const DeleteAccountScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const ProfileScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.profileEdit,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const PersonalInfoScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationSettings,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const NotificationSettingsScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.feedback,
+        pageBuilder: (context, state) =>
+            _fadePage(state, const FeedbackScreen()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

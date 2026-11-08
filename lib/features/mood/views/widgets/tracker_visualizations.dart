@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:dailypulse/core/constant/strings/home_strings.dart';
+import 'package:dailypulse/core/constant/constants.dart';
 import 'package:dailypulse/core/theme/context_extensions.dart';
 import 'package:dailypulse/features/mood/models/home_assets.dart';
 import 'home_asset_icon.dart';
@@ -25,77 +24,59 @@ class TrackerSubtitle extends StatelessWidget {
   }
 }
 
-class SleepScore extends StatelessWidget {
-  const SleepScore({super.key});
+/// 4x4 grid of the last 16 days; lit cells are days with an entry.
+class JournalHeatmap extends StatelessWidget {
+  const JournalHeatmap({
+    super.key,
+    required this.loggedDays,
+    required this.today,
+  });
+
+  static const _cells = 16;
+
+  final Set<DateTime> loggedDays;
+  final DateTime today;
 
   @override
   Widget build(BuildContext context) {
+    final home = context.home;
+
     return SizedBox(
       width: 64,
-      height: 64,
-      child: Stack(
-        alignment: Alignment.center,
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
         children: [
-          SvgPicture.asset(HomeAssets.sleepRing, width: 56, height: 56),
-          Positioned(
-            top: 4,
-            right: 12,
-            child: SvgPicture.asset(
-              HomeAssets.sleepProgress,
-              width: 32,
-              height: 27,
+          for (var i = _cells - 1; i >= 0; i--)
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color:
+                    loggedDays.contains(
+                      DateTime(today.year, today.month, today.day - i),
+                    )
+                    ? home.orange
+                    : home.orangeDark,
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
-          ),
-          Text(
-            HomeStrings.sleepScore,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.home.onMedia,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
         ],
       ),
     );
   }
 }
 
-class JournalHeatmap extends StatelessWidget {
-  const JournalHeatmap({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final home = context.home;
-    return SizedBox(
-      width: 64,
-      child: Wrap(
-        spacing: 4,
-        runSpacing: 4,
-        children: List.generate(16, (index) {
-          final color = switch (index) {
-            2 || 3 || 10 || 11 => home.orange,
-            5 || 6 || 7 || 8 || 9 => index < 8 ? home.orange : home.orangeDark,
-            _ => home.orangeDark,
-          };
-          return Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-}
-
+/// Five segments, the first [level] of them lit.
 class StressBars extends StatelessWidget {
-  const StressBars({super.key});
+  const StressBars({super.key, required this.level});
+
+  final int level;
 
   @override
   Widget build(BuildContext context) {
     final home = context.home;
+
     return Row(
       children: List.generate(5, (index) {
         return Expanded(
@@ -103,7 +84,7 @@ class StressBars extends StatelessWidget {
             height: 6,
             margin: EdgeInsets.only(right: index == 4 ? 0 : 4),
             decoration: BoxDecoration(
-              color: index < 3 ? home.yellow : home.headerSurface,
+              color: index < level ? home.yellow : home.headerSurface,
               borderRadius: BorderRadius.circular(20),
             ),
           ),
@@ -113,33 +94,36 @@ class StressBars extends StatelessWidget {
   }
 }
 
+/// The last few mood levels, oldest first, joined by arrows.
 class MoodProgression extends StatelessWidget {
-  const MoodProgression({super.key});
+  const MoodProgression({super.key, required this.levels});
+
+  final List<int> levels;
 
   @override
   Widget build(BuildContext context) {
     final home = context.home;
+
     return FittedBox(
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
-          _MoodTag(
-            label: HomeStrings.sad,
-            background: home.orangeDark,
-            foreground: home.orange,
-          ),
-          const HomeAssetIcon(HomeAssets.arrowRight),
-          _MoodTag(
-            label: HomeStrings.neutral,
-            background: home.headerSurface,
-            foreground: home.accent,
-          ),
-          const HomeAssetIcon(HomeAssets.arrowRight),
-          _MoodTag(
-            label: HomeStrings.happy,
-            background: home.greenDark,
-            foreground: home.green,
-          ),
+          for (var i = 0; i < levels.length; i++) ...[
+            if (i > 0) const HomeAssetIcon(HomeAssets.arrowRight),
+            _MoodTag(
+              label: AppConstants.moodLabels[levels[i]],
+              background: switch (levels[i]) {
+                <= 1 => home.orangeDark,
+                <= 3 => home.headerSurface,
+                _ => home.greenDark,
+              },
+              foreground: switch (levels[i]) {
+                <= 1 => home.orange,
+                <= 3 => home.accent,
+                _ => home.green,
+              },
+            ),
+          ],
         ],
       ),
     );

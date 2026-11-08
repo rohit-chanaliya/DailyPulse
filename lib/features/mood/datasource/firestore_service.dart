@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inject_annotation/inject_annotation.dart';
 
 import '../models/mood_entry.dart';
+import 'package:dailypulse/features/settings/models/feedback_entry.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 
 /// Firestore access for mood entries.
@@ -14,6 +15,7 @@ class FirestoreService {
   static const String _moodsCollection = 'moods';
   static const String _usersCollection = 'users';
   static const String _preferencesCollection = 'preferences';
+  static const String _feedbackCollection = 'feedback';
 
   /// Firestore caps a single write batch at 500 operations.
   static const int _deleteBatchSize = 400;
@@ -36,6 +38,28 @@ class FirestoreService {
         stackTrace: stackTrace,
       );
       return null;
+    }
+  }
+
+  /// Writes a feedback document; its id makes a retry idempotent.
+  ///
+  /// Returns `false` on failure or when the server does not answer in time,
+  /// so the caller can keep the entry queued.
+  Future<bool> addFeedback(FeedbackEntry entry) async {
+    try {
+      await _firestore
+          .collection(_feedbackCollection)
+          .doc(entry.id)
+          .set(entry.toFirestore())
+          .timeout(const Duration(seconds: 10));
+      return true;
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Error adding feedback to Firestore',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
     }
   }
 

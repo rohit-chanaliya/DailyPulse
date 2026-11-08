@@ -46,21 +46,16 @@ class DailyPulseApp extends StatelessWidget {
     return SignalBuilder(
       builder: (context) => MaterialApp.router(
         title: 'DailyPulse',
-        theme: AppTheme.lightTheme,
+        theme: AppTheme.darkTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: appComponent.themeSignal.themeMode,
+        themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         routerConfig: router,
         builder: (context, child) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
           return AnnotatedRegion<SystemUiOverlayStyle>(
-            value: isDark
-                ? SystemUiOverlayStyle.light.copyWith(
-                    statusBarColor: Colors.transparent,
-                  )
-                : SystemUiOverlayStyle.dark.copyWith(
-                    statusBarColor: Colors.transparent,
-                  ),
+            value: SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+            ),
             child: child ?? const SizedBox.shrink(),
           );
         },

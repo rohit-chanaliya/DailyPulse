@@ -6,21 +6,36 @@ import 'package:dailypulse/features/mood/models/home_assets.dart';
 import 'home_asset_icon.dart';
 import 'home_metric_card.dart';
 
+/// Days logged this year and a heatmap of the last 28 days.
 class JournalMetricCard extends StatelessWidget {
-  const JournalMetricCard({super.key});
+  const JournalMetricCard({
+    super.key,
+    required this.daysLogged,
+    required this.daysInYear,
+    required this.loggedDays,
+    required this.today,
+  });
+
+  final int daysLogged;
+  final int daysInYear;
+  final Set<DateTime> loggedDays;
+  final DateTime today;
+
+  static const _cells = 28;
 
   @override
   Widget build(BuildContext context) {
     final home = context.home;
+
     return HomeMetricCard(
       color: home.purple,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            spacing: 8,
             children: [
               const HomeAssetIcon(HomeAssets.documentHealth),
-              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   HomeStrings.healthJournal,
@@ -28,7 +43,6 @@ class JournalMetricCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.titleMedium?.copyWith(
                     color: home.onMedia,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -36,10 +50,10 @@ class JournalMetricCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            HomeStrings.journalProgress,
+            '$daysLogged/$daysInYear',
+            maxLines: 1,
             style: context.textTheme.headlineLarge?.copyWith(
               color: home.purplePale,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const Spacer(),
@@ -48,21 +62,22 @@ class JournalMetricCard extends StatelessWidget {
             child: Wrap(
               spacing: 4,
               runSpacing: 4,
-              children: List.generate(28, (index) {
-                final color = switch (index % 7) {
-                  0 || 1 || 2 || 5 => home.purpleLight,
-                  3 || 6 => home.purplePale,
-                  _ => home.onMedia,
-                };
-                return Container(
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(6),
+              children: [
+                for (var i = _cells - 1; i >= 0; i--)
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color:
+                          loggedDays.contains(
+                            DateTime(today.year, today.month, today.day - i),
+                          )
+                          ? home.onMedia
+                          : home.purpleLight,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
-                );
-              }),
+              ],
             ),
           ),
         ],
