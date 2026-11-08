@@ -9,7 +9,6 @@ import 'package:dailypulse/core/utils/snackbar_utils.dart';
 import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
 import 'package:dailypulse/features/auth/viewmodels/auth_signal.dart';
-import './widgets/auth_back_button.dart';
 import './widgets/auth_google_button.dart';
 import './widgets/auth_header.dart';
 import './widgets/auth_primary_button.dart';
@@ -68,41 +67,21 @@ class _SignInScreenState extends State<SignInScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 32,
+                  minHeight: constraints.maxHeight - 48,
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Top Navigation
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: AuthBackButton(
-                        onPressed: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go(AppRoutes.welcome);
-                          }
-                        },
-                      ),
+                    const AuthHeader(
+                      title: AuthStrings.signInTitle,
+                      subtitle: AuthStrings.signInSubtitle,
                     ),
+                    const SizedBox(height: 28),
 
-                    // Centered Core: Hero Header + Form + Switch Link
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const AuthHeader(
-                            title: AuthStrings.signInTitle,
-                            subtitle: AuthStrings.signInSubtitle,
-                          ),
-                          const SizedBox(height: 28),
-
-                          Form(
+                    Form(
                             key: _formKey,
                             child: Column(
                               children: [
@@ -254,11 +233,6 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
                   ],
                 ),
               ),
