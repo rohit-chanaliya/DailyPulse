@@ -41,7 +41,7 @@
   <body>
     <main>
       <h1>DailyPulse Privacy Policy</h1>
-      <p class="updated">Last updated: 2 November 2026</p>
+      <p class="updated">Last updated: 8 November 2026</p>
 
       <p>
         DailyPulse is a mood tracking app. This policy explains what data the
@@ -50,18 +50,55 @@
       </p>
 
       <h2>Data we collect</h2>
+      <p><strong>Account</strong></p>
       <ul>
-        <li>Email address and name you provide when you create an account.</li>
-        <li>Mood entries: a mood level, an optional title and an optional note.</li>
-        <li>App preferences such as your theme choice and onboarding state,
-            stored on your device.</li>
+        <li>Email address, first name and last name you provide when you create
+            an account.</li>
+        <li>If you sign in with Google, the name, email address and profile
+            photo link of your Google account.</li>
+        <li>Passwords are handled by Firebase Authentication. We never see or
+            store your password.</li>
       </ul>
+      <p><strong>Profile (all optional)</strong></p>
+      <ul>
+        <li>Gender, date of birth and location (free text you type), and the
+            avatar you pick.</li>
+        <li>A profile photo you upload stays on your device only. It is never
+            sent to our servers.</li>
+      </ul>
+      <p><strong>Your entries</strong></p>
+      <ul>
+        <li>Mood entries: a mood level, an optional title, an optional note,
+            optional tags and the date and time.</li>
+      </ul>
+      <p><strong>Feedback</strong></p>
+      <ul>
+        <li>If you send feedback, the areas you select (for example
+            "Performance" or "Bug"), the time, and your account ID. There is no
+            free-text field.</li>
+      </ul>
+      <p><strong>On your device only</strong></p>
+      <ul>
+        <li>Onboarding state, daily reminder settings (time, sound, vibration),
+            an uploaded profile photo and feedback waiting to be sent.</li>
+      </ul>
+
+      <h2>Reminders</h2>
+      <p>
+        The optional daily reminder is scheduled on your device. It does not use
+        push messages from our servers, and no data is sent to schedule it.
+        Android may ask for notification permission.
+      </p>
 
       <h2>Where data is stored</h2>
       <p>
         Your mood entries are stored locally on your device first and are synced
-        to your private account in Google Cloud Firestore. Data in transit is
-        encrypted. Account authentication is handled by Firebase Authentication.
+        to your private account in Google Cloud Firestore. Your profile details
+        are stored in your private account in Cloud Firestore. Only your account
+        can read your entries and profile. Feedback can be written but not read
+        back by the app. Data in transit is encrypted. Sign-in is handled by
+        Firebase Authentication and Google Sign-In, which process data on our
+        behalf.
       </p>
 
       <h2>What we do not do</h2>
@@ -70,6 +107,13 @@
         <li>We do not use analytics, advertising or tracking SDKs.</li>
         <li>Mood notes are never shown to anyone else.</li>
       </ul>
+
+      <h2>How long we keep data</h2>
+      <p>
+        We keep your account data until you delete your account. Feedback
+        contains no personal text and is kept after account deletion, but it is
+        no longer linked to any account.
+      </p>
 
       <h2>Children</h2>
       <p>
@@ -86,9 +130,18 @@
 
       <h2>Deleting your data</h2>
       <p>
-        You can delete your account and all associated data from inside the app
-        (Settings → Delete Account), or request deletion from our
-        <a href="/delete-account">account deletion page</a>.
+        You can delete your account from inside the app (Settings → Delete
+        Account), or request deletion from our
+        <a href="/delete-account">account deletion page</a>. This removes your
+        sign-in account, mood entries, profile details and the local copy of
+        your entries. Uninstalling the app removes anything else stored on your
+        device, such as an uploaded profile photo.
+      </p>
+
+      <h2>Changes to this policy</h2>
+      <p>
+        If we change what we collect, we will update this page and the date at
+        the top.
       </p>
 
       <h2>Contact</h2>
