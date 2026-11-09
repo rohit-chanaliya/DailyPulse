@@ -10,12 +10,13 @@ abstract final class InsightsStrings {
   static const thisWeek = 'This Week';
   static const breakdown = 'Mood Breakdown';
   static const emptyMessage = 'Log some moods to see your stats';
-  static const noData = 'No data in this range';
   static const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   static const tagCorrelationTitle = 'Activities & Habits';
-  static const tagCorrelationSubtitle = 'How your tags correlate with how you feel';
-  static const noTagsPrompt = 'Tag your mood entries to unlock activity insights';
+  static const tagCorrelationSubtitle =
+      'How your tags correlate with how you feel';
+  static const noTagsPrompt =
+      'Tag your mood entries to unlock activity insights';
   static const weeklyPatternsTitle = 'Daily Patterns';
   static const bestDay = 'Best Day';
   static const toughestDay = 'Toughest Day';

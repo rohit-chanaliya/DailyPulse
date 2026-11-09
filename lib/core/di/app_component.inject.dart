@@ -17,25 +17,25 @@ import 'package:inject_annotation/inject_annotation.dart' as _i21;
 
 import '../../features/auth/repository/auth_error_mapper.dart' as _i22;
 import '../../features/auth/repository/auth_repository.dart' as _i5;
-import '../../features/auth/viewmodels/auth_signal.dart' as _i11;
-import '../../features/insights/viewmodels/insights_signal.dart' as _i15;
+import '../../features/auth/viewmodels/auth_signal.dart' as _i12;
+import '../../features/insights/viewmodels/insights_signal.dart' as _i16;
 import '../../features/mood/datasource/firestore_service.dart' as _i7;
 import '../../features/mood/datasource/hive_service.dart' as _i6;
 import '../../features/mood/models/mood_entry.dart' as _i24;
 import '../../features/mood/repository/mood_repository.dart' as _i10;
 import '../../features/mood/services/sync_service.dart' as _i9;
-import '../../features/mood/viewmodels/mood_signal.dart' as _i14;
+import '../../features/mood/viewmodels/mood_signal.dart' as _i15;
 import '../../features/onboarding/repository/onboarding_repository.dart'
     as _i18;
 import '../../features/onboarding/viewmodels/onboarding_signal.dart' as _i19;
 import '../../features/onboarding/viewmodels/splash_signal.dart' as _i20;
 import '../../features/settings/repository/feedback_repository.dart' as _i8;
-import '../../features/settings/viewmodels/feedback_signal.dart' as _i13;
+import '../../features/settings/viewmodels/feedback_signal.dart' as _i14;
 import '../../features/settings/viewmodels/notification_settings_signal.dart'
     as _i17;
 import '../services/app_preferences.dart' as _i4;
-import '../services/deep_link_service.dart' as _i12;
-import '../services/notification_service.dart' as _i16;
+import '../services/deep_link_service.dart' as _i13;
+import '../services/notification_service.dart' as _i11;
 import 'app_component.dart' as _i1;
 import 'firebase_module.dart' as _i2;
 import 'infrastructure_module.dart' as _i3;
@@ -89,11 +89,15 @@ class AppComponent$Component implements _i1.AppComponent {
       _syncService$Provider,
       _firestoreService$Provider,
     );
+    _notificationService$Provider = _NotificationService$Provider(
+      _appPreferences$Provider,
+    );
     _authSignal$Provider = _AuthSignal$Provider(
       _authRepository$Provider,
       _syncService$Provider,
       _moodRepository$Provider,
       _appPreferences$Provider,
+      _notificationService$Provider,
     );
     _deepLinkService$Provider = _DeepLinkService$Provider(_authSignal$Provider);
     _feedbackSignal$Provider = _FeedbackSignal$Provider(
@@ -105,9 +109,6 @@ class AppComponent$Component implements _i1.AppComponent {
       _authSignal$Provider,
     );
     _insightsSignal$Provider = _InsightsSignal$Provider(_moodSignal$Provider);
-    _notificationService$Provider = _NotificationService$Provider(
-      _appPreferences$Provider,
-    );
     _notificationSettingsSignal$Provider = _NotificationSettingsSignal$Provider(
       _appPreferences$Provider,
       _notificationService$Provider,
@@ -138,6 +139,8 @@ class AppComponent$Component implements _i1.AppComponent {
 
   late final _MoodRepository$Provider _moodRepository$Provider;
 
+  late final _NotificationService$Provider _notificationService$Provider;
+
   late final _AuthSignal$Provider _authSignal$Provider;
 
   late final _DeepLinkService$Provider _deepLinkService$Provider;
@@ -147,8 +150,6 @@ class AppComponent$Component implements _i1.AppComponent {
   late final _MoodSignal$Provider _moodSignal$Provider;
 
   late final _InsightsSignal$Provider _insightsSignal$Provider;
-
-  late final _NotificationService$Provider _notificationService$Provider;
 
   late final _NotificationSettingsSignal$Provider
   _notificationSettingsSignal$Provider;
@@ -182,23 +183,23 @@ class AppComponent$Component implements _i1.AppComponent {
   _i10.MoodRepository get moodRepository => _moodRepository$Provider.get();
 
   @override
-  _i11.AuthSignal get authSignal => _authSignal$Provider.get();
-
-  @override
-  _i12.DeepLinkService get deepLinkService => _deepLinkService$Provider.get();
-
-  @override
-  _i13.FeedbackSignal get feedbackSignal => _feedbackSignal$Provider.get();
-
-  @override
-  _i14.MoodSignal get moodSignal => _moodSignal$Provider.get();
-
-  @override
-  _i15.InsightsSignal get insightsSignal => _insightsSignal$Provider.get();
-
-  @override
-  _i16.NotificationService get notificationService =>
+  _i11.NotificationService get notificationService =>
       _notificationService$Provider.get();
+
+  @override
+  _i12.AuthSignal get authSignal => _authSignal$Provider.get();
+
+  @override
+  _i13.DeepLinkService get deepLinkService => _deepLinkService$Provider.get();
+
+  @override
+  _i14.FeedbackSignal get feedbackSignal => _feedbackSignal$Provider.get();
+
+  @override
+  _i15.MoodSignal get moodSignal => _moodSignal$Provider.get();
+
+  @override
+  _i16.InsightsSignal get insightsSignal => _insightsSignal$Provider.get();
 
   @override
   _i17.NotificationSettingsSignal get notificationSettingsSignal =>
@@ -266,12 +267,13 @@ class _AuthRepository$Provider implements _i21.Provider<_i5.AuthRepository> {
   _i5.AuthRepository get() => _singleton;
 }
 
-class _AuthSignal$Provider implements _i21.Provider<_i11.AuthSignal> {
+class _AuthSignal$Provider implements _i21.Provider<_i12.AuthSignal> {
   _AuthSignal$Provider(
     this._authRepository$Provider,
     this._syncService$Provider,
     this._moodRepository$Provider,
     this._appPreferences$Provider,
+    this._notificationService$Provider,
   );
 
   final _AuthRepository$Provider _authRepository$Provider;
@@ -282,17 +284,20 @@ class _AuthSignal$Provider implements _i21.Provider<_i11.AuthSignal> {
 
   final _AppPreferences$Provider _appPreferences$Provider;
 
-  late final _i11.AuthSignal _singleton = _create();
+  final _NotificationService$Provider _notificationService$Provider;
 
-  _i11.AuthSignal _create() => _i11.AuthSignal(
+  late final _i12.AuthSignal _singleton = _create();
+
+  _i12.AuthSignal _create() => _i12.AuthSignal(
     _authRepository$Provider.get(),
     _syncService$Provider.get(),
     _moodRepository$Provider.get(),
     _appPreferences$Provider.get(),
+    _notificationService$Provider.get(),
   );
 
   @override
-  _i11.AuthSignal get() => _singleton;
+  _i12.AuthSignal get() => _singleton;
 }
 
 class _BoxOfDynamic$Provider implements _i21.Provider<_i23.Box<dynamic>> {
@@ -335,18 +340,18 @@ class _Connectivity$Provider implements _i21.Provider<_i25.Connectivity> {
   _i25.Connectivity get() => _singleton;
 }
 
-class _DeepLinkService$Provider implements _i21.Provider<_i12.DeepLinkService> {
+class _DeepLinkService$Provider implements _i21.Provider<_i13.DeepLinkService> {
   _DeepLinkService$Provider(this._authSignal$Provider);
 
   final _AuthSignal$Provider _authSignal$Provider;
 
-  late final _i12.DeepLinkService _singleton = _create();
+  late final _i13.DeepLinkService _singleton = _create();
 
-  _i12.DeepLinkService _create() =>
-      _i12.DeepLinkService(_authSignal$Provider.get());
+  _i13.DeepLinkService _create() =>
+      _i13.DeepLinkService(_authSignal$Provider.get());
 
   @override
-  _i12.DeepLinkService get() => _singleton;
+  _i13.DeepLinkService get() => _singleton;
 }
 
 class _FeedbackRepository$Provider
@@ -371,7 +376,7 @@ class _FeedbackRepository$Provider
   _i8.FeedbackRepository get() => _singleton;
 }
 
-class _FeedbackSignal$Provider implements _i21.Provider<_i13.FeedbackSignal> {
+class _FeedbackSignal$Provider implements _i21.Provider<_i14.FeedbackSignal> {
   _FeedbackSignal$Provider(
     this._feedbackRepository$Provider,
     this._authSignal$Provider,
@@ -381,15 +386,15 @@ class _FeedbackSignal$Provider implements _i21.Provider<_i13.FeedbackSignal> {
 
   final _AuthSignal$Provider _authSignal$Provider;
 
-  late final _i13.FeedbackSignal _singleton = _create();
+  late final _i14.FeedbackSignal _singleton = _create();
 
-  _i13.FeedbackSignal _create() => _i13.FeedbackSignal(
+  _i14.FeedbackSignal _create() => _i14.FeedbackSignal(
     _feedbackRepository$Provider.get(),
     _authSignal$Provider.get(),
   );
 
   @override
-  _i13.FeedbackSignal get() => _singleton;
+  _i14.FeedbackSignal get() => _singleton;
 }
 
 class _FirebaseAuth$Provider implements _i21.Provider<_i26.FirebaseAuth> {
@@ -447,18 +452,18 @@ class _HiveService$Provider implements _i21.Provider<_i6.HiveService> {
   _i6.HiveService get() => _singleton;
 }
 
-class _InsightsSignal$Provider implements _i21.Provider<_i15.InsightsSignal> {
+class _InsightsSignal$Provider implements _i21.Provider<_i16.InsightsSignal> {
   _InsightsSignal$Provider(this._moodSignal$Provider);
 
   final _MoodSignal$Provider _moodSignal$Provider;
 
-  late final _i15.InsightsSignal _singleton = _create();
+  late final _i16.InsightsSignal _singleton = _create();
 
-  _i15.InsightsSignal _create() =>
-      _i15.InsightsSignal(_moodSignal$Provider.get());
+  _i16.InsightsSignal _create() =>
+      _i16.InsightsSignal(_moodSignal$Provider.get());
 
   @override
-  _i15.InsightsSignal get() => _singleton;
+  _i16.InsightsSignal get() => _singleton;
 }
 
 class _MoodRepository$Provider implements _i21.Provider<_i10.MoodRepository> {
@@ -486,7 +491,7 @@ class _MoodRepository$Provider implements _i21.Provider<_i10.MoodRepository> {
   _i10.MoodRepository get() => _singleton;
 }
 
-class _MoodSignal$Provider implements _i21.Provider<_i14.MoodSignal> {
+class _MoodSignal$Provider implements _i21.Provider<_i15.MoodSignal> {
   _MoodSignal$Provider(
     this._moodRepository$Provider,
     this._authSignal$Provider,
@@ -496,30 +501,30 @@ class _MoodSignal$Provider implements _i21.Provider<_i14.MoodSignal> {
 
   final _AuthSignal$Provider _authSignal$Provider;
 
-  late final _i14.MoodSignal _singleton = _create();
+  late final _i15.MoodSignal _singleton = _create();
 
-  _i14.MoodSignal _create() => _i14.MoodSignal(
+  _i15.MoodSignal _create() => _i15.MoodSignal(
     _moodRepository$Provider.get(),
     _authSignal$Provider.get(),
   );
 
   @override
-  _i14.MoodSignal get() => _singleton;
+  _i15.MoodSignal get() => _singleton;
 }
 
 class _NotificationService$Provider
-    implements _i21.Provider<_i16.NotificationService> {
+    implements _i21.Provider<_i11.NotificationService> {
   _NotificationService$Provider(this._appPreferences$Provider);
 
   final _AppPreferences$Provider _appPreferences$Provider;
 
-  late final _i16.NotificationService _singleton = _create();
+  late final _i11.NotificationService _singleton = _create();
 
-  _i16.NotificationService _create() =>
-      _i16.NotificationService(_appPreferences$Provider.get());
+  _i11.NotificationService _create() =>
+      _i11.NotificationService(_appPreferences$Provider.get());
 
   @override
-  _i16.NotificationService get() => _singleton;
+  _i11.NotificationService get() => _singleton;
 }
 
 class _NotificationSettingsSignal$Provider
