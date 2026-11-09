@@ -16,7 +16,6 @@ abstract final class HistoryStrings {
   static const calendar = 'Calendar';
   static const allDays = 'All Days';
   static const pickDateTooltip = 'Jump to a date';
-  static const logMoodForDate = 'Log mood for this day';
   static const backfillTitle = 'No mood logged on this date';
   static const backfillButton = 'Back-fill Mood';
 }

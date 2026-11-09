@@ -1,7 +1,7 @@
 name: dailypulse
 description: "Daily Pulse - Track your daily moods and emotions"
 publish_to: "none"
-version: 1.0.1+2
+version: 1.0.2+10
 
 environment:
   sdk: ^3.11.3
@@ -56,14 +56,14 @@ flutter:
     - assets/home/
 
 flutter_native_splash:
-  color: "#FAF8F5"
+  color: "#161210"
   color_dark: "#161210"
   image: assets/splash_android12.png
   image_dark: assets/splash_android12.png
   android_gravity: center
   ios_content_mode: scaleAspectFit
   android_12:
-    color: "#FAF8F5"
+    color: "#161210"
     color_dark: "#161210"
     image: assets/splash_android12.png
     image_dark: assets/splash_android12.png

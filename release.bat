@@ -1,18 +1,17 @@
 @echo off
-echo Building release APK...
-flutter build apk --release
+REM Publishes a Play Store bundle (AAB). Run release_apk.bat for a test APK.
+set VERSION=1.0.2
 
-echo Renaming APK...
-set VERSION=v1.0.1
-copy build\app\outputs\flutter-apk\app-release.apk build\app\outputs\flutter-apk\DailyPulse-%VERSION%.apk
+where flutter >nul 2>nul || (echo flutter not found in PATH & exit /b 1)
+if not exist android\key.properties (echo Missing android\key.properties & exit /b 1)
 
-echo Creating GitHub release...
-set APK_PATH=build\app\outputs\flutter-apk\DailyPulse-%VERSION%.apk
-if not exist "%APK_PATH%" (
-    echo Error: APK file not found at %APK_PATH%
-    exit /b 1
-)
-gh release create v1.0.1 "build\app\outputs\flutter-apk\DailyPulse-v1.0.1.apk" --title "DailyPulse v1.0.1" --notes "Release notes here"
+echo Building release AAB...
+flutter build appbundle --release || exit /b 1
 
-echo Done!
+set AAB=build\app\outputs\bundle\release\app-release.aab
+if not exist "%AAB%" (echo AAB not found at %AAB% & exit /b 1)
 
+echo Done: %AAB%
+echo Upload this file to the Play Console (internal or closed testing first).
+echo If you also want a GitHub release, run the following after a successful upload:
+echo   gh release create v%VERSION% "%AAB%" --title "DailyPulse v%VERSION%" --notes "Release notes here"

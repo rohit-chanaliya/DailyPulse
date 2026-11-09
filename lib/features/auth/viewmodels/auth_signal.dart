@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inject_annotation/inject_annotation.dart';
@@ -6,6 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import 'package:dailypulse/core/constant/strings/auth_strings.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
+import 'package:dailypulse/core/services/notification_service.dart';
 import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:dailypulse/core/utils/result.dart';
 import 'package:dailypulse/features/auth/models/user_profile.dart';
@@ -25,6 +27,7 @@ class AuthSignal {
     this._syncService,
     this._moodRepository,
     this._preferences,
+    this._notificationService,
   ) {
     _authSubscription = _repository.userChanges.listen(
       _onAuthStateChanged,
@@ -39,6 +42,7 @@ class AuthSignal {
   final SyncService _syncService;
   final MoodRepository _moodRepository;
   final AppPreferences _preferences;
+  final NotificationService _notificationService;
   late final StreamSubscription<User?> _authSubscription;
 
   final status = signal<AuthStatus>(AuthStatus.initial);
@@ -146,6 +150,8 @@ class AuthSignal {
 
   Future<void> signOut() async {
     appLogger.i('User signed out');
+    // Reminders are account scoped: a signed-out device must stay quiet.
+    await _notificationService.cancelDailyReminder();
     await _repository.signOut();
   }
 
@@ -267,10 +273,13 @@ class AuthSignal {
     }
 
     final result = await _repository.deleteAccount(password: password);
-    return switch (result) {
-      Ok() => true,
-      Err(:final message) => _fail(message),
-    };
+    switch (result) {
+      case Ok():
+        await _clearLocalTraces(current.uid);
+        return true;
+      case Err(:final message):
+        return _fail(message);
+    }
   }
 
   bool _fail(String? message, {AuthStatus state = AuthStatus.unauthenticated}) {
@@ -348,6 +357,32 @@ class AuthSignal {
     if (current == null) return;
     profileImagePath.value = path;
     await _preferences.setProfileImagePath(current.uid, path);
+  }
+
+
+  /// Removes data the account deletion cannot reach on the server: the queued
+  /// feedback, an uploaded avatar file and its saved path.
+  Future<bool> _clearLocalTraces(String userId) async {
+    try {
+      final avatarPath = _preferences.getProfileImagePath(userId);
+      if (avatarPath != null && avatarPath.isNotEmpty) {
+        final file = File(avatarPath);
+        if (file.existsSync()) await file.delete();
+      }
+      await _preferences.setProfileImagePath(userId, null);
+      await _preferences.setPendingFeedback([
+        for (final item in _preferences.pendingFeedback)
+          if (item['userId'] != userId) item,
+      ]);
+      return true;
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Failed to clear local traces after account deletion',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
   }
 
   void dispose() {
