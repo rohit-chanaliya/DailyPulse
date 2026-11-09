@@ -40,7 +40,6 @@ abstract final class ProfileStrings {
   static const uploadAvatarTooltip = 'Upload a photo';
   static const locationLabel = 'Location';
   static const locationHint = 'City, Country';
-  static const locationTooLong = 'Keep it under 60 characters';
 
   // Profile hero
   static const statAge = 'Age';

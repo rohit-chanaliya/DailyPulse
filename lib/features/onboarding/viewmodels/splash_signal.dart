@@ -55,14 +55,14 @@ class SplashSignal {
   }
 
   void _startPhase1(void Function() onComplete) {
-    _phaseTimer = Timer(const Duration(milliseconds: 2200), () {
+    _phaseTimer = Timer(const Duration(milliseconds: 1200), () {
       currentPhase.value = SplashPhase.progressLoading;
       _startPhase2(onComplete);
     });
   }
 
   void _startPhase2(void Function() onComplete) {
-    const duration = Duration(milliseconds: 1800);
+    const duration = Duration(milliseconds: 1000);
     const interval = Duration(milliseconds: 30);
     final totalSteps = duration.inMilliseconds ~/ interval.inMilliseconds;
     var step = 0;
@@ -73,7 +73,7 @@ class SplashSignal {
       if (nextProgress >= 100) {
         progressValue.value = 100;
         timer.cancel();
-        _phaseTimer = Timer(const Duration(milliseconds: 300), () {
+        _phaseTimer = Timer(const Duration(milliseconds: 200), () {
           currentPhase.value = SplashPhase.fetchingData;
           _startPhase3(onComplete);
         });
@@ -84,7 +84,7 @@ class SplashSignal {
   }
 
   void _startPhase3(void Function() onComplete) {
-    _phaseTimer = Timer(const Duration(milliseconds: 3200), onComplete);
+    _phaseTimer = Timer(const Duration(milliseconds: 600), onComplete);
   }
 
   void skipSplash(void Function() onComplete) {

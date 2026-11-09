@@ -22,11 +22,11 @@
 ### Must do before upload
 - [ ] Review and merge `chore/release-review` PR
 - [ ] Test the release build on a physical device (list below)
-- [ ] Add **App signing key** fingerprints in Firebase Console → Project settings → Your apps → Android → Add fingerprint:
+- [x] Add **App signing key** fingerprints in Firebase Console → Project settings → Your apps → Android → Add fingerprint:
   - SHA-1: `06:A5:A6:85:53:B8:1B:8C:31:5F:4A:2C:C5:BC:5A:24:91:E6:6D:00`
   - SHA-256: `B4:95:9E:61:9B:4D:AC:7A:A4:6B:D2:94:28:68:FA:59:3D:E1:38:95:C6:C4:E0:FE:90:AA:E7:E8:7A:04:EE:63`
-- [ ] Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
-- [ ] Deploy hosting (after the PR merges): `firebase deploy --only hosting`
+- [x] Deploy Firestore indexes: `firebase deploy --only firestore:indexes`
+- [x] Deploy hosting (after the PR merges): `firebase deploy --only hosting`
 - [ ] Check the biggest version code used in Play Console → Test and release → App bundle explorer. Currently set to **10** in `pubspec.yaml` (`1.0.2+10`).
 
 ### Play Console → App content (all required)
@@ -89,9 +89,15 @@
 - [x] Version `1.0.2+10`, Settings version string updated
 - [x] Removed 41 unused asset constants and files (assets 4.5 MB → 3.6 MB)
 - [x] Removed 5 unused widgets and 30 unused strings
-- [x] Regression checks: `flutter analyze` 0 issues, `flutter test` 21 passed, release AAB builds and is signed
+- [x] Bundled the Urbanist font files under `assets/google_fonts/` and disabled runtime fetching
+- [x] Added `HiveBootstrap` with corrupt-box quarantine, safe `AppPreferences` readers and `StartupErrorApp` fallback
+- [x] Dark `NormalTheme` window background (`#161210`) across all Android style configs (no white flash)
+- [x] Added upload-key SHA-256 to `assetlinks.json`, monochrome `ic_notification` vector, awaited `GoogleSignIn.initialize()`, deleted replaced avatar files, capped and batched `pending_feedback`, shortened splash to ~3 s
+- [x] Regression checks: `flutter analyze` 0 issues, `flutter test` 26 passed, release AAB builds and is signed
 
 ### Known, intentionally not changed
+- [ ] Dark-only theme for the `1.0.x` line; light mode is deferred to a later release.
+- [ ] `pending_feedback` TTL pruning is deferred to `1.0.3` (queue is capped at 50 entries and wiped on account deletion).
 - [ ] `history_calendar_strip.dart` is 321 lines (guideline is 300). Pre-existing; split it when that file is next touched.
 - [ ] Password minimum stays at 6 characters unless requested.
 - [ ] No crash-reporting opt-out toggle, so Data safety lists crash data as "required".

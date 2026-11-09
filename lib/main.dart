@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_router.dart';
-import 'package:dailypulse/core/services/app_preferences.dart';
 import 'package:dailypulse/core/services/crash_reporting.dart';
+import 'package:dailypulse/core/services/hive_bootstrap.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
-import 'package:dailypulse/features/mood/datasource/hive_service.dart';
+import 'package:dailypulse/core/utils/app_logger.dart';
+import 'package:dailypulse/core/widgets/startup_error_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import 'firebase_options.dart';
@@ -19,13 +21,20 @@ final _navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  GoogleFonts.config.allowRuntimeFetching = false;
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await CrashReporting.init();
-  await HiveService.init();
-  await AppPreferences.init();
-
-  initDependencies();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await CrashReporting.init();
+    await HiveBootstrap.init();
+    initDependencies();
+  } catch (e, stackTrace) {
+    appLogger.e('Application startup failed', error: e, stackTrace: stackTrace);
+    runApp(const StartupErrorApp());
+    return;
+  }
 
   // Start the auth listener before the first frame so the user is known early.
   final _ = appComponent.authSignal;

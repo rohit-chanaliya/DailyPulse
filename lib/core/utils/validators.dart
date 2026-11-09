@@ -44,15 +44,39 @@ class Validators {
   }
 
   static String? validateFirstName(String? value) {
-    if (value == null || value.trim().isEmpty) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) {
       return 'Please enter your first name';
+    }
+    if (trimmed.length > 50) {
+      return 'Keep it under 50 characters';
     }
     return null;
   }
 
   static String? validateLastName(String? value) {
-    if (value == null || value.trim().isEmpty) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) {
       return 'Please enter your last name';
+    }
+    if (trimmed.length > 50) {
+      return 'Keep it under 50 characters';
+    }
+    return null;
+  }
+
+  static String? validateOptionalLastName(String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.length > 50) {
+      return 'Keep it under 50 characters';
+    }
+    return null;
+  }
+
+  static String? validateLocation(String? value) {
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.length > 60) {
+      return 'Keep it under 60 characters';
     }
     return null;
   }

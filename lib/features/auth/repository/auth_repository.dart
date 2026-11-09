@@ -22,13 +22,23 @@ class AuthRepository {
   @inject
   AuthRepository(this._auth, this._errorMapper, this._firestore) {
     if (!kIsWeb) {
-      unawaited(GoogleSignIn.instance.initialize());
+      _googleSignInReady = GoogleSignIn.instance.initialize().catchError((
+        Object error,
+        StackTrace stackTrace,
+      ) {
+        appLogger.e(
+          'Google Sign-In initialisation failed',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      });
     }
   }
 
   final FirebaseAuth _auth;
   final AuthErrorMapper _errorMapper;
   final FirebaseFirestore _firestore;
+  Future<void>? _googleSignInReady;
 
   static const Duration _actionTimeout = Duration(seconds: 15);
 
@@ -401,6 +411,8 @@ class AuthRepository {
   }
 
   Future<AuthCredential> _googleCredential() async {
+    final ready = _googleSignInReady;
+    if (ready != null) await ready;
     final googleUser = await GoogleSignIn.instance.authenticate();
     final googleAuth = googleUser.authentication;
     return GoogleAuthProvider.credential(idToken: googleAuth.idToken);
@@ -448,15 +460,25 @@ class AuthRepository {
     String avatarId = '',
   }) async {
     try {
-      final fullName = '$firstName $lastName'.trim();
+      final trimmedFirst = firstName.trim();
+      final trimmedLast = lastName.trim();
+      final trimmedGender = gender.trim();
+      final trimmedLocation = location.trim();
+      final fullName = '$trimmedFirst $trimmedLast'.trim();
+      final email = _auth.currentUser?.email?.trim() ?? '';
+
       final data = <String, dynamic>{
         'userId': userId,
-        'email': _auth.currentUser?.email ?? '',
-        'firstName': firstName.trim(),
-        'lastName': lastName.trim(),
-        'name': fullName,
-        'gender': gender.trim(),
-        'location': location.trim(),
+        if (email.isNotEmpty) 'email': email,
+        'firstName': trimmedFirst,
+        'lastName': trimmedLast.isNotEmpty
+            ? trimmedLast
+            : FieldValue.delete(),
+        if (fullName.isNotEmpty) 'name': fullName,
+        'gender': trimmedGender.isNotEmpty
+            ? trimmedGender
+            : FieldValue.delete(),
+        'location': trimmedLocation,
         'avatarId': avatarId,
         'dateOfBirth': dateOfBirth != null
             ? Timestamp.fromDate(dateOfBirth)
@@ -478,12 +500,12 @@ class AuthRepository {
       appLogger.i('User profile updated successfully in Firestore');
       return Ok(UserProfile(
         userId: userId,
-        email: _auth.currentUser?.email ?? '',
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        gender: gender.trim(),
+        email: email,
+        firstName: trimmedFirst,
+        lastName: trimmedLast,
+        gender: trimmedGender,
         dateOfBirth: dateOfBirth,
-        location: location.trim(),
+        location: trimmedLocation,
         avatarId: avatarId,
         updatedAt: DateTime.now(),
       ));

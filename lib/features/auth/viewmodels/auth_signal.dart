@@ -352,13 +352,34 @@ class AuthSignal {
   }
 
   /// Sets or updates the local profile avatar image path for the user.
+  ///
+  /// The previous image file is removed so switching photos or presets does
+  /// not leave orphaned files behind.
   Future<void> updateProfileImage(String? path) async {
     final current = user.value;
     if (current == null) return;
+
+    final previousPath = _preferences.getProfileImagePath(current.uid);
     profileImagePath.value = path;
     await _preferences.setProfileImagePath(current.uid, path);
+
+    if (previousPath != null && previousPath != path) {
+      await _deleteAvatarFile(previousPath);
+    }
   }
 
+  Future<void> _deleteAvatarFile(String path) async {
+    try {
+      final file = File(path);
+      if (file.existsSync()) await file.delete();
+    } catch (e, stackTrace) {
+      appLogger.w(
+        'Could not delete the previous avatar file',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
 
   /// Removes data the account deletion cannot reach on the server: the queued
   /// feedback, an uploaded avatar file and its saved path.

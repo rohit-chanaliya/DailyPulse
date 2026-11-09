@@ -75,7 +75,6 @@ class MoodSignal {
     isLoading.value = true;
     try {
       entries.value = await _repository.fetchAndSyncFromFirebase(userId);
-      appLogger.d('Fetched ${entries.value.length} mood entries');
     } catch (e, stackTrace) {
       appLogger.e(
         'Error fetching mood entries',

@@ -30,8 +30,7 @@ class NotificationService {
       tz.initializeTimeZones();
       await _setLocalTimezone();
 
-      const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('ic_notification');
       const initSettings = InitializationSettings(android: androidSettings);
 
       await _plugin.initialize(settings: initSettings);

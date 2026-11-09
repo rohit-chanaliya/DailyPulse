@@ -14,6 +14,7 @@ import 'package:dailypulse/core/utils/app_logger.dart';
 import 'package:dailypulse/core/utils/dialog_utils.dart';
 import 'package:dailypulse/core/utils/result.dart';
 import 'package:dailypulse/core/utils/snackbar_utils.dart';
+import 'package:dailypulse/core/utils/validators.dart';
 import 'package:dailypulse/core/widgets/accent_pill_button.dart';
 import 'package:dailypulse/core/widgets/app_top_nav.dart';
 import 'package:dailypulse/core/widgets/custom_text_field.dart';
@@ -30,8 +31,6 @@ class PersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
-  static const _maxLocationLength = 60;
-
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
@@ -219,15 +218,14 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   label: ProfileStrings.firstNameLabel,
                   hintText: ProfileStrings.firstNameHint,
                   keyboardType: TextInputType.name,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? ProfileStrings.firstNameRequired
-                      : null,
+                  validator: Validators.validateFirstName,
                 ),
                 CustomTextField(
                   controller: _lastNameController,
                   label: ProfileStrings.lastNameLabel,
                   hintText: ProfileStrings.lastNameHint,
                   keyboardType: TextInputType.name,
+                  validator: Validators.validateOptionalLastName,
                 ),
                 CustomTextField(
                   controller: _emailController,
@@ -272,9 +270,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   controller: _locationController,
                   label: ProfileStrings.locationLabel,
                   hintText: ProfileStrings.locationHint,
-                  validator: (v) => (v ?? '').trim().length > _maxLocationLength
-                      ? ProfileStrings.locationTooLong
-                      : null,
+                  validator: Validators.validateLocation,
                 ),
                 ProfileGenderPills(
                   selectedGender: _gender,

@@ -55,7 +55,7 @@ class SyncService {
       },
     );
 
-    appLogger.i('Background sync listener active');
+    appLogger.d('Background sync listener active');
   }
 
   void _startTimerIfNeeded() {
@@ -135,7 +135,6 @@ class SyncService {
         if (docId != null) {
           final updatedEntry = entry.copyWith(id: docId);
           await _hiveService.put(updatedEntry);
-          appLogger.d('Synced entry with localId ${entry.localId}');
         }
       }
 

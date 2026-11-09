@@ -72,7 +72,7 @@ class FirestoreService {
           .orderBy('timestamp', descending: true)
           .get();
 
-      appLogger.i('Fetched ${querySnapshot.docs.length} entries from Firebase');
+      appLogger.d('Fetched ${querySnapshot.docs.length} entries from Firebase');
       return querySnapshot.docs
           .map((doc) => MoodEntry.fromFirestore(doc.data(), doc.id))
           .toList();
@@ -85,7 +85,7 @@ class FirestoreService {
             .where('userId', isEqualTo: userId)
             .get();
 
-        appLogger.i(
+        appLogger.d(
           'Fetched ${querySnapshot.docs.length} entries (without orderBy)',
         );
         final entries = querySnapshot.docs

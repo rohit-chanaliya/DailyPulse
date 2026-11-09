@@ -1,6 +1,7 @@
-import 'package:dailypulse/core/constant/constants.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:inject_annotation/inject_annotation.dart';
+
+import 'package:dailypulse/core/constant/constants.dart';
 
 import '../models/mood_entry.dart';
 
@@ -15,19 +16,8 @@ class HiveService {
   HiveService(this._moodBox);
 
   static const String boxName = AppConstants.hiveBoxName;
-  static const String _directory = 'dailypulse';
 
   final Box<MoodEntry> _moodBox;
-
-  static Future<void> init() async {
-    await Hive.initFlutter(_directory);
-
-    if (!Hive.isAdapterRegistered(MoodEntryAdapter().typeId)) {
-      Hive.registerAdapter(MoodEntryAdapter());
-    }
-
-    await Hive.openBox<MoodEntry>(boxName);
-  }
 
   /// Emits [userId]'s entries whenever the box changes.
   Stream<List<MoodEntry>> watchForUser(String? userId) {

@@ -76,10 +76,7 @@ class MoodRepository {
   // replaced when the fetch fails — Firestore throws instead of returning [].
   Future<List<MoodEntry>> fetchAndSyncFromFirebase(String userId) async {
     try {
-      appLogger.i('Starting Firebase fetch');
       final firebaseEntries = await _firestoreService.fetchMoodEntries(userId);
-
-      appLogger.i('Fetched ${firebaseEntries.length} entries from Firebase');
 
       final localEntries = _hiveService.getAllForUser(userId);
       final localById = <String, MoodEntry>{
@@ -110,7 +107,7 @@ class MoodRepository {
       }
       await _hiveService.putAll(merged);
 
-      appLogger.i('Merged ${merged.length} entries into local Hive');
+      appLogger.d('Merged ${merged.length} entries into local Hive');
       return _hiveService.getAllForUser(userId);
     } catch (e, stackTrace) {
       appLogger.e(
