@@ -41,7 +41,7 @@
   <body>
     <main>
       <h1>DailyPulse Privacy Policy</h1>
-      <p class="updated">Last updated: 8 November 2026</p>
+      <p class="updated">Last updated: 9 November 2026</p>
 
       <p>
         DailyPulse is a mood tracking app. This policy explains what data the
@@ -77,6 +77,14 @@
             "Performance" or "Bug"), the time, and your account ID. There is no
             free-text field.</li>
       </ul>
+      <p><strong>Crash reports</strong></p>
+      <ul>
+        <li>If the app crashes or hits an unexpected error, Firebase
+            Crashlytics receives a technical report: the error and stack
+            trace, app version, Android version, device model and a random
+            installation ID. Reports do not include your email, name, mood
+            entries or notes.</li>
+      </ul>
       <p><strong>On your device only</strong></p>
       <ul>
         <li>Onboarding state, daily reminder settings (time, sound, vibration),
@@ -97,14 +105,17 @@
         are stored in your private account in Cloud Firestore. Only your account
         can read your entries and profile. Feedback can be written but not read
         back by the app. Data in transit is encrypted. Sign-in is handled by
-        Firebase Authentication and Google Sign-In, which process data on our
+        Firebase Authentication and Google Sign-In, and crash reports by
+        Firebase Crashlytics. These Google services process data on our
         behalf.
       </p>
 
       <h2>What we do not do</h2>
       <ul>
         <li>We do not sell your data or share it with advertisers.</li>
-        <li>We do not use analytics, advertising or tracking SDKs.</li>
+        <li>We do not use analytics, advertising or tracking SDKs. The only
+            diagnostic tool we use is Firebase Crashlytics, to find and fix
+            crashes.</li>
         <li>Mood notes are never shown to anyone else.</li>
       </ul>
 

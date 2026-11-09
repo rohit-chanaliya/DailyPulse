@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dailypulse/core/di/injection.dart';
 import 'package:dailypulse/core/router/app_router.dart';
 import 'package:dailypulse/core/services/app_preferences.dart';
+import 'package:dailypulse/core/services/crash_reporting.dart';
 import 'package:dailypulse/core/theme/app_theme.dart';
 import 'package:dailypulse/features/mood/datasource/hive_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +20,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await CrashReporting.init();
   await HiveService.init();
   await AppPreferences.init();
 

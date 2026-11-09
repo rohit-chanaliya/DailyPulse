@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
+import 'package:dailypulse/core/services/crash_reporting.dart';
+
 /// Global logger instance for the application.
 ///
 /// Debug builds log everything with a pretty printer. Release builds only log
-/// warnings and errors in a compact format.
+/// warnings and errors in a compact format, and errors are also sent to
+/// Crashlytics as non-fatal reports.
 ///
 /// Usage:
 /// - appLogger.d('Debug message');
@@ -23,4 +26,7 @@ final appLogger = Logger(
           dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
         ),
   level: kReleaseMode ? Level.warning : Level.debug,
+  output: kReleaseMode
+      ? MultiOutput([ConsoleOutput(), CrashlyticsLogOutput()])
+      : ConsoleOutput(),
 );
